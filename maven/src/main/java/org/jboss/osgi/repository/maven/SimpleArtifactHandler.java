@@ -21,15 +21,20 @@
  */
 package org.jboss.osgi.repository.maven;
 
+import org.jboss.logging.Logger;
 import org.jboss.osgi.repository.ArtifactCoordinates;
 import org.jboss.osgi.repository.ArtifactHandler;
+import org.jboss.osgi.repository.RepositoryResolutionException;
 import org.osgi.framework.BundleContext;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A simple {@link ArtifactHandler} that uses .
@@ -37,7 +42,9 @@ import java.util.List;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-class URLStreamArtifactHandler implements ArtifactHandler {
+class SimpleArtifactHandler implements ArtifactHandler {
+
+    private static Logger log = Logger.getLogger(SimpleArtifactHandler.class);
 
     private static String JBOSS_NEXUS_BASE = "http://repository.jboss.org/nexus/content/groups/public";
     private static String MAVEN_CENTRAL_BASE = "http://repo1.maven.org/maven2";
@@ -45,24 +52,38 @@ class URLStreamArtifactHandler implements ArtifactHandler {
     private final BundleContext context;
     private final URL[] baserepos;
 
-    URLStreamArtifactHandler(BundleContext context) {
+    SimpleArtifactHandler(BundleContext context) {
         this.context = context;
-        baserepos = new URL[]{getBaseURL(JBOSS_NEXUS_BASE), getBaseURL(MAVEN_CENTRAL_BASE)};
+
+        List<URL> repos = new ArrayList<URL>();
+        String userhome = System.getProperty("user.home");
+        File localrepo = new File(userhome + File.separator + ".m2" + File.separator + "repository");
+        if (localrepo.isDirectory()) {
+            repos.add(getBaseURL(localrepo.toURI().toString()));
+        }
+        repos.add(getBaseURL(JBOSS_NEXUS_BASE));
+        repos.add(getBaseURL(MAVEN_CENTRAL_BASE));
+        baserepos = repos.toArray(new URL[repos.size()]);
     }
 
     @Override
     public URL[] resolveArtifacts(ArtifactCoordinates coordinates) {
-        List<URL> result = new ArrayList<URL>();
+        URL result = null;
         for (URL baseURL : baserepos) {
             URL url = coordinates.toArtifactURL(baseURL);
             try {
                 url.openStream().close();
-                result.add(url);
+                result = url;
+                break;
             } catch (IOException e) {
                 // ignore
             }
         }
-        return result.toArray(new URL[result.size()]);
+        if (result == null)
+            throw new RepositoryResolutionException("Cannot resolve: " + coordinates);
+
+        log.infof("resolved %s -> %s", coordinates, result);
+        return new URL[]{result};
     }
 
     @Override

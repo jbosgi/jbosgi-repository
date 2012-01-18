@@ -31,7 +31,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.repository.Repository;
 import org.osgi.util.tracker.ServiceTracker;
 
-import java.io.File;
 import java.net.URL;
 
 /**
@@ -62,7 +61,7 @@ public class RepositoryActivator implements BundleActivator {
         private ArtifactHandler delegate;
 
         TrackingArtifactHandler(BundleContext context) {
-            delegate = new URLStreamArtifactHandler(context);
+            delegate = new SimpleArtifactHandler(context);
             ServiceTracker tracker = new ServiceTracker(context, ArtifactHandler.class.getName(), null) {
 
                 @Override
@@ -73,7 +72,7 @@ public class RepositoryActivator implements BundleActivator {
                 @Override
                 public void removedService(ServiceReference reference, Object service) {
                     super.removedService(reference, service);
-                    delegate = new URLStreamArtifactHandler(context);                }
+                    delegate = new SimpleArtifactHandler(context);                }
             };
             tracker.open();
         }

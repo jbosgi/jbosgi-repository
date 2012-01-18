@@ -21,6 +21,7 @@
  */
 package org.jboss.osgi.repository.maven;
 
+import org.jboss.logging.Logger;
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.ArtifactCoordinates;
@@ -68,6 +69,8 @@ import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMES
  */
 public class MavenDelegateRepository implements XRepository {
 
+    private static Logger log = Logger.getLogger(MavenDelegateRepository.class);
+
     private final ArtifactHandler artifactHandler;
 
     public MavenDelegateRepository(ArtifactHandler artifactHandler) {
@@ -95,13 +98,17 @@ public class MavenDelegateRepository implements XRepository {
 
     @Override
     public XCapability findProvider(XRequirement req) {
+        XCapability cap = null;
         String namespace = req.getNamespace();
         if (MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
             SortedSet<Capability> caps = processMavenIdentity(req);
-            return caps.isEmpty() ? null : (XCapability) caps.first();
+            if (caps.isEmpty() == false)
+                cap = (XCapability) caps.first();
         } else {
             throw new NotImplementedException("Unsupported requirement namespace: " + namespace);
         }
+        log.infof("findProvider %s -> %s", req, cap);
+        return cap;
     }
 
     @Override
