@@ -27,15 +27,15 @@ import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.RequirementBuilder;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.maven.MavenDelegateRepository;
+import org.jboss.osgi.repository.maven.ShrinkwrapArtifactHandler;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XRequirement;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.Version;
 import org.osgi.framework.resource.Capability;
-import org.osgi.service.repository.Repository;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.SortedSet;
 import java.util.jar.JarInputStream;
@@ -57,7 +57,14 @@ public class MavenDelegateTestCase  {
 
     @Before
     public void setUp() {
-        repository = new MavenDelegateRepository();
+        repository = new MavenDelegateRepository(new ShrinkwrapArtifactHandler());
+    }
+
+    @Test
+    public void testFindProvider() throws Exception {
+        RequirementBuilder builder = repository.getRequirementBuilder();
+        XRequirement req = builder.createArtifactRequirement("org.apache.felix:org.apache.felix.configadmin:1.2.8");
+        verifyCapability(repository.findProvider(req));
     }
 
     @Test
@@ -81,10 +88,13 @@ public class MavenDelegateTestCase  {
         verifyProviders(repository.findProviders(req));
     }
 
-    private void verifyProviders(SortedSet<Capability> caps) throws IOException {
+    private void verifyProviders(SortedSet<Capability> caps) throws Exception {
         assertEquals("One capability", 1, caps.size());
-        XIdentityCapability icap = (XIdentityCapability) caps.first();
+        verifyCapability(caps.first());
+    }
 
+    private void verifyCapability(Capability cap) throws Exception {
+        XIdentityCapability icap = (XIdentityCapability) cap;
         assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
         assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());
         assertEquals(IDENTITY_TYPE_BUNDLE, icap.getType());

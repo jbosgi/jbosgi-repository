@@ -23,25 +23,26 @@ package org.jboss.osgi.repository.maven;
 
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
+import org.jboss.osgi.repository.ArtifactCoordinates;
+import org.jboss.osgi.repository.ArtifactHandler;
+import org.jboss.osgi.repository.RepositoryResolutionException;
 import org.jboss.osgi.repository.RequirementBuilder;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.internal.AbstractRequirementBuilder;
 import org.jboss.osgi.repository.internal.NotImplementedException;
+import org.jboss.osgi.resolver.XCapability;
+import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.spi.AbstractBundleRevision;
 import org.jboss.osgi.resolver.spi.ResourceIndexComparator;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
 import org.osgi.framework.resource.Resource;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -61,6 +62,12 @@ import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMES
  */
 public class MavenDelegateRepository implements XRepository {
 
+    private final ArtifactHandler artifactHandler;
+
+    public MavenDelegateRepository(ArtifactHandler artifactHandler) {
+        this.artifactHandler =artifactHandler;
+    }
+
     @Override
     public RequirementBuilder getRequirementBuilder() {
         return AbstractRequirementBuilder.INSTANCE;
@@ -70,7 +77,6 @@ public class MavenDelegateRepository implements XRepository {
     public SortedSet<Capability> findProviders(Requirement req) {
         if (req == null)
             throw new IllegalArgumentException("Null req");
-
         SortedSet<Capability> result;
         String namespace = req.getNamespace();
         if (MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
@@ -82,18 +88,31 @@ public class MavenDelegateRepository implements XRepository {
     }
 
     @Override
+    public XCapability findProvider(XRequirement req) {
+        String namespace = req.getNamespace();
+        if (MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
+            SortedSet<Capability> caps = processMavenIdentity(req);
+            return caps.isEmpty() ? null : (XCapability) caps.first();
+        } else {
+            throw new NotImplementedException("Unsupported requirement namespace: " + namespace);
+        }
+    }
+
+    @Override
     public Map<Requirement, SortedSet<Capability>> findProviders(Collection<? extends Requirement> requirements) {
         throw new NotImplementedException();
     }
 
     private SortedSet<Capability> processMavenIdentity(Requirement req) {
         String mavenId = (String) req.getAttributes().get(MAVEN_IDENTITY_NAMESPACE);
-        MavenDependencyResolver resolver = DependencyResolvers.use(MavenDependencyResolver.class).artifact(mavenId);
-        File[] files = resolver.resolveAsFiles();
-        return processResolutionResult(files);
+        ArtifactCoordinates coordinates = ArtifactCoordinates.parse(mavenId);
+        URL[] urls = artifactHandler.resolveArtifacts(coordinates);
+        SortedSet<Capability> result = processResolutionResult(urls);
+        artifactHandler.storeArtifacts(coordinates, urls);
+        return result;
     }
 
-    private SortedSet<Capability> processResolutionResult(File[] files) {
+    private SortedSet<Capability> processResolutionResult(URL[] urls) {
         final List<Resource> resources = new ArrayList<Resource>();
         SortedSet<Capability> result = new TreeSet<Capability>(new ResourceIndexComparator() {
             @Override
@@ -101,8 +120,8 @@ public class MavenDelegateRepository implements XRepository {
                 return resources.indexOf(res);
             }
         });
-        for (File file : files) {
-            XResource resource = new FileBasedResource(file);
+        for (URL url : urls) {
+            XResource resource = new URLBasedResource(url);
             resources.add(resource);
             XResourceBuilder builder = XResourceBuilder.INSTANCE;
             InputStream content = resource.getContent();
@@ -132,20 +151,20 @@ public class MavenDelegateRepository implements XRepository {
         }
     }
 
-    private static class FileBasedResource extends AbstractBundleRevision {
+    private static class URLBasedResource extends AbstractBundleRevision {
 
-        private final File file;
-        
-        FileBasedResource(File file) {
-            this.file = file;
+        private final URL url;
+
+        URLBasedResource(URL url) {
+            this.url = url;
         }
         
         @Override
         public InputStream getContent() {
             try {
-                return new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-                throw new IllegalStateException("File not found: " + file);
+                return url.openStream();
+            } catch (IOException e) {
+                throw new RepositoryResolutionException(e);
             }
         }
     }

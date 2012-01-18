@@ -21,20 +21,17 @@
  */
 package org.jboss.osgi.repository;
 
-import org.jboss.osgi.resolver.XCapability;
-import org.jboss.osgi.resolver.XRequirement;
-import org.osgi.service.repository.Repository;
+import java.net.URL;
 
 /**
- * An extension to the {@code Repository}
+ * Handles resolution and storage of repository artifacts
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public interface XRepository extends Repository {
+public interface ArtifactHandler {
 
-    RequirementBuilder getRequirementBuilder();
+    URL[] resolveArtifacts(ArtifactCoordinates coordinates) throws RepositoryResolutionException;
 
-    // [TODO] Remove when osgi.core R5 is generally available
-    XCapability findProvider(XRequirement req);
+    void storeArtifacts(ArtifactCoordinates coordinates, URL[] urls);
 }
