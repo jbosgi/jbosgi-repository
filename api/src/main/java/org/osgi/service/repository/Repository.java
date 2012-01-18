@@ -20,14 +20,13 @@
 
 package org.osgi.service.repository;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.SortedSet;
-
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
 import org.osgi.framework.resource.Resource;
 import org.osgi.service.resolver.Environment;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Represents a repository that contains {@link Resource resources}.
@@ -71,7 +70,7 @@ public interface Repository {
    *  
    * @throws NullPointerException if the requirement is null
    */
-  SortedSet<Capability> findProviders(Requirement requirement);
+  Collection<Capability> findProviders(Requirement requirement);
 
   /**
    * Find any capabilities that match the supplied requirements.
@@ -85,5 +84,5 @@ public interface Repository {
    * 
    * @throws NullPointerException if requirements is null
    */
-  Map<Requirement, SortedSet<Capability>> findProviders(Collection<? extends Requirement> requirements);
+  Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> requirements);
 }

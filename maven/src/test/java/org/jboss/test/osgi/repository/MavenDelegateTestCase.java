@@ -29,22 +29,18 @@ import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.maven.MavenDelegateRepository;
 import org.jboss.osgi.repository.maven.ShrinkwrapArtifactHandler;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
-import org.jboss.osgi.resolver.v2.XIdentityCapability;
-import org.jboss.osgi.resolver.v2.XRequirement;
 import org.jboss.osgi.resolver.v2.XRequirement;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.Version;
 import org.osgi.framework.resource.Capability;
 
 import java.io.InputStream;
-import java.util.SortedSet;
+import java.util.Collection;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.osgi.framework.resource.ResourceConstants.IDENTITY_TYPE_BUNDLE;
 
 /**
@@ -90,9 +86,9 @@ public class MavenDelegateTestCase  {
         verifyProviders(repository.findProviders(req));
     }
 
-    private void verifyProviders(SortedSet<Capability> caps) throws Exception {
+    private void verifyProviders(Collection<Capability> caps) throws Exception {
         assertEquals("One capability", 1, caps.size());
-        verifyCapability(caps.first());
+        verifyCapability(caps.iterator().next());
     }
 
     private void verifyCapability(Capability cap) throws Exception {

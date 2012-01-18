@@ -32,20 +32,12 @@ import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.internal.AbstractRequirementBuilder;
 import org.jboss.osgi.repository.internal.NotImplementedException;
 import org.jboss.osgi.resolver.v2.XCapability;
-import org.jboss.osgi.resolver.v2.XCapability;
-import org.jboss.osgi.resolver.v2.XRequirement;
 import org.jboss.osgi.resolver.v2.XRequirement;
 import org.jboss.osgi.resolver.v2.XResource;
-import org.jboss.osgi.resolver.v2.XResource;
-import org.jboss.osgi.resolver.v2.XResourceBuilder;
 import org.jboss.osgi.resolver.v2.XResourceBuilder;
 import org.jboss.osgi.resolver.v2.spi.AbstractBundleRevision;
-import org.jboss.osgi.resolver.v2.spi.AbstractBundleRevision;
-import org.jboss.osgi.resolver.v2.spi.ResourceIndexComparator;
-import org.jboss.osgi.resolver.v2.spi.ResourceIndexComparator;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
-import org.osgi.framework.resource.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,8 +46,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
@@ -83,10 +73,10 @@ public class MavenDelegateRepository implements XRepository {
     }
 
     @Override
-    public SortedSet<Capability> findProviders(Requirement req) {
+    public Collection<Capability> findProviders(Requirement req) {
         if (req == null)
             throw new IllegalArgumentException("Null req");
-        SortedSet<Capability> result;
+        Collection<Capability> result;
         String namespace = req.getNamespace();
         if (MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
             result = processMavenIdentity(req);
@@ -101,9 +91,9 @@ public class MavenDelegateRepository implements XRepository {
         XCapability cap = null;
         String namespace = req.getNamespace();
         if (MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
-            SortedSet<Capability> caps = processMavenIdentity(req);
+            List<Capability> caps = processMavenIdentity(req);
             if (caps.isEmpty() == false)
-                cap = (XCapability) caps.first();
+                cap = (XCapability) caps.get(0);
         } else {
             throw new NotImplementedException("Unsupported requirement namespace: " + namespace);
         }
@@ -112,30 +102,23 @@ public class MavenDelegateRepository implements XRepository {
     }
 
     @Override
-    public Map<Requirement, SortedSet<Capability>> findProviders(Collection<? extends Requirement> requirements) {
+    public Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> requirements) {
         throw new NotImplementedException();
     }
 
-    private SortedSet<Capability> processMavenIdentity(Requirement req) {
+    private List<Capability> processMavenIdentity(Requirement req) {
         String mavenId = (String) req.getAttributes().get(MAVEN_IDENTITY_NAMESPACE);
         ArtifactCoordinates coordinates = ArtifactCoordinates.parse(mavenId);
         URL[] urls = artifactHandler.resolveArtifacts(coordinates);
-        SortedSet<Capability> result = processResolutionResult(urls);
+        List<Capability> result = processResolutionResult(urls);
         artifactHandler.storeArtifacts(coordinates, urls);
         return result;
     }
 
-    private SortedSet<Capability> processResolutionResult(URL[] urls) {
-        final List<Resource> resources = new ArrayList<Resource>();
-        SortedSet<Capability> result = new TreeSet<Capability>(new ResourceIndexComparator() {
-            @Override
-            protected long getResourceIndex(Resource res) {
-                return resources.indexOf(res);
-            }
-        });
+    private List<Capability> processResolutionResult(URL[] urls) {
+        List<Capability> result = new ArrayList<Capability>();
         for (URL url : urls) {
             XResource resource = new URLBasedResource(url);
-            resources.add(resource);
             XResourceBuilder builder = XResourceBuilder.INSTANCE;
             InputStream content = resource.getContent();
             try {
