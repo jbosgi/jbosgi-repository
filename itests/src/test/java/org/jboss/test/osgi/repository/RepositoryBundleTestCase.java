@@ -20,18 +20,22 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.osgi.repository.RequirementBuilder;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.resolver.XCapability;
-import org.jboss.osgi.resolver.XRequirement;
+import org.jboss.osgi.resolver.v2.XCapability;
+import org.jboss.osgi.resolver.v2.XIdentityCapability;
+import org.jboss.osgi.resolver.v2.XRequirement;
 import org.jboss.osgi.testing.OSGiManifestBuilder;
+import org.jboss.osgi.testing.OSGiTestHelper;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.resource.Resource;
 import org.osgi.service.repository.Repository;
 
 import javax.inject.Inject;
@@ -50,9 +54,6 @@ public class RepositoryBundleTestCase {
     @Inject
     public BundleContext context;
 
-    @Inject
-    public Bundle bundle;
-
     @Deployment
     public static JavaArchive createdeployment() {
         final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "example-bundle");
@@ -62,7 +63,8 @@ public class RepositoryBundleTestCase {
                 OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
                 builder.addBundleSymbolicName(archive.getName());
                 builder.addBundleManifestVersion(2);
-                builder.addImportPackages(BundleActivator.class, Repository.class, XRepository.class);
+                builder.addImportPackages(BundleActivator.class, Repository.class, Resource.class);
+                builder.addImportPackages(XRepository.class, XCapability.class);
                 return builder.openStream();
             }
         });
@@ -82,8 +84,18 @@ public class RepositoryBundleTestCase {
         XRequirement req = reqbuilder.createArtifactRequirement("org.apache.felix:org.apache.felix.configadmin:1.2.8");
         assertNotNull("Requirement not null", req);
 
-        XCapability xcap = xrepo.findProvider(req);
+        XCapability xcap = (XCapability) xrepo.findProvider(req);
         assertNotNull("Capability not null", xcap);
 
+        String identity = (String) xcap.getAttribute("osgi.identity");
+        Assert.assertEquals("org.apache.felix.configadmin", identity);
+        InputStream content = xcap.getResource().getContent();
+        try {
+            Bundle bundle = context.installBundle(identity, content);
+            bundle.start();
+            OSGiTestHelper.assertBundleState(Bundle.ACTIVE, bundle.getState());
+        } finally {
+            content.close();
+        }
     }
 }

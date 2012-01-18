@@ -22,8 +22,10 @@
 package org.jboss.osgi.repository.internal;
 
 import org.jboss.osgi.repository.RequirementBuilder;
-import org.jboss.osgi.resolver.XRequirement;
-import org.jboss.osgi.resolver.XResourceBuilder;
+import org.jboss.osgi.resolver.v2.XRequirement;
+import org.jboss.osgi.resolver.v2.XRequirement;
+import org.jboss.osgi.resolver.v2.XResourceBuilder;
+import org.jboss.osgi.resolver.v2.XResourceBuilder;
 
 import java.util.HashMap;
 import java.util.Map;

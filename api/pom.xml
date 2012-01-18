@@ -25,19 +25,10 @@
 
     <!-- Dependencies -->
     <dependencies>
-
         <dependency>
             <groupId>org.jboss.osgi.resolver</groupId>
-            <artifactId>jbosgi-resolver-api</artifactId>
+            <artifactId>jbosgi-resolver-apiv2</artifactId>
         </dependency>
-
-        <!-- OSGi Dependencies -->
-        <dependency>
-            <groupId>org.jboss.osgi.core</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
     </dependencies>
 
 </project>

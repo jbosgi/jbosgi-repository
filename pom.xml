@@ -38,13 +38,13 @@
         <version.jboss.arquillian.osgi>1.0.0.CR5-SNAPSHOT</version.jboss.arquillian.osgi>
         <version.jboss.logmanager>1.2.0.GA</version.jboss.logmanager>
         <version.jboss.osgi.resolver>2.0.0.Alpha2-SNAPSHOT</version.jboss.osgi.resolver>
-        <version.jboss.osgi.core>5.0.CR3-SNAPSHOT</version.jboss.osgi.core>
         <version.jboss.osgi.framework>1.1.0</version.jboss.osgi.framework>
         <version.jboss.osgi.spi>1.0.28</version.jboss.osgi.spi>
         <version.jboss.shrinkwrap>1.0.0-cr-1</version.jboss.shrinkwrap>
         <version.jboss.shrinkwrap.resolver>1.0.0-beta-5</version.jboss.shrinkwrap.resolver>
         <version.mockito>1.8.4</version.mockito>
         <version.osgi.compendium>4.2.0</version.osgi.compendium>
+        <version.osgi.core>4.2.0</version.osgi.core>
     </properties>
 
     <!-- Dependency Management -->
@@ -71,18 +71,13 @@
                 <version>${version.jboss.logmanager}</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.osgi.core</groupId>
-                <artifactId>org.osgi.core</artifactId>
-                <version>${version.jboss.osgi.core}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.jboss.osgi.framework</groupId>
                 <artifactId>jbosgi-framework-core</artifactId>
                 <version>${version.jboss.osgi.framework}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.osgi.resolver</groupId>
-                <artifactId>jbosgi-resolver-api</artifactId>
+                <artifactId>jbosgi-resolver-apiv2</artifactId>
                 <version>${version.jboss.osgi.resolver}</version>
             </dependency>
             <dependency>
@@ -94,6 +89,11 @@
                 <groupId>org.jboss.shrinkwrap.resolver</groupId>
                 <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
                 <version>${version.jboss.shrinkwrap.resolver}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${version.osgi.core}</version>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>

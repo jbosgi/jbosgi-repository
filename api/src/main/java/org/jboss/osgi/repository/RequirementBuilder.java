@@ -21,7 +21,8 @@
  */
 package org.jboss.osgi.repository;
 
-import org.jboss.osgi.resolver.XRequirement;
+import org.jboss.osgi.resolver.v2.XRequirement;
+import org.jboss.osgi.resolver.v2.XRequirement;
 
 /**
  * A builder for resource requirements

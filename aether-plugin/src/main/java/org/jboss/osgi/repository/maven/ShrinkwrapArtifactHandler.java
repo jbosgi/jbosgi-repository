@@ -28,7 +28,6 @@ import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
 import org.jboss.shrinkwrap.resolver.api.ResolutionException;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 
-import javax.jnlp.FileSaveService;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;

@@ -21,8 +21,10 @@
  */
 package org.jboss.osgi.repository;
 
-import org.jboss.osgi.resolver.XCapability;
-import org.jboss.osgi.resolver.XRequirement;
+import org.jboss.osgi.resolver.v2.XCapability;
+import org.jboss.osgi.resolver.v2.XCapability;
+import org.jboss.osgi.resolver.v2.XRequirement;
+import org.jboss.osgi.resolver.v2.XRequirement;
 import org.osgi.service.repository.Repository;
 
 /**
