@@ -15,10 +15,11 @@
     <parent>
         <groupId>org.jboss.osgi</groupId>
         <artifactId>jboss-osgi-parent</artifactId>
-        <version>1.0.10</version>
+        <version>1.0.12</version>
     </parent>
 
     <name>JBossOSGi Repository</name>
+
     <groupId>org.jboss.osgi.repository</groupId>
     <artifactId>jbosgi-repository-parent</artifactId>
     <packaging>pom</packaging>
@@ -35,16 +36,15 @@
     <!-- Properties -->
     <properties>
         <version.jboss.arquillian.core>1.0.0.CR7</version.jboss.arquillian.core>
-        <version.jboss.arquillian.osgi>1.0.0.CR5-SNAPSHOT</version.jboss.arquillian.osgi>
+        <version.jboss.arquillian.osgi>1.0.0.CR5</version.jboss.arquillian.osgi>
         <version.jboss.logmanager>1.2.0.GA</version.jboss.logmanager>
-        <version.jboss.osgi.resolver>2.0.0.Alpha2-SNAPSHOT</version.jboss.osgi.resolver>
+        <version.jboss.osgi.resolver>2.0.0.Alpha2</version.jboss.osgi.resolver>
         <version.jboss.osgi.framework>1.1.0</version.jboss.osgi.framework>
-        <version.jboss.osgi.spi>1.0.28</version.jboss.osgi.spi>
         <version.jboss.shrinkwrap>1.0.0-cr-1</version.jboss.shrinkwrap>
         <version.jboss.shrinkwrap.resolver>1.0.0-beta-5</version.jboss.shrinkwrap.resolver>
+        <version.junit>4.10</version.junit>
         <version.mockito>1.8.4</version.mockito>
-        <version.osgi.compendium>4.2.0</version.osgi.compendium>
-        <version.osgi.core>4.2.0</version.osgi.core>
+        <version.osgi>4.2.0</version.osgi>
     </properties>
 
     <!-- Dependency Management -->
@@ -54,11 +54,6 @@
                 <groupId>org.jboss.arquillian.junit</groupId>
                 <artifactId>arquillian-junit-container</artifactId>
                 <version>${version.jboss.arquillian.core}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.arquillian.osgi</groupId>
-                <artifactId>arquillian-osgi-bundle</artifactId>
-                <version>${version.jboss.arquillian.osgi}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.arquillian.container</groupId>
@@ -81,24 +76,24 @@
                 <version>${version.jboss.osgi.resolver}</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.osgi.spi</groupId>
-                <artifactId>jbosgi-spi</artifactId>
-                <version>${version.jboss.osgi.spi}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.jboss.shrinkwrap.resolver</groupId>
                 <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
                 <version>${version.jboss.shrinkwrap.resolver}</version>
             </dependency>
             <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.core</artifactId>
-                <version>${version.osgi.core}</version>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${version.junit}</version>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.compendium</artifactId>
-                <version>${version.osgi.compendium}</version>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${version.osgi}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.enterprise</artifactId>
+                <version>${version.osgi}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -106,8 +101,8 @@
     <!-- Modules -->
     <modules>
         <module>api</module>
-        <module>maven</module>
-        <module>aether-plugin</module>
+        <module>bundle</module>
+        <module>plugins</module>
         <module>itests</module>
     </modules>
 

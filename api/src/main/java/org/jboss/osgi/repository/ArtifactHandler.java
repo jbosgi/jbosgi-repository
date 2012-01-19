@@ -21,6 +21,7 @@
  */
 package org.jboss.osgi.repository;
 
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -31,7 +32,21 @@ import java.net.URL;
  */
 public interface ArtifactHandler {
 
+    /**
+     * Resolve the the given artifact coordinates.
+     *
+     * @param coordinates the artifact coordinates
+     * @return An array of URLs that match the given coordinates or an empty array.
+     * @throws RepositoryResolutionException on resolution error
+     */
     URL[] resolveArtifacts(ArtifactCoordinates coordinates) throws RepositoryResolutionException;
 
-    void storeArtifacts(ArtifactCoordinates coordinates, URL[] urls);
+    /**
+     * Store the artifacts to the internal cache.
+     *
+     * @param coordinates the artifact coordinates
+     * @return An array of URLs that now point to the internal cache..
+     * @throws RepositoryStorageException on artifact storage error
+     */
+    URL[] storeArtifacts(ArtifactCoordinates coordinates, URL[] urls) throws RepositoryStorageException;
 }

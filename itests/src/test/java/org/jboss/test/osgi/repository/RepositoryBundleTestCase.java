@@ -22,25 +22,27 @@ import org.jboss.osgi.repository.RequirementBuilder;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.v2.XCapability;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
-import org.jboss.osgi.resolver.v2.XRequirement;
 import org.jboss.osgi.testing.OSGiManifestBuilder;
 import org.jboss.osgi.testing.OSGiTestHelper;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.resource.Capability;
+import org.osgi.framework.resource.Requirement;
 import org.osgi.framework.resource.Resource;
 import org.osgi.service.repository.Repository;
 
 import javax.inject.Inject;
 import java.io.InputStream;
+import java.util.Collection;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -81,17 +83,17 @@ public class RepositoryBundleTestCase {
 
         XRepository xrepo = (XRepository) repo;
         RequirementBuilder reqbuilder = xrepo.getRequirementBuilder();
-        XRequirement req = reqbuilder.createArtifactRequirement("org.apache.felix:org.apache.felix.configadmin:1.2.8");
+        Requirement req = reqbuilder.createArtifactRequirement("org.apache.felix:org.apache.felix.configadmin:1.2.8");
         assertNotNull("Requirement not null", req);
 
-        XCapability xcap = (XCapability) xrepo.findProvider(req);
-        assertNotNull("Capability not null", xcap);
+        Collection<Capability> caps = xrepo.findProviders(req);
+        assertEquals("Capability not null", 1, caps.size());
 
-        String identity = (String) xcap.getAttribute("osgi.identity");
-        Assert.assertEquals("org.apache.felix.configadmin", identity);
+        XIdentityCapability xcap = (XIdentityCapability) caps.iterator().next();
+        assertEquals("org.apache.felix.configadmin", xcap.getSymbolicName());
         InputStream content = xcap.getResource().getContent();
         try {
-            Bundle bundle = context.installBundle(identity, content);
+            Bundle bundle = context.installBundle(xcap.getSymbolicName(), content);
             bundle.start();
             OSGiTestHelper.assertBundleState(Bundle.ACTIVE, bundle.getState());
         } finally {

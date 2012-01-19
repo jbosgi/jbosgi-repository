@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ====================================================================== -->
+<!--                                                                        -->
+<!-- JBoss, the OpenSource J2EE webOS                                       -->
+<!--                                                                        -->
+<!-- Distributable under LGPL license.                                      -->
+<!-- See terms of license at http://www.gnu.org.                            -->
+<!--                                                                        -->
+<!-- ====================================================================== -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jboss.osgi.repository</groupId>
+        <artifactId>jbosgi-repository-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <name>JBossOSGi Repository: Bundle</name>
+
+    <groupId>org.jboss.osgi.repository</groupId>
+    <artifactId>jbosgi-repository</artifactId>
+    <packaging>bundle</packaging>
+
+    <!-- Properties -->
+    <properties>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.osgi.repository</groupId>
+            <artifactId>jbosgi-repository-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- OSGi Dependencies -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.enterprise</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.jboss.osgi.repository</groupId>
+            <artifactId>jbosgi-repository-plugin-shrinkwrap</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Activator>org.jboss.osgi.repository.internal.RepositoryActivator</Bundle-Activator>
+                        <Export-Package />
+                        <Import-Package>
+                            org.jboss.logging;version="[3.0,4.0)",
+                            org.osgi.framework;version="[1.5,2.0)",
+                            org.osgi.util.tracker;version="[1.4,2.0)",
+
+                            !javax.security.auth.x500
+                        </Import-Package>
+                        <Embed-Transitive>true</Embed-Transitive>
+                        <Embed-Dependency>
+                            jbosgi-metadata;inline=false,
+                            jbosgi-repository-api;inline=false,
+                            jbosgi-resolver-apiv2;inline=false,
+                        </Embed-Dependency>
+                        <_exportcontents>
+                            org.jboss.osgi.repository;version=${project.version},
+                            org.jboss.osgi.resolver.v2;version=${version.jboss.osgi.resolver},
+                            org.osgi.framework.resource;version=1.0,
+                            org.osgi.framework.wiring;version=1.1,
+                            org.osgi.service.repository;version=1.0,
+                            org.osgi.service.resolver;version=1.0,
+                        </_exportcontents>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

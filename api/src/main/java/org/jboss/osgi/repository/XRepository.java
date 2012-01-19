@@ -21,10 +21,6 @@
  */
 package org.jboss.osgi.repository;
 
-import org.jboss.osgi.resolver.v2.XCapability;
-import org.jboss.osgi.resolver.v2.XCapability;
-import org.jboss.osgi.resolver.v2.XRequirement;
-import org.jboss.osgi.resolver.v2.XRequirement;
 import org.osgi.service.repository.Repository;
 
 /**
@@ -36,7 +32,4 @@ import org.osgi.service.repository.Repository;
 public interface XRepository extends Repository {
 
     RequirementBuilder getRequirementBuilder();
-
-    // [TODO] Remove when osgi.core R5 is generally available
-    XCapability findProvider(XRequirement req);
 }
