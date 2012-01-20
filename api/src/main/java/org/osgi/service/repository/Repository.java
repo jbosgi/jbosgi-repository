@@ -30,59 +30,55 @@ import java.util.Map;
 
 /**
  * Represents a repository that contains {@link Resource resources}.
- * 
- * <p>
+ * <p/>
+ * <p/>
  * Repositories may be registered as services and may be used as inputs to an
  * {@link Environment#findProviders(Requirement)} operation.
- * 
- * <p>
+ * <p/>
+ * <p/>
  * Repositories registered as services may be filtered using standard service
  * properties.
- * 
- * @ThreadSafe
+ *
  * @version $Id: 95cb10e57c1262d6aae8e3bb5e9d3fa4f8d1cd64 $
+ * @ThreadSafe
  */
 public interface Repository {
-  /**
-   * Service attribute to uniquely identify this repository
-   */
-  final String ID = "repository.id";
+    /**
+     * Service attribute to uniquely identify this repository
+     */
+    final String ID = "repository.id";
 
-  /**
-   * Service attribute to define the name of this repository
-   */
-  final String NAME = "repository.name";
+    /**
+     * Service attribute to define the name of this repository
+     */
+    final String NAME = "repository.name";
 
-  /**
-   * Service attribute to provide a human readable name for this repository
-   */
-  final String DISPLAY_NAME = "repository.displayName";
+    /**
+     * Service attribute to provide a human readable name for this repository
+     */
+    final String DISPLAY_NAME = "repository.displayName";
 
-  /**
-   * Find any capabilities that match the supplied requirement.
-   * 
-   * <p>
-   * See {@link Environment#findProviders} for a discussion on matching.
-   * 
-   * @param requirement The requirement that should be matched
-   * 
-   * @return A collection of capabilities that match the supplied requirement
-   *  
-   * @throws NullPointerException if the requirement is null
-   */
-  Collection<Capability> findProviders(Requirement requirement);
+    /**
+     * Find any capabilities that match the supplied requirement.
+     * <p/>
+     * <p/>
+     * See {@link Environment#findProviders} for a discussion on matching.
+     *
+     * @param requirement The requirement that should be matched
+     * @return A collection of capabilities that match the supplied requirement
+     * @throws NullPointerException if the requirement is null
+     */
+    Collection<Capability> findProviders(Requirement requirement);
 
-  /**
-   * Find any capabilities that match the supplied requirements.
-   * 
-   * <p>
-   * See {@link Environment#findProviders} for a discussion on matching.
-   * 
-   * @param requirements the requirements that should be matched
-   *
-   * @return A map of requirements to capabilites that match the supplied requirements
-   * 
-   * @throws NullPointerException if requirements is null
-   */
-  Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> requirements);
+    /**
+     * Find any capabilities that match the supplied requirements.
+     * <p/>
+     * <p/>
+     * See {@link Environment#findProviders} for a discussion on matching.
+     *
+     * @param requirements the requirements that should be matched
+     * @return A map of requirements to capabilites that match the supplied requirements
+     * @throws NullPointerException if requirements is null
+     */
+    Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> requirements);
 }

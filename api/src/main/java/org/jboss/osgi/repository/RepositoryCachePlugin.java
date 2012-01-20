@@ -21,32 +21,22 @@
  */
 package org.jboss.osgi.repository;
 
-import java.io.IOException;
+import org.osgi.framework.resource.Capability;
+import org.osgi.framework.resource.Requirement;
+import org.osgi.framework.resource.Resource;
+
 import java.net.URL;
+import java.util.Collection;
 
 /**
- * Handles resolution and storage of repository artifacts
+ * Handles storage of repository artifacts
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public interface ArtifactHandler {
+public interface RepositoryCachePlugin {
 
-    /**
-     * Resolve the the given artifact coordinates.
-     *
-     * @param coordinates the artifact coordinates
-     * @return An array of URLs that match the given coordinates or an empty array.
-     * @throws RepositoryResolutionException on resolution error
-     */
-    URL[] resolveArtifacts(ArtifactCoordinates coordinates) throws RepositoryResolutionException;
+    Collection<Capability> findProviders(Requirement req);
 
-    /**
-     * Store the artifacts to the internal cache.
-     *
-     * @param coordinates the artifact coordinates
-     * @return An array of URLs that now point to the internal cache..
-     * @throws RepositoryStorageException on artifact storage error
-     */
-    URL[] storeArtifacts(ArtifactCoordinates coordinates, URL[] urls) throws RepositoryStorageException;
+    Collection<Capability> storeCapabilities(Collection<Capability> caps) throws RepositoryStorageException;
 }

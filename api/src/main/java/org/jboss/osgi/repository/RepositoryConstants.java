@@ -25,8 +25,8 @@ package org.jboss.osgi.repository;
  * Defines names for the attributes, directives and name spaces for
  * resources, capabilities and requirements in the context of the
  * JBoss Repository.
- *
- * <p>
+ * <p/>
+ * <p/>
  * The values associated with these keys are of type {@code String}, unless
  * otherwise indicated.
  *
@@ -36,8 +36,8 @@ package org.jboss.osgi.repository;
 public final class RepositoryConstants {
 
     // Hide ctor
-	private RepositoryConstants() {
-	}
+    private RepositoryConstants() {
+    }
 
     /**
      * Artifact coordinatess may be given in simple groupId:artifactId:version form,

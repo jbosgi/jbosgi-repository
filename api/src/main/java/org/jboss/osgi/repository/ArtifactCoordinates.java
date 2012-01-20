@@ -53,7 +53,7 @@ public class ArtifactCoordinates {
         return result;
     }
 
-    public ArtifactCoordinates create(String groupId, String artifactId, String version, String type, String classifier) {
+    public static ArtifactCoordinates create(String groupId, String artifactId, String version, String type, String classifier) {
         return new ArtifactCoordinates(groupId, artifactId, type, version, classifier);
     }
 

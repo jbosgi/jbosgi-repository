@@ -21,17 +21,19 @@
  */
 package org.jboss.osgi.repository.internal;
 
-import org.jboss.osgi.repository.ArtifactCoordinates;
-import org.jboss.osgi.repository.ArtifactHandler;
+import org.jboss.osgi.repository.ArtifactProviderPlugin;
+import org.jboss.osgi.repository.RepositoryCachePlugin;
 import org.jboss.osgi.repository.XRepository;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.resource.Capability;
+import org.osgi.framework.resource.Requirement;
 import org.osgi.service.repository.Repository;
 import org.osgi.util.tracker.ServiceTracker;
 
-import java.net.URL;
+import java.util.Collection;
 
 /**
  * An activator for the {@link XRepository} service.
@@ -42,11 +44,12 @@ import java.net.URL;
 public class RepositoryActivator implements BundleActivator {
 
     private ServiceRegistration registration;
-    
+
     @Override
     public void start(final BundleContext context) throws Exception {
-        ArtifactHandler artifactHandler = new TrackingArtifactHandler(context);
-        RepositoryImpl service = new RepositoryImpl(artifactHandler);
+        ArtifactProviderPlugin provider = new TrackingArtifactHandler(context);
+        RepositoryCachePlugin cache = new AbstractRepositoryCache();
+        RepositoryImpl service = new RepositoryImpl(provider,  cache);
         registration = context.registerService(Repository.class.getName(), service, null);
     }
 
@@ -56,35 +59,31 @@ public class RepositoryActivator implements BundleActivator {
             registration.unregister();
     }
 
-    class TrackingArtifactHandler implements ArtifactHandler {
+    class TrackingArtifactHandler implements ArtifactProviderPlugin {
 
-        private ArtifactHandler delegate;
+        private ArtifactProviderPlugin delegate;
 
         TrackingArtifactHandler(BundleContext context) {
             delegate = new SimpleArtifactHandler(context);
-            ServiceTracker tracker = new ServiceTracker(context, ArtifactHandler.class.getName(), null) {
+            ServiceTracker tracker = new ServiceTracker(context, ArtifactProviderPlugin.class.getName(), null) {
 
                 @Override
                 public void modifiedService(ServiceReference reference, Object service) {
-                    delegate = (ArtifactHandler) service;
+                    delegate = (ArtifactProviderPlugin) service;
                 }
 
                 @Override
                 public void removedService(ServiceReference reference, Object service) {
                     super.removedService(reference, service);
-                    delegate = new SimpleArtifactHandler(context);                }
+                    delegate = new SimpleArtifactHandler(context);
+                }
             };
             tracker.open();
         }
 
         @Override
-        public URL[] resolveArtifacts(ArtifactCoordinates coordinates) {
-            return delegate.resolveArtifacts(coordinates);
-        }
-
-        @Override
-        public URL[] storeArtifacts(ArtifactCoordinates coordinates, URL[] urls) {
-            return delegate.storeArtifacts(coordinates, urls);
+        public Collection<Capability> findProviders(Requirement req) {
+            return delegate.findProviders(req);
         }
     }
 

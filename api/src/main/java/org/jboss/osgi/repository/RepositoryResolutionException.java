@@ -22,20 +22,16 @@ package org.jboss.osgi.repository;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class RepositoryResolutionException extends RuntimeException
-{
-   public RepositoryResolutionException(String message)
-   {
-      super(message);
-   }
+public class RepositoryResolutionException extends RuntimeException {
+    public RepositoryResolutionException(String message) {
+        super(message);
+    }
 
-   public RepositoryResolutionException(Throwable cause)
-   {
-      super(cause);
-   }
+    public RepositoryResolutionException(Throwable cause) {
+        super(cause);
+    }
 
-   public RepositoryResolutionException(String message, Throwable cause)
-   {
-      super(message, cause);
-   }
+    public RepositoryResolutionException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

@@ -22,20 +22,16 @@ package org.jboss.osgi.repository;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class RepositoryStorageException extends RuntimeException
-{
-   public RepositoryStorageException(String message)
-   {
-      super(message);
-   }
+public class RepositoryStorageException extends RuntimeException {
+    public RepositoryStorageException(String message) {
+        super(message);
+    }
 
-   public RepositoryStorageException(Throwable cause)
-   {
-      super(cause);
-   }
+    public RepositoryStorageException(Throwable cause) {
+        super(cause);
+    }
 
-   public RepositoryStorageException(String message, Throwable cause)
-   {
-      super(message, cause);
-   }
+    public RepositoryStorageException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

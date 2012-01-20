@@ -19,25 +19,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.osgi.repository.internal;
+package org.jboss.osgi.repository;
+
+import org.jboss.osgi.resolver.v2.XResource;
+import org.osgi.framework.resource.Capability;
+import org.osgi.framework.resource.Requirement;
+
+import java.net.URL;
+import java.util.Map;
 
 /**
- * A RuntimeException that should be thrown for unimplemented features
- * 
+ * A builder for resource requirements
+ *
  * @author thomas.diesler@jboss.com
- * @since 18-Jun-2008
+ * @since 16-Jan-2012
  */
-@SuppressWarnings("serial")
-public class NotImplementedException extends RuntimeException {
+public interface ResourceBuilder {
 
-    public NotImplementedException() {
-    }
-
-    public NotImplementedException(String message) {
-        super(message);
-    }
-
-    public NotImplementedException(String jiraIssue, String message) {
-        super("[" + jiraIssue + "] " + message);
-    }
+    XResource createResource(URL url);
+    
 }

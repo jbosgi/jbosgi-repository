@@ -22,69 +22,69 @@ import org.osgi.framework.resource.Requirement;
  * locate content via the {@link Repository#findProviders(Requirement)} method.
  */
 public final class ContentNamespace {
-	private ContentNamespace() {
-		// non-instantiable
-	}
+    private ContentNamespace() {
+        // non-instantiable
+    }
 
-	/**
-	 * Namespace of the content capability
-	 */
-	public final String		CAPABILITY					= "osgi.content";
+    /**
+     * Namespace of the content capability
+     */
+    public final String CAPABILITY = "osgi.content";
 
-	/**
-	 * Checksum attribute of a resource
-	 */
-	public final String		CHECKSUM_ATTRIBUTE			= "checksum";
+    /**
+     * Checksum attribute of a resource
+     */
+    public final String CHECKSUM_ATTRIBUTE = "checksum";
 
-	/**
-	 * The checksum algorithm used to calculate the {@link #CHECKSUM_ATTRIBUTE}
-	 * if not specified this is assumed to be SHA-256 - TODO need default?
-	 */
-	public final String		CHECKSUM_ALGO_ATTRIBUTE		= "checksumAlgo";
+    /**
+     * The checksum algorithm used to calculate the {@link #CHECKSUM_ATTRIBUTE}
+     * if not specified this is assumed to be SHA-256 - TODO need default?
+     */
+    public final String CHECKSUM_ALGO_ATTRIBUTE = "checksumAlgo";
 
-	/**
-	 * A copyright statement for the resource
-	 */
-	public final String		COPYRIGHT_ATTRIBUTE			= "copyright";
+    /**
+     * A copyright statement for the resource
+     */
+    public final String COPYRIGHT_ATTRIBUTE = "copyright";
 
-	/**
-	 * A human readable description of this resource
-	 */
-	public final String		DESCRIPTION_ATTRIBUTE		= "description";
+    /**
+     * A human readable description of this resource
+     */
+    public final String DESCRIPTION_ATTRIBUTE = "description";
 
-	/**
-	 * A URL where documentation for this resource can be accessed
-	 */
-	public final String		DOCUMENTATION_URL_ATTRIBUTE	= "documentation";
+    /**
+     * A URL where documentation for this resource can be accessed
+     */
+    public final String DOCUMENTATION_URL_ATTRIBUTE = "documentation";
 
-	/**
-	 * Provides an optional machine readable form of license information. See
-	 * section 3.2.1.10 of the OSGi Core Specification for information on it's
-	 * usage.
-	 */
-	public final String		LICENSE_ATTRIBUTE			= "license";
+    /**
+     * Provides an optional machine readable form of license information. See
+     * section 3.2.1.10 of the OSGi Core Specification for information on it's
+     * usage.
+     */
+    public final String LICENSE_ATTRIBUTE = "license";
 
-	/**
-	 * A URL where source control management for this resource is located
-	 */
-	public final String		SCM_URL_ATTRIBUTE			= "scm";
+    /**
+     * A URL where source control management for this resource is located
+     */
+    public final String SCM_URL_ATTRIBUTE = "scm";
 
-	/**
-	 * The size of this resource in bytes.
-	 */
-	public final String		SIZE_ATTRIBUTE				= "size";
+    /**
+     * The size of this resource in bytes.
+     */
+    public final String SIZE_ATTRIBUTE = "size";
 
-	/**
-	 * A URL where source code for this resource is located
-	 */
-	public final String		SOURCE_URL_ATTRIBUTE		= "source";
+    /**
+     * A URL where source code for this resource is located
+     */
+    public final String SOURCE_URL_ATTRIBUTE = "source";
 
-	/**
-	 * All attributes defined in this interface
-	 */
-	public final String[]	ATTRIBUTES					= {CHECKSUM_ATTRIBUTE,
-			CHECKSUM_ALGO_ATTRIBUTE, COPYRIGHT_ATTRIBUTE,
-			DESCRIPTION_ATTRIBUTE, DOCUMENTATION_URL_ATTRIBUTE,
-			LICENSE_ATTRIBUTE, SCM_URL_ATTRIBUTE, SIZE_ATTRIBUTE,
-			SOURCE_URL_ATTRIBUTE						};
+    /**
+     * All attributes defined in this interface
+     */
+    public final String[] ATTRIBUTES = {CHECKSUM_ATTRIBUTE,
+            CHECKSUM_ALGO_ATTRIBUTE, COPYRIGHT_ATTRIBUTE,
+            DESCRIPTION_ATTRIBUTE, DOCUMENTATION_URL_ATTRIBUTE,
+            LICENSE_ATTRIBUTE, SCM_URL_ATTRIBUTE, SIZE_ATTRIBUTE,
+            SOURCE_URL_ATTRIBUTE};
 }

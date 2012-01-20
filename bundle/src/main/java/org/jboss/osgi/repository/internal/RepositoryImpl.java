@@ -22,30 +22,17 @@
 package org.jboss.osgi.repository.internal;
 
 import org.jboss.logging.Logger;
-import org.jboss.osgi.metadata.OSGiMetaData;
-import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
-import org.jboss.osgi.repository.ArtifactCoordinates;
-import org.jboss.osgi.repository.ArtifactHandler;
-import org.jboss.osgi.repository.RepositoryResolutionException;
+import org.jboss.osgi.repository.ArtifactProviderPlugin;
+import org.jboss.osgi.repository.RepositoryCachePlugin;
 import org.jboss.osgi.repository.RequirementBuilder;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.resolver.v2.XResource;
-import org.jboss.osgi.resolver.v2.XResourceBuilder;
-import org.jboss.osgi.resolver.v2.spi.AbstractBundleRevision;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.JarInputStream;
-import java.util.jar.Manifest;
-
-import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMESPACE;
 
 /**
  * An implementation of a Repository that delegates to Mavan.
@@ -53,14 +40,16 @@ import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMES
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class RepositoryImpl implements XRepository {
+public final class RepositoryImpl implements XRepository {
 
     private static Logger log = Logger.getLogger(RepositoryImpl.class);
 
-    private final ArtifactHandler artifactHandler;
+    private final ArtifactProviderPlugin provider;
+    private final RepositoryCachePlugin cache;
 
-    public RepositoryImpl(ArtifactHandler artifactHandler) {
-        this.artifactHandler =artifactHandler;
+    public RepositoryImpl(ArtifactProviderPlugin provider, RepositoryCachePlugin cache) {
+        this.provider = provider;
+        this.cache = cache;
     }
 
     @Override
@@ -70,77 +59,29 @@ public class RepositoryImpl implements XRepository {
 
     @Override
     public Collection<Capability> findProviders(Requirement req) {
-        if (req == null)
-            throw new IllegalArgumentException("Null req");
-        Collection<Capability> result;
-        String namespace = req.getNamespace();
-        if (MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
-            result = processMavenIdentity(req);
-        } else {
-            throw new NotImplementedException("Unsupported requirement namespace: " + namespace);
+        log.infof("find providers for: %s", req);
+
+        // First get the matching capabilities from the cache
+        Collection<Capability> caps = cache.findProviders(req);
+        if (caps.isEmpty()) {
+            // Next, get matching capabilities from the provider
+            caps = provider.findProviders(req);
+
+            // Store the provided cpabilities in the cache
+            caps = cache.storeCapabilities(caps);
         }
-        return result;
+
+        log.infof("found matching caps: %s", caps);
+        return Collections.unmodifiableCollection(caps);
     }
 
     @Override
-    public Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> requirements) {
-        throw new NotImplementedException();
-    }
-
-    private List<Capability> processMavenIdentity(Requirement req) {
-        String mavenId = (String) req.getAttributes().get(MAVEN_IDENTITY_NAMESPACE);
-        ArtifactCoordinates coordinates = ArtifactCoordinates.parse(mavenId);
-        URL[] urls = artifactHandler.resolveArtifacts(coordinates);
-        List<Capability> result = processResolutionResult(urls);
-        artifactHandler.storeArtifacts(coordinates, urls);
-        return result;
-    }
-
-    private List<Capability> processResolutionResult(URL[] urls) {
-        List<Capability> result = new ArrayList<Capability>();
-        for (URL url : urls) {
-            XResource resource = new URLBasedResource(url);
-            XResourceBuilder builder = XResourceBuilder.INSTANCE;
-            InputStream content = resource.getContent();
-            try {
-                Manifest manifest = new JarInputStream(content).getManifest();
-                OSGiMetaData metaData = OSGiMetaDataBuilder.load(manifest);
-                builder.associateResource(resource).load(metaData);
-                result.add(resource.getIdentityCapability());
-            } catch (Exception ex) {
-                throw new RepositoryResolutionException("Cannot create capability from: " + url, ex);
-            } finally {
-                safeClose(content);
-            }
+    public Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> reqs) {
+        Map<Requirement, Collection<Capability>> result = new HashMap<Requirement, Collection<Capability>>();
+        for (Requirement req : reqs) {
+            Collection<Capability> caps = findProviders(req);
+            result.put(req, caps);
         }
-        return result;
-    }
-
-    private void safeClose(InputStream content) {
-        if (content != null)                    {
-            try {
-                content.close();
-            } catch (IOException e) {
-                // ignore
-            }
-        }
-    }
-
-    private static class URLBasedResource extends AbstractBundleRevision {
-
-        private final URL url;
-
-        URLBasedResource(URL url) {
-            this.url = url;
-        }
-        
-        @Override
-        public InputStream getContent() {
-            try {
-                return url.openStream();
-            } catch (IOException e) {
-                throw new RepositoryResolutionException(e);
-            }
-        }
+        return Collections.unmodifiableMap(result);
     }
 }

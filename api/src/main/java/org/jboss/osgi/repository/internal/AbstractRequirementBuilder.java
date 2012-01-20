@@ -21,11 +21,10 @@
  */
 package org.jboss.osgi.repository.internal;
 
+import org.jboss.osgi.repository.ArtifactCoordinates;
 import org.jboss.osgi.repository.RequirementBuilder;
-import org.jboss.osgi.resolver.v2.XRequirement;
-import org.jboss.osgi.resolver.v2.XRequirement;
 import org.jboss.osgi.resolver.v2.XResourceBuilder;
-import org.jboss.osgi.resolver.v2.XResourceBuilder;
+import org.osgi.framework.resource.Requirement;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,38 +43,24 @@ public class AbstractRequirementBuilder implements RequirementBuilder {
 
     // Hide ctor
     private AbstractRequirementBuilder() {
-
     }
 
-    public XRequirement createArtifactRequirement(String mavenId) {
-        XResourceBuilder builder = XResourceBuilder.INSTANCE.createResource();
+    @Override
+    public Requirement createArtifactRequirement(String mavenid) {
+        return createArtifactRequirement(ArtifactCoordinates.parse(mavenid));
+    }
+
+    @Override
+    public Requirement createArtifactRequirement(ArtifactCoordinates coordinates) {
         Map<String, Object> atts = new HashMap<String, Object>();
         Map<String, String> dirs = new HashMap<String, String>();
-        atts.put(MAVEN_IDENTITY_NAMESPACE, mavenId);
-        return builder.addGenericRequirement(MAVEN_IDENTITY_NAMESPACE, atts, dirs);
+        atts.put(MAVEN_IDENTITY_NAMESPACE, coordinates.toExternalForm());
+        return createRequirement(MAVEN_IDENTITY_NAMESPACE, atts, dirs);
     }
 
-    public XRequirement createArtifactRequirement(String groupId, String artifactId, String version) {
-        String mavenId = getMavenIdentifier(groupId, artifactId, version, null, null);
-        return createArtifactRequirement(mavenId);
+    @Override
+    public Requirement createRequirement(String namespace, Map<String, Object> atts, Map<String, String> dirs) {
+        XResourceBuilder builder = XResourceBuilder.INSTANCE.createResource();
+        return builder.addGenericRequirement(namespace, atts, dirs);
     }
-
-    public XRequirement createArtifactRequirement(String groupId, String artifactId, String version, String type, String classifier) {
-        String mavenId = getMavenIdentifier(groupId, artifactId, version, type, classifier);
-        return createArtifactRequirement(mavenId);
-    }
-
-    private String getMavenIdentifier(String groupId, String artifactId, String version, String type, String classifier) {
-        if (groupId == null)
-            throw new IllegalArgumentException("Null groupId");
-        if (artifactId == null)
-            throw new IllegalArgumentException("Null artifactId");
-        if (version == null)
-            throw new IllegalArgumentException("Null version");
-        String mavenId = groupId + ":" + artifactId + ":" + (type != null ? type : "jar") + ":" + version;
-        if (classifier != null)
-            mavenId += ":" + classifier;
-        return mavenId;
-    }
-
 }

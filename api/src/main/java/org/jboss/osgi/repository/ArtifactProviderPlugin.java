@@ -21,21 +21,19 @@
  */
 package org.jboss.osgi.repository;
 
+import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
 
-import java.util.Map;
+import java.net.URL;
+import java.util.Collection;
 
 /**
- * A builder for resource requirements
+ * Handles resolution of repository artifacts
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public interface RequirementBuilder {
+public interface ArtifactProviderPlugin {
 
-    Requirement createArtifactRequirement(String mavenid);
-    
-    Requirement createArtifactRequirement(ArtifactCoordinates coordinates);
-    
-    Requirement createRequirement(String namespace, Map<String, Object> atts, Map<String, String> dirs);
+    Collection<Capability> findProviders(Requirement req);
 }

@@ -19,56 +19,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.osgi.repository.internal;
+package org.jboss.osgi.repository.maven;
 
-import org.jboss.logging.Logger;
+import org.jboss.osgi.repository.internal.AbstractResourceBuilder;
 import org.jboss.osgi.repository.ArtifactCoordinates;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.jboss.osgi.repository.RepositoryResolutionException;
 import org.jboss.osgi.resolver.v2.XResource;
-import org.osgi.framework.BundleContext;
+import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
+import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMESPACE;
 
 /**
- * A simple {@link org.jboss.osgi.repository.ArtifactProviderPlugin} that uses .
+ * An {@link ArtifactProviderPlugin} that delegates to shrinkwrap
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-class SimpleArtifactHandler implements ArtifactProviderPlugin {
-
-    private static Logger log = Logger.getLogger(SimpleArtifactHandler.class);
-
-    private static String JBOSS_NEXUS_BASE = "http://repository.jboss.org/nexus/content/groups/public";
-    private static String MAVEN_CENTRAL_BASE = "http://repo1.maven.org/maven2";
-
-    private final BundleContext context;
-    private final URL[] baserepos;
-
-    SimpleArtifactHandler(BundleContext context) {
-        this.context = context;
-
-        List<URL> repos = new ArrayList<URL>();
-        String userhome = System.getProperty("user.home");
-        File localrepo = new File(userhome + File.separator + ".m2" + File.separator + "repository");
-        if (localrepo.isDirectory()) {
-            repos.add(getBaseURL(localrepo.toURI().toString()));
-        }
-        repos.add(getBaseURL(JBOSS_NEXUS_BASE));
-        repos.add(getBaseURL(MAVEN_CENTRAL_BASE));
-        baserepos = repos.toArray(new URL[repos.size()]);
-    }
+public class ShrinkwrapProviderPlugin implements ArtifactProviderPlugin {
 
     @Override
     public Collection<Capability> findProviders(Requirement req) {
@@ -76,16 +53,16 @@ class SimpleArtifactHandler implements ArtifactProviderPlugin {
         if (MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
             String mavenId = (String) req.getAttributes().get(MAVEN_IDENTITY_NAMESPACE);
             ArtifactCoordinates coordinates = ArtifactCoordinates.parse(mavenId);
+            MavenDependencyResolver resolver = DependencyResolvers.use(MavenDependencyResolver.class);
+            resolver = resolver.artifact(coordinates.toExternalForm());
             try {
-                List<URL> urls = new ArrayList<URL>();
-                for (URL baseURL : baserepos) {
-                    URL url = coordinates.toArtifactURL(baseURL);
+                File[] files = resolver.resolveAsFiles();
+                URL[] urls = new URL[files.length];
+                for (int i = 0; i < files.length; i++) {
                     try {
-                        url.openStream().close();
-                        urls.add(url);
-                        break;
-                    } catch (IOException e) {
-                        // ignore
+                        urls[i] = files[i].toURI().toURL();
+                    } catch (MalformedURLException e) {
+                        //ignore
                     }
                 }
                 AbstractResourceBuilder builder = AbstractResourceBuilder.INSTANCE;
@@ -101,15 +78,5 @@ class SimpleArtifactHandler implements ArtifactProviderPlugin {
         } else {
             throw new RepositoryResolutionException("Unsupported namespace: " + namespace);
         }
-    }
-
-    private URL getBaseURL(String basestr) {
-        URL baseURL = null;
-        try {
-            baseURL = new URL(basestr);
-        } catch (MalformedURLException e) {
-            // ignore
-        }
-        return baseURL;
     }
 }

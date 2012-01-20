@@ -24,19 +24,23 @@ package org.jboss.test.osgi.repository;
 
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
+import org.jboss.osgi.repository.RepositoryCachePlugin;
+import org.jboss.osgi.repository.RepositoryStorageException;
 import org.jboss.osgi.repository.RequirementBuilder;
 import org.jboss.osgi.repository.XRepository;
+import org.jboss.osgi.repository.internal.AbstractRepositoryCache;
 import org.jboss.osgi.repository.internal.RepositoryImpl;
-import org.jboss.osgi.repository.maven.ShrinkwrapArtifactHandler;
+import org.jboss.osgi.repository.maven.ShrinkwrapProviderPlugin;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
-import org.jboss.osgi.resolver.v2.XRequirement;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Version;
 import org.osgi.framework.resource.Capability;
+import org.osgi.framework.resource.Requirement;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
@@ -45,37 +49,25 @@ import static org.osgi.framework.resource.ResourceConstants.IDENTITY_TYPE_BUNDLE
 
 /**
  * Test the default resolver integration.
- * 
+ *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class ShrinkwrapDelegateTestCase {
+public class ShrinkwrapProviderTestCase {
 
     private XRepository repository;
 
     @Before
     public void setUp() {
-        repository = new RepositoryImpl(new ShrinkwrapArtifactHandler());
+        ShrinkwrapProviderPlugin provider = new ShrinkwrapProviderPlugin();
+        RepositoryCachePlugin cache = new AbstractRepositoryCache();
+        repository = new RepositoryImpl(provider, cache);
     }
 
     @Test
     public void testFindProvidersByMavenId() throws Exception {
         RequirementBuilder builder = repository.getRequirementBuilder();
-        XRequirement req = builder.createArtifactRequirement("org.apache.felix:org.apache.felix.configadmin:1.2.8");
-        verifyProviders(repository.findProviders(req));
-    }
-
-    @Test
-    public void testFindProvidersByArtifactId() throws Exception {
-        RequirementBuilder builder = repository.getRequirementBuilder();
-        XRequirement req = builder.createArtifactRequirement("org.apache.felix", "org.apache.felix.configadmin", "1.2.8");
-        verifyProviders(repository.findProviders(req));
-    }
-
-    @Test
-    public void testFindProvidersExplicit() throws Exception {
-        RequirementBuilder builder = repository.getRequirementBuilder();
-        XRequirement req = builder.createArtifactRequirement("org.apache.felix", "org.apache.felix.configadmin", "1.2.8", "jar", null);
+        Requirement req = builder.createArtifactRequirement("org.apache.felix:org.apache.felix.configadmin:1.2.8");
         verifyProviders(repository.findProviders(req));
     }
 
