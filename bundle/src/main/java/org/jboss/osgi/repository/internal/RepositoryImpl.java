@@ -24,8 +24,9 @@ package org.jboss.osgi.repository.internal;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.jboss.osgi.repository.RepositoryCachePlugin;
-import org.jboss.osgi.repository.RequirementBuilder;
+import org.jboss.osgi.repository.RepositoryRequirementBuilder;
 import org.jboss.osgi.repository.XRepository;
+import org.jboss.osgi.repository.spi.AbstractRepositoryRequirementBuilder;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
 
@@ -53,8 +54,8 @@ public final class RepositoryImpl implements XRepository {
     }
 
     @Override
-    public RequirementBuilder getRequirementBuilder() {
-        return AbstractRequirementBuilder.INSTANCE;
+    public RepositoryRequirementBuilder getRequirementBuilder() {
+        return AbstractRepositoryRequirementBuilder.INSTANCE;
     }
 
     @Override

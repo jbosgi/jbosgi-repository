@@ -24,16 +24,17 @@ package org.jboss.osgi.repository.internal;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.jboss.osgi.repository.RepositoryCachePlugin;
 import org.jboss.osgi.repository.XRepository;
+import org.jboss.osgi.repository.spi.AbstractRepositoryCachePlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
 import org.osgi.service.repository.Repository;
 import org.osgi.util.tracker.ServiceTracker;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * An activator for the {@link XRepository} service.
@@ -43,48 +44,43 @@ import java.util.Collection;
  */
 public class RepositoryActivator implements BundleActivator {
 
-    private ServiceRegistration registration;
-
     @Override
     public void start(final BundleContext context) throws Exception {
-        ArtifactProviderPlugin provider = new TrackingArtifactHandler(context);
-        RepositoryCachePlugin cache = new AbstractRepositoryCache();
+        // Register the SimpleArtifactProvider 
+        SimpleArtifactProvider simpleProvider = new SimpleArtifactProvider(context);
+        context.registerService(ArtifactProviderPlugin.class.getName(), simpleProvider, null);
+        // Register the Repository
+        ArtifactProviderPlugin provider = new TrackingArtifactProvider(context);
+        RepositoryCachePlugin cache = new AbstractRepositoryCachePlugin();
         RepositoryImpl service = new RepositoryImpl(provider,  cache);
-        registration = context.registerService(Repository.class.getName(), service, null);
+        context.registerService(Repository.class.getName(), service, null);
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
-        if (registration != null)
-            registration.unregister();
     }
 
-    class TrackingArtifactHandler implements ArtifactProviderPlugin {
+    static class TrackingArtifactProvider implements ArtifactProviderPlugin {
 
-        private ArtifactProviderPlugin delegate;
+        private final ServiceTracker tracker;
 
-        TrackingArtifactHandler(BundleContext context) {
-            delegate = new SimpleArtifactHandler(context);
-            ServiceTracker tracker = new ServiceTracker(context, ArtifactProviderPlugin.class.getName(), null) {
-
-                @Override
-                public void modifiedService(ServiceReference reference, Object service) {
-                    delegate = (ArtifactProviderPlugin) service;
-                }
-
-                @Override
-                public void removedService(ServiceReference reference, Object service) {
-                    super.removedService(reference, service);
-                    delegate = new SimpleArtifactHandler(context);
-                }
-            };
+        TrackingArtifactProvider(BundleContext context) {
+            tracker = new ServiceTracker(context, ArtifactProviderPlugin.class.getName(), null) {};
             tracker.open();
         }
 
         @Override
         public Collection<Capability> findProviders(Requirement req) {
-            return delegate.findProviders(req);
+            Collection<Capability> result = new ArrayList<Capability>();
+            for (Object service : tracker.getServices()) {
+                ArtifactProviderPlugin plugin = (ArtifactProviderPlugin) service;
+                Collection<Capability> caps = plugin.findProviders(req);
+                if (caps.isEmpty() == false) {
+                    result.addAll(caps);
+                    break;
+                }
+            }
+            return Collections.unmodifiableCollection(result);
         }
     }
-
 }

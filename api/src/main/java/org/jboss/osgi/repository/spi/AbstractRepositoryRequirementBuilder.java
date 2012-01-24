@@ -19,10 +19,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.osgi.repository.internal;
+package org.jboss.osgi.repository.spi;
 
-import org.jboss.osgi.repository.ArtifactCoordinates;
-import org.jboss.osgi.repository.RequirementBuilder;
+import org.jboss.modules.ModuleIdentifier;
+import org.jboss.osgi.repository.MavenCoordinates;
+import org.jboss.osgi.repository.RepositoryRequirementBuilder;
 import org.jboss.osgi.resolver.v2.XResourceBuilder;
 import org.osgi.framework.resource.Requirement;
 
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMESPACE;
+import static org.jboss.osgi.repository.RepositoryConstants.MODULE_IDENTITY_NAMESPACE;
 
 /**
  * A builder for resource requirements
@@ -37,21 +39,24 @@ import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMES
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class AbstractRequirementBuilder implements RequirementBuilder {
+public class AbstractRepositoryRequirementBuilder implements RepositoryRequirementBuilder {
 
-    public static AbstractRequirementBuilder INSTANCE = new AbstractRequirementBuilder();
+    public static AbstractRepositoryRequirementBuilder INSTANCE = new AbstractRepositoryRequirementBuilder();
 
     // Hide ctor
-    private AbstractRequirementBuilder() {
+    private AbstractRepositoryRequirementBuilder() {
     }
 
     @Override
-    public Requirement createArtifactRequirement(String mavenid) {
-        return createArtifactRequirement(ArtifactCoordinates.parse(mavenid));
+    public Requirement createArtifactRequirement(ModuleIdentifier moduleId) {
+        Map<String, Object> atts = new HashMap<String, Object>();
+        Map<String, String> dirs = new HashMap<String, String>();
+        atts.put(MODULE_IDENTITY_NAMESPACE, moduleId.toString());
+        return createRequirement(MODULE_IDENTITY_NAMESPACE, atts, dirs);
     }
 
     @Override
-    public Requirement createArtifactRequirement(ArtifactCoordinates coordinates) {
+    public Requirement createArtifactRequirement(MavenCoordinates coordinates) {
         Map<String, Object> atts = new HashMap<String, Object>();
         Map<String, String> dirs = new HashMap<String, String>();
         atts.put(MAVEN_IDENTITY_NAMESPACE, coordinates.toExternalForm());
@@ -60,7 +65,7 @@ public class AbstractRequirementBuilder implements RequirementBuilder {
 
     @Override
     public Requirement createRequirement(String namespace, Map<String, Object> atts, Map<String, String> dirs) {
-        XResourceBuilder builder = XResourceBuilder.INSTANCE.createResource();
+        XResourceBuilder builder = XResourceBuilder.create();
         return builder.addGenericRequirement(namespace, atts, dirs);
     }
 }

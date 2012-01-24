@@ -21,11 +21,9 @@
  */
 package org.jboss.osgi.repository;
 
-import org.jboss.osgi.resolver.v2.XResource;
-import org.osgi.framework.resource.Capability;
+import org.jboss.modules.ModuleIdentifier;
 import org.osgi.framework.resource.Requirement;
 
-import java.net.URL;
 import java.util.Map;
 
 /**
@@ -34,8 +32,11 @@ import java.util.Map;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public interface ResourceBuilder {
+public interface RepositoryRequirementBuilder {
 
-    XResource createResource(URL url);
-    
+    Requirement createArtifactRequirement(MavenCoordinates coordinates);
+
+    Requirement createArtifactRequirement(ModuleIdentifier coordinates);
+
+    Requirement createRequirement(String namespace, Map<String, Object> atts, Map<String, String> dirs);
 }

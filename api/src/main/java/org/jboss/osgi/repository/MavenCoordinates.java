@@ -30,7 +30,7 @@ import java.net.URL;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class ArtifactCoordinates {
+public class MavenCoordinates {
 
     private final String groupId;
     private final String artifactId;
@@ -38,26 +38,26 @@ public class ArtifactCoordinates {
     private final String version;
     private final String classifier;
 
-    public static ArtifactCoordinates parse(String coordinates) {
-        ArtifactCoordinates result;
+    public static MavenCoordinates parse(String coordinates) {
+        MavenCoordinates result;
         String[] parts = coordinates.split(":");
         if (parts.length == 3) {
-            result = new ArtifactCoordinates(parts[0], parts[1], null, parts[2], null);
+            result = new MavenCoordinates(parts[0], parts[1], null, parts[2], null);
         } else if (parts.length == 4) {
-            result = new ArtifactCoordinates(parts[0], parts[1], parts[2], parts[3], null);
+            result = new MavenCoordinates(parts[0], parts[1], parts[2], parts[3], null);
         } else if (parts.length == 5) {
-            result = new ArtifactCoordinates(parts[0], parts[1], parts[2], parts[3], parts[4]);
+            result = new MavenCoordinates(parts[0], parts[1], parts[2], parts[3], parts[4]);
         } else {
             throw new IllegalArgumentException("Invalid coordinates: " + coordinates);
         }
         return result;
     }
 
-    public static ArtifactCoordinates create(String groupId, String artifactId, String version, String type, String classifier) {
-        return new ArtifactCoordinates(groupId, artifactId, type, version, classifier);
+    public static MavenCoordinates create(String groupId, String artifactId, String version, String type, String classifier) {
+        return new MavenCoordinates(groupId, artifactId, type, version, classifier);
     }
 
-    private ArtifactCoordinates(String groupId, String artifactId, String type, String version, String classifier) {
+    private MavenCoordinates(String groupId, String artifactId, String type, String version, String classifier) {
         if (groupId == null)
             throw new IllegalArgumentException("Null groupId");
         if (artifactId == null)
@@ -113,6 +113,6 @@ public class ArtifactCoordinates {
 
     @Override
     public String toString() {
-        return "ArtifactCoordinates[" + toExternalForm() + "]";
+        return "MavenCoordinates[" + toExternalForm() + "]";
     }
 }

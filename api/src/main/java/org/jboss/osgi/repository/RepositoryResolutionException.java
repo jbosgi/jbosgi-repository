@@ -23,6 +23,7 @@ package org.jboss.osgi.repository;
  * @since 16-Jan-2012
  */
 public class RepositoryResolutionException extends RuntimeException {
+
     public RepositoryResolutionException(String message) {
         super(message);
     }

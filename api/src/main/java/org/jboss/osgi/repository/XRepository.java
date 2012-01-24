@@ -31,5 +31,5 @@ import org.osgi.service.repository.Repository;
  */
 public interface XRepository extends Repository {
 
-    RequirementBuilder getRequirementBuilder();
+    RepositoryRequirementBuilder getRequirementBuilder();
 }

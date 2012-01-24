@@ -25,19 +25,23 @@ package org.jboss.test.osgi.repository;
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.MavenCoordinates;
+import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.jboss.osgi.repository.RepositoryCachePlugin;
-import org.jboss.osgi.repository.RepositoryRequirementBuilder;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.spi.AbstractRepositoryCachePlugin;
+import org.jboss.osgi.repository.internal.BundleLocalCache;
 import org.jboss.osgi.repository.internal.RepositoryImpl;
-import org.jboss.osgi.repository.maven.ShrinkwrapProviderPlugin;
+import org.jboss.osgi.repository.internal.SimpleArtifactProvider;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.jar.JarInputStream;
@@ -52,28 +56,32 @@ import static org.osgi.framework.resource.ResourceConstants.IDENTITY_TYPE_BUNDLE
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class ShrinkwrapProviderTestCase {
+public class SimpleArtifactProviderTestCase {
 
     private XRepository repository;
 
     @Before
-    public void setUp() {
-        ShrinkwrapProviderPlugin provider = new ShrinkwrapProviderPlugin();
-        RepositoryCachePlugin cache = new AbstractRepositoryCachePlugin();
+    public void setUp() throws IOException {
+        BundleContext context = Mockito.mock(BundleContext.class);
+        Mockito.when(context.getDataFile("repository")).thenReturn(new File("./target/repository").getCanonicalFile());
+        ArtifactProviderPlugin provider = new SimpleArtifactProvider(context);
+        RepositoryCachePlugin cache = new BundleLocalCache(context);
         repository = new RepositoryImpl(provider, cache);
     }
 
     @Test
     public void testFindProvidersByMavenId() throws Exception {
-        RepositoryRequirementBuilder builder = repository.getRequirementBuilder();
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
-        Requirement req = builder.createArtifactRequirement(mavenid);
-        verifyProviders(repository.findProviders(req));
-    }
-
-    private void verifyProviders(Collection<Capability> caps) throws Exception {
+        Requirement req = repository.getRequirementBuilder().createArtifactRequirement(mavenid);
+        Collection<Capability> caps = repository.findProviders(req);
         assertEquals("One capability", 1, caps.size());
         Capability cap = caps.iterator().next();
+        verifyProvider(cap);
+
+
+    }
+
+    private void verifyProvider(Capability cap) throws Exception {
         XIdentityCapability icap = (XIdentityCapability) cap;
         assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
         assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());

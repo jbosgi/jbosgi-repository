@@ -40,8 +40,24 @@ public final class RepositoryConstants {
     }
 
     /**
-     * Artifact coordinatess may be given in simple groupId:artifactId:version form,
+     * Artifact coordinates may be given in simple groupId:artifactId:version form,
      * or they may be fully qualified in the form groupId:artifactId:type:version[:classifier]
      */
     public static final String MAVEN_IDENTITY_NAMESPACE = "maven.identity";
+
+    /**
+     * Artifact coordinates may be given by {@link org.jboss.modules.ModuleIdentifier}
+     */
+    public static final String MODULE_IDENTITY_NAMESPACE = "module.identity";
+
+    /**
+     * An attribute on the identity capability that represents the location of the resource.
+     */
+    public static final String CONTENT_URL = "content.url";
+
+    /**
+     * An attribute on the identity capability that represents the location of the resource
+     * relative to the base url of the repository.
+     */
+    public static final String CONTENT_PATH = "content.path";
 }

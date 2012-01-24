@@ -19,23 +19,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.osgi.repository;
+package org.jboss.osgi.repository.spi;
 
+import org.jboss.osgi.repository.RepositoryCachePlugin;
+import org.jboss.osgi.repository.RepositoryStorageException;
+import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
 
-import java.util.Map;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
- * A builder for resource requirements
+ * An abstract  {@link RepositoryCachePlugin} that does nothing
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public interface RequirementBuilder {
+public class AbstractRepositoryCachePlugin implements RepositoryCachePlugin {
 
-    Requirement createArtifactRequirement(String mavenid);
-    
-    Requirement createArtifactRequirement(ArtifactCoordinates coordinates);
-    
-    Requirement createRequirement(String namespace, Map<String, Object> atts, Map<String, String> dirs);
+    @Override
+    public Collection<Capability> findProviders(Requirement req) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<Capability> storeCapabilities(Collection<Capability> caps) throws RepositoryStorageException {
+        return caps;
+    }
 }

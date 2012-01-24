@@ -19,31 +19,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.osgi.repository.internal;
+package org.jboss.osgi.repository;
 
-import org.jboss.osgi.repository.RepositoryCachePlugin;
-import org.jboss.osgi.repository.RepositoryStorageException;
-import org.osgi.framework.resource.Capability;
-import org.osgi.framework.resource.Requirement;
+import org.jboss.osgi.repository.spi.AbstractRepositoryResourceBuilder;
+import org.jboss.osgi.resolver.v2.XResourceBuilder;
+import org.jboss.osgi.resolver.v2.spi.AbstractResourceBuilder;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.net.URL;
 
 /**
- * An abstract  {@link RepositoryCachePlugin} that does nothing
+ * A builder for resource requirements
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class AbstractRepositoryCache implements RepositoryCachePlugin {
+public abstract class RepositoryResourceBuilder extends AbstractResourceBuilder {
 
-    @Override
-    public Collection<Capability> findProviders(Requirement req) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Collection<Capability> storeCapabilities(Collection<Capability> caps) throws RepositoryStorageException {
-        return caps;
+    public static XResourceBuilder create(URL baseURL, String contentPath) {
+        return new AbstractRepositoryResourceBuilder(baseURL, contentPath);
     }
 }

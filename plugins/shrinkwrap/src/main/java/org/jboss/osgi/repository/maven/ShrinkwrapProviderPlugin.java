@@ -21,10 +21,10 @@
  */
 package org.jboss.osgi.repository.maven;
 
-import org.jboss.osgi.repository.internal.AbstractResourceBuilder;
-import org.jboss.osgi.repository.ArtifactCoordinates;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
+import org.jboss.osgi.repository.MavenCoordinates;
 import org.jboss.osgi.repository.RepositoryResolutionException;
+import org.jboss.osgi.repository.RepositoryResourceBuilder;
 import org.jboss.osgi.resolver.v2.XResource;
 import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
@@ -36,6 +36,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMESPACE;
 
@@ -50,9 +52,10 @@ public class ShrinkwrapProviderPlugin implements ArtifactProviderPlugin {
     @Override
     public Collection<Capability> findProviders(Requirement req) {
         String namespace = req.getNamespace();
+        List<Capability> result = new ArrayList<Capability>();
         if (MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
             String mavenId = (String) req.getAttributes().get(MAVEN_IDENTITY_NAMESPACE);
-            ArtifactCoordinates coordinates = ArtifactCoordinates.parse(mavenId);
+            MavenCoordinates coordinates = MavenCoordinates.parse(mavenId);
             MavenDependencyResolver resolver = DependencyResolvers.use(MavenDependencyResolver.class);
             resolver = resolver.artifact(coordinates.toExternalForm());
             try {
@@ -65,18 +68,18 @@ public class ShrinkwrapProviderPlugin implements ArtifactProviderPlugin {
                         //ignore
                     }
                 }
-                AbstractResourceBuilder builder = AbstractResourceBuilder.INSTANCE;
-                Collection<Capability> result = new ArrayList<Capability>();
                 for (URL url : urls) {
-                    XResource xres = builder.createResource(url);
-                    result.add(xres.getIdentityCapability());
+                    int baseIndex = url.toExternalForm().indexOf(coordinates.getGroupId().replace('.', '/'));
+                    URL baseURL = new URL(url.toExternalForm().substring(0, baseIndex));
+                    String contentPath = url.toExternalForm().substring(baseIndex);
+                    XResource resource = RepositoryResourceBuilder.create(baseURL, contentPath).getResource();
+                    result.add(resource.getIdentityCapability());
                 }
                 return result;
             } catch (Exception ex) {
                 throw new RepositoryResolutionException(ex);
             }
-        } else {
-            throw new RepositoryResolutionException("Unsupported namespace: " + namespace);
         }
+        return Collections.unmodifiableList(result);
     }
 }

@@ -22,9 +22,10 @@
 package org.jboss.osgi.repository.internal;
 
 import org.jboss.logging.Logger;
-import org.jboss.osgi.repository.ArtifactCoordinates;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
+import org.jboss.osgi.repository.MavenCoordinates;
 import org.jboss.osgi.repository.RepositoryResolutionException;
+import org.jboss.osgi.repository.RepositoryResourceBuilder;
 import org.jboss.osgi.resolver.v2.XResource;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.resource.Capability;
@@ -36,6 +37,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMESPACE;
@@ -46,9 +48,9 @@ import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMES
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-class SimpleArtifactHandler implements ArtifactProviderPlugin {
+public class SimpleArtifactProvider implements ArtifactProviderPlugin {
 
-    private static Logger log = Logger.getLogger(SimpleArtifactHandler.class);
+    private static Logger log = Logger.getLogger(SimpleArtifactProvider.class);
 
     private static String JBOSS_NEXUS_BASE = "http://repository.jboss.org/nexus/content/groups/public";
     private static String MAVEN_CENTRAL_BASE = "http://repo1.maven.org/maven2";
@@ -56,7 +58,7 @@ class SimpleArtifactHandler implements ArtifactProviderPlugin {
     private final BundleContext context;
     private final URL[] baserepos;
 
-    SimpleArtifactHandler(BundleContext context) {
+    public SimpleArtifactProvider(BundleContext context) {
         this.context = context;
 
         List<URL> repos = new ArrayList<URL>();
@@ -73,34 +75,29 @@ class SimpleArtifactHandler implements ArtifactProviderPlugin {
     @Override
     public Collection<Capability> findProviders(Requirement req) {
         String namespace = req.getNamespace();
+        List<Capability> result = new ArrayList<Capability>();
         if (MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
             String mavenId = (String) req.getAttributes().get(MAVEN_IDENTITY_NAMESPACE);
-            ArtifactCoordinates coordinates = ArtifactCoordinates.parse(mavenId);
+            MavenCoordinates coordinates = MavenCoordinates.parse(mavenId);
             try {
-                List<URL> urls = new ArrayList<URL>();
                 for (URL baseURL : baserepos) {
                     URL url = coordinates.toArtifactURL(baseURL);
                     try {
                         url.openStream().close();
-                        urls.add(url);
+                        String contentPath = url.toExternalForm();
+                        contentPath = contentPath.substring(baseURL.toExternalForm().length());
+                        XResource resource = RepositoryResourceBuilder.create(baseURL, contentPath).getResource();
+                        result.add(resource.getIdentityCapability());
                         break;
                     } catch (IOException e) {
                         // ignore
                     }
                 }
-                AbstractResourceBuilder builder = AbstractResourceBuilder.INSTANCE;
-                Collection<Capability> result = new ArrayList<Capability>();
-                for (URL url : urls) {
-                    XResource xres = builder.createResource(url);
-                    result.add(xres.getIdentityCapability());
-                }
-                return result;
             } catch (Exception ex) {
                 throw new RepositoryResolutionException(ex);
             }
-        } else {
-            throw new RepositoryResolutionException("Unsupported namespace: " + namespace);
         }
+        return Collections.unmodifiableList(result);
     }
 
     private URL getBaseURL(String basestr) {
