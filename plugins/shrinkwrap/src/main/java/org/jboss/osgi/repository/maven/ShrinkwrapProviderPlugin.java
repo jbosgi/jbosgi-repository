@@ -22,10 +22,10 @@
 package org.jboss.osgi.repository.maven;
 
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
-import org.jboss.osgi.repository.MavenCoordinates;
 import org.jboss.osgi.repository.RepositoryResolutionException;
-import org.jboss.osgi.repository.RepositoryResourceBuilder;
+import org.jboss.osgi.resolver.v2.MavenCoordinates;
 import org.jboss.osgi.resolver.v2.XResource;
+import org.jboss.osgi.resolver.v2.XResourceBuilder;
 import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.osgi.framework.resource.Capability;
@@ -39,7 +39,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMESPACE;
+import static org.jboss.osgi.resolver.v2.XResourceConstants.MAVEN_IDENTITY_NAMESPACE;
+
 
 /**
  * An {@link ArtifactProviderPlugin} that delegates to shrinkwrap
@@ -72,7 +73,7 @@ public class ShrinkwrapProviderPlugin implements ArtifactProviderPlugin {
                     int baseIndex = url.toExternalForm().indexOf(coordinates.getGroupId().replace('.', '/'));
                     URL baseURL = new URL(url.toExternalForm().substring(0, baseIndex));
                     String contentPath = url.toExternalForm().substring(baseIndex);
-                    XResource resource = RepositoryResourceBuilder.create(baseURL, contentPath).getResource();
+                    XResource resource = XResourceBuilder.create(baseURL, contentPath).getResource();
                     result.add(resource.getIdentityCapability());
                 }
                 return result;

@@ -24,14 +24,14 @@ package org.jboss.test.osgi.repository;
 
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
-import org.jboss.osgi.repository.MavenCoordinates;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.jboss.osgi.repository.RepositoryCachePlugin;
-import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.internal.BundleLocalCache;
 import org.jboss.osgi.repository.internal.RepositoryImpl;
 import org.jboss.osgi.repository.internal.SimpleArtifactProvider;
+import org.jboss.osgi.resolver.v2.MavenCoordinates;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
+import org.jboss.osgi.resolver.v2.XRequirementBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -39,6 +39,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
+import org.osgi.service.repository.Repository;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,7 +59,7 @@ import static org.osgi.framework.resource.ResourceConstants.IDENTITY_TYPE_BUNDLE
  */
 public class SimpleArtifactProviderTestCase {
 
-    private XRepository repository;
+    private Repository repository;
 
     @Before
     public void setUp() throws IOException {
@@ -72,7 +73,7 @@ public class SimpleArtifactProviderTestCase {
     @Test
     public void testFindProvidersByMavenId() throws Exception {
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
-        Requirement req = repository.getRequirementBuilder().createArtifactRequirement(mavenid);
+        Requirement req = XRequirementBuilder.createArtifactRequirement(mavenid);
         Collection<Capability> caps = repository.findProviders(req);
         assertEquals("One capability", 1, caps.size());
         Capability cap = caps.iterator().next();

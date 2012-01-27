@@ -24,11 +24,9 @@ package org.jboss.osgi.repository.internal;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.jboss.osgi.repository.RepositoryCachePlugin;
-import org.jboss.osgi.repository.RepositoryRequirementBuilder;
-import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.spi.AbstractRepositoryRequirementBuilder;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
+import org.osgi.service.repository.Repository;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -41,7 +39,7 @@ import java.util.Map;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public final class RepositoryImpl implements XRepository {
+public final class RepositoryImpl implements Repository {
 
     private static Logger log = Logger.getLogger(RepositoryImpl.class);
 
@@ -51,11 +49,6 @@ public final class RepositoryImpl implements XRepository {
     public RepositoryImpl(ArtifactProviderPlugin provider, RepositoryCachePlugin cache) {
         this.provider = provider;
         this.cache = cache;
-    }
-
-    @Override
-    public RepositoryRequirementBuilder getRequirementBuilder() {
-        return AbstractRepositoryRequirementBuilder.INSTANCE;
     }
 
     @Override

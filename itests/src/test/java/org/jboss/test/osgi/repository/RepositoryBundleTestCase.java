@@ -18,9 +18,8 @@ package org.jboss.test.osgi.repository;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.osgi.repository.MavenCoordinates;
-import org.jboss.osgi.repository.RepositoryRequirementBuilder;
-import org.jboss.osgi.repository.XRepository;
+import org.jboss.osgi.resolver.v2.MavenCoordinates;
+import org.jboss.osgi.resolver.v2.XRequirementBuilder;
 import org.jboss.osgi.resolver.v2.XCapability;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
 import org.jboss.osgi.testing.OSGiManifestBuilder;
@@ -67,7 +66,7 @@ public class RepositoryBundleTestCase {
                 builder.addBundleSymbolicName(archive.getName());
                 builder.addBundleManifestVersion(2);
                 builder.addImportPackages(BundleActivator.class, Repository.class, Resource.class);
-                builder.addImportPackages(XRepository.class, XCapability.class);
+                builder.addImportPackages(Repository.class, XCapability.class);
                 return builder.openStream();
             }
         });
@@ -82,13 +81,11 @@ public class RepositoryBundleTestCase {
         Repository repo = (Repository) context.getService(sref);
         assertNotNull("Repository not null", repo);
 
-        XRepository xrepo = (XRepository) repo;
-        RepositoryRequirementBuilder reqbuilder = xrepo.getRequirementBuilder();
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
-        Requirement req = reqbuilder.createArtifactRequirement(mavenid);
+        Requirement req = XRequirementBuilder.createArtifactRequirement(mavenid);
         assertNotNull("Requirement not null", req);
 
-        Collection<Capability> caps = xrepo.findProviders(req);
+        Collection<Capability> caps = repo.findProviders(req);
         assertEquals("Capability not null", 1, caps.size());
 
         XIdentityCapability xcap = (XIdentityCapability) caps.iterator().next();

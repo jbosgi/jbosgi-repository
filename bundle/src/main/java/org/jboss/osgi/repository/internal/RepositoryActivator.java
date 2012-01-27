@@ -23,7 +23,6 @@ package org.jboss.osgi.repository.internal;
 
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.jboss.osgi.repository.RepositoryCachePlugin;
-import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.AbstractRepositoryCachePlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;

@@ -24,19 +24,19 @@ package org.jboss.test.osgi.repository;
 
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
-import org.jboss.osgi.repository.MavenCoordinates;
 import org.jboss.osgi.repository.RepositoryCachePlugin;
-import org.jboss.osgi.repository.RepositoryRequirementBuilder;
-import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.spi.AbstractRepositoryCachePlugin;
 import org.jboss.osgi.repository.internal.RepositoryImpl;
 import org.jboss.osgi.repository.maven.ShrinkwrapProviderPlugin;
+import org.jboss.osgi.repository.spi.AbstractRepositoryCachePlugin;
+import org.jboss.osgi.resolver.v2.MavenCoordinates;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
+import org.jboss.osgi.resolver.v2.XRequirementBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Version;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
+import org.osgi.service.repository.Repository;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -54,7 +54,7 @@ import static org.osgi.framework.resource.ResourceConstants.IDENTITY_TYPE_BUNDLE
  */
 public class ShrinkwrapProviderTestCase {
 
-    private XRepository repository;
+    private Repository repository;
 
     @Before
     public void setUp() {
@@ -65,9 +65,8 @@ public class ShrinkwrapProviderTestCase {
 
     @Test
     public void testFindProvidersByMavenId() throws Exception {
-        RepositoryRequirementBuilder builder = repository.getRequirementBuilder();
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
-        Requirement req = builder.createArtifactRequirement(mavenid);
+        Requirement req = XRequirementBuilder.createArtifactRequirement(mavenid);
         verifyProviders(repository.findProviders(req));
     }
 

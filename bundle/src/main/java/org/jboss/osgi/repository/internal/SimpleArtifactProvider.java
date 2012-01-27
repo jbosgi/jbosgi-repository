@@ -23,10 +23,11 @@ package org.jboss.osgi.repository.internal;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
-import org.jboss.osgi.repository.MavenCoordinates;
 import org.jboss.osgi.repository.RepositoryResolutionException;
-import org.jboss.osgi.repository.RepositoryResourceBuilder;
+import org.jboss.osgi.resolver.v2.MavenCoordinates;
 import org.jboss.osgi.resolver.v2.XResource;
+import org.jboss.osgi.resolver.v2.XResourceBuilder;
+import org.jboss.osgi.resolver.v2.XResourceConstants;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
@@ -40,7 +41,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMESPACE;
+import static org.jboss.osgi.resolver.v2.XResourceConstants.MAVEN_IDENTITY_NAMESPACE;
+
 
 /**
  * A simple {@link org.jboss.osgi.repository.ArtifactProviderPlugin} that uses .
@@ -55,12 +57,9 @@ public class SimpleArtifactProvider implements ArtifactProviderPlugin {
     private static String JBOSS_NEXUS_BASE = "http://repository.jboss.org/nexus/content/groups/public";
     private static String MAVEN_CENTRAL_BASE = "http://repo1.maven.org/maven2";
 
-    private final BundleContext context;
     private final URL[] baserepos;
 
     public SimpleArtifactProvider(BundleContext context) {
-        this.context = context;
-
         List<URL> repos = new ArrayList<URL>();
         String userhome = System.getProperty("user.home");
         File localrepo = new File(userhome + File.separator + ".m2" + File.separator + "repository");
@@ -86,7 +85,7 @@ public class SimpleArtifactProvider implements ArtifactProviderPlugin {
                         url.openStream().close();
                         String contentPath = url.toExternalForm();
                         contentPath = contentPath.substring(baseURL.toExternalForm().length());
-                        XResource resource = RepositoryResourceBuilder.create(baseURL, contentPath).getResource();
+                        XResource resource = XResourceBuilder.create(baseURL, contentPath).getResource();
                         result.add(resource.getIdentityCapability());
                         break;
                     } catch (IOException e) {

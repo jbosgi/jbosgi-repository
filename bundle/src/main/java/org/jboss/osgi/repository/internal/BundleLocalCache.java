@@ -22,12 +22,10 @@
 package org.jboss.osgi.repository.internal;
 
 import org.jboss.logging.Logger;
-import org.jboss.osgi.repository.MavenCoordinates;
-import org.jboss.osgi.repository.RepositoryConstants;
 import org.jboss.osgi.repository.RepositoryResolutionException;
-import org.jboss.osgi.repository.RepositoryResourceBuilder;
 import org.jboss.osgi.repository.RepositoryStorageException;
 import org.jboss.osgi.repository.spi.AbstractRepositoryCachePlugin;
+import org.jboss.osgi.resolver.v2.MavenCoordinates;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
 import org.jboss.osgi.resolver.v2.XResource;
 import org.jboss.osgi.resolver.v2.XResourceBuilder;
@@ -47,7 +45,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.jboss.osgi.repository.RepositoryConstants.MAVEN_IDENTITY_NAMESPACE;
+import static org.jboss.osgi.resolver.v2.XResourceConstants.CONTENT_PATH;
+import static org.jboss.osgi.resolver.v2.XResourceConstants.MAVEN_IDENTITY_NAMESPACE;
+
 
 /**
  * A simple {@link org.jboss.osgi.repository.ArtifactProviderPlugin} that uses .
@@ -81,7 +81,7 @@ public class BundleLocalCache extends AbstractRepositoryCachePlugin {
             if (new File(url.getPath()).exists()) {
                 String contentPath = url.toExternalForm();
                 contentPath = contentPath.substring(baseURL.toExternalForm().length());
-                XResource resource = RepositoryResourceBuilder.create(baseURL, contentPath).getResource();
+                XResource resource = XResourceBuilder.create(baseURL, contentPath).getResource();
                 result.add(resource.getIdentityCapability());
             }
             return Collections.unmodifiableList(result);
@@ -95,7 +95,7 @@ public class BundleLocalCache extends AbstractRepositoryCachePlugin {
         List<Capability> result = new ArrayList<Capability>(caps.size());
         for (Capability cap : caps) {
             XIdentityCapability icap = (XIdentityCapability) cap;
-            String contentPath = (String) icap.getAttribute(RepositoryConstants.CONTENT_PATH);
+            String contentPath = (String) icap.getAttribute(CONTENT_PATH);
             if (contentPath != null) {
                 File contentFile = new File(repository.getAbsolutePath() + File.separator + contentPath);
                 try {
@@ -113,7 +113,7 @@ public class BundleLocalCache extends AbstractRepositoryCachePlugin {
     private XIdentityCapability recreateIdentity(File contentFile) throws IOException {
         URL baseURL = repository.toURI().toURL();
         String contentPath = contentFile.getPath().substring(repository.getAbsolutePath().length() + 1);
-        XResourceBuilder builder = RepositoryResourceBuilder.create(baseURL, contentPath);
+        XResourceBuilder builder = XResourceBuilder.create(baseURL, contentPath);
         return builder.getResource().getIdentityCapability();
     }
 
