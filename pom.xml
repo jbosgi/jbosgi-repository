@@ -106,6 +106,7 @@
     <!-- Modules -->
     <modules>
         <module>api</module>
+        <module>core</module>
         <module>bundle</module>
         <module>plugins</module>
         <module>itests</module>

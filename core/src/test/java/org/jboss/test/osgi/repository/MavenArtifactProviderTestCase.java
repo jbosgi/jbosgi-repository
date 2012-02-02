@@ -26,16 +26,14 @@ import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.jboss.osgi.repository.RepositoryCachePlugin;
-import org.jboss.osgi.repository.internal.BundleLocalCache;
-import org.jboss.osgi.repository.internal.RepositoryImpl;
-import org.jboss.osgi.repository.internal.SimpleArtifactProvider;
+import org.jboss.osgi.repository.core.FileBasedRepositoryCachePlugin;
+import org.jboss.osgi.repository.core.MavenArtifactProvider;
+import org.jboss.osgi.repository.core.RepositoryImpl;
 import org.jboss.osgi.resolver.v2.MavenCoordinates;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
 import org.jboss.osgi.resolver.v2.XRequirementBuilder;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
@@ -57,16 +55,15 @@ import static org.osgi.framework.resource.ResourceConstants.IDENTITY_TYPE_BUNDLE
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class SimpleArtifactProviderTestCase {
+public class MavenArtifactProviderTestCase {
 
     private Repository repository;
 
     @Before
     public void setUp() throws IOException {
-        BundleContext context = Mockito.mock(BundleContext.class);
-        Mockito.when(context.getDataFile("repository")).thenReturn(new File("./target/repository").getCanonicalFile());
-        ArtifactProviderPlugin provider = new SimpleArtifactProvider(context);
-        RepositoryCachePlugin cache = new BundleLocalCache(context);
+        File cacheFile = new File("./target/repository").getCanonicalFile();
+        ArtifactProviderPlugin provider = new MavenArtifactProvider();
+        RepositoryCachePlugin cache = new FileBasedRepositoryCachePlugin(cacheFile);
         repository = new RepositoryImpl(provider, cache);
     }
 

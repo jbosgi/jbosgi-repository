@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.osgi.repository.internal;
+package org.jboss.osgi.repository.core;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
@@ -27,8 +27,6 @@ import org.jboss.osgi.repository.RepositoryResolutionException;
 import org.jboss.osgi.resolver.v2.MavenCoordinates;
 import org.jboss.osgi.resolver.v2.XResource;
 import org.jboss.osgi.resolver.v2.XResourceBuilder;
-import org.jboss.osgi.resolver.v2.XResourceConstants;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
 
@@ -45,21 +43,22 @@ import static org.jboss.osgi.resolver.v2.XResourceConstants.MAVEN_IDENTITY_NAMES
 
 
 /**
- * A simple {@link org.jboss.osgi.repository.ArtifactProviderPlugin} that uses .
+ * A simple {@link org.jboss.osgi.repository.ArtifactProviderPlugin} that
+ * delegates to a maven repositories.
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class SimpleArtifactProvider implements ArtifactProviderPlugin {
+public class MavenArtifactProvider implements ArtifactProviderPlugin {
 
-    private static Logger log = Logger.getLogger(SimpleArtifactProvider.class);
+    private static Logger log = Logger.getLogger(MavenArtifactProvider.class);
 
     private static String JBOSS_NEXUS_BASE = "http://repository.jboss.org/nexus/content/groups/public";
     private static String MAVEN_CENTRAL_BASE = "http://repo1.maven.org/maven2";
 
     private final URL[] baserepos;
 
-    public SimpleArtifactProvider(BundleContext context) {
+    public MavenArtifactProvider() {
         List<URL> repos = new ArrayList<URL>();
         String userhome = System.getProperty("user.home");
         File localrepo = new File(userhome + File.separator + ".m2" + File.separator + "repository");

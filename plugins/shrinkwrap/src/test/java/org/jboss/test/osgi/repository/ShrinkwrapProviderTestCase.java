@@ -25,7 +25,7 @@ package org.jboss.test.osgi.repository;
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.RepositoryCachePlugin;
-import org.jboss.osgi.repository.internal.RepositoryImpl;
+import org.jboss.osgi.repository.core.RepositoryImpl;
 import org.jboss.osgi.repository.maven.ShrinkwrapProviderPlugin;
 import org.jboss.osgi.repository.spi.AbstractRepositoryCachePlugin;
 import org.jboss.osgi.resolver.v2.MavenCoordinates;

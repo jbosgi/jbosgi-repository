@@ -18,11 +18,11 @@
         <version>1.0.4-SNAPSHOT</version>
     </parent>
 
-    <name>JBossOSGi Repository: Bundle</name>
+    <name>JBossOSGi Repository: Core</name>
 
     <groupId>org.jboss.osgi.repository</groupId>
-    <artifactId>jbosgi-repository</artifactId>
-    <packaging>bundle</packaging>
+    <artifactId>jbosgi-repository-core</artifactId>
+    <packaging>jar</packaging>
 
     <!-- Properties -->
     <properties>
@@ -31,12 +31,10 @@
     <dependencies>
         <dependency>
             <groupId>org.jboss.osgi.repository</groupId>
-            <artifactId>jbosgi-repository-core</artifactId>
+            <artifactId>jbosgi-repository-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
-        <!-- OSGi Dependencies -->
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
@@ -47,35 +45,36 @@
             <artifactId>org.osgi.enterprise</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.jboss.logmanager</groupId>
+            <artifactId>jboss-logmanager</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
+                <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Activator>org.jboss.osgi.repository.internal.RepositoryActivator</Bundle-Activator>
-                        <Export-Package />
-                        <Import-Package>
-                            org.jboss.logging;version="[3.0,4.0)",
-                            org.jboss.osgi.repository;version="[1.0,2.0)",
-                            org.jboss.osgi.repository.spi;version="[1.0,2.0)",
-                            org.jboss.osgi.resolver.v2;version="[2.0,3.0)",
-                            org.osgi.framework;version="[1.5,2.0)",
-                            org.osgi.framework.resource;version="[1.0,2.0)",
-                            org.osgi.framework.wiring;version="[1.0,2.0)",
-                            org.osgi.service.repository;version="[1.0,2.0)",
-                            org.osgi.service.resolver;version="[1.0,2.0)",
-                            org.osgi.util.tracker;version="[1.4,2.0)",
-                            !javax.security.auth.x500
-                        </Import-Package>
-                        <Embed-Dependency>
-                            jbosgi-repository-core;inline=true,
-                        </Embed-Dependency>
-                    </instructions>
+                    <systemProperties>
+                        <property>
+                            <name>java.util.logging.manager</name>
+                            <value>org.jboss.logmanager.LogManager</value>
+                        </property>
+                    </systemProperties>
                 </configuration>
             </plugin>
         </plugins>

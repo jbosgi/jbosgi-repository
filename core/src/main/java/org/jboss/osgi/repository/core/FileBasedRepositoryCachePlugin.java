@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.osgi.repository.internal;
+package org.jboss.osgi.repository.core;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.repository.RepositoryResolutionException;
@@ -29,7 +29,6 @@ import org.jboss.osgi.resolver.v2.MavenCoordinates;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
 import org.jboss.osgi.resolver.v2.XResource;
 import org.jboss.osgi.resolver.v2.XResourceBuilder;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
 import org.osgi.framework.resource.Resource;
@@ -50,19 +49,20 @@ import static org.jboss.osgi.resolver.v2.XResourceConstants.MAVEN_IDENTITY_NAMES
 
 
 /**
- * A simple {@link org.jboss.osgi.repository.ArtifactProviderPlugin} that uses .
+ * A simple {@link org.jboss.osgi.repository.RepositoryCachePlugin} that uses
+ * the local file system.
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class BundleLocalCache extends AbstractRepositoryCachePlugin {
+public class FileBasedRepositoryCachePlugin extends AbstractRepositoryCachePlugin {
 
-    private static Logger log = Logger.getLogger(BundleLocalCache.class);
+    private static Logger log = Logger.getLogger(FileBasedRepositoryCachePlugin.class);
 
     private final File repository;
 
-    public BundleLocalCache(BundleContext context) {
-        repository = context.getDataFile("repository");
+    public FileBasedRepositoryCachePlugin(File repository) {
+        this.repository = repository;
     }
 
     @Override
