@@ -27,7 +27,7 @@
     <dependencies>
         <dependency>
             <groupId>org.jboss.osgi.resolver</groupId>
-            <artifactId>jbosgi-resolver-apiv2</artifactId>
+            <artifactId>jbosgi-resolver-api-v2</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -56,12 +56,12 @@
                         <Import-Package>
                             org.jboss.logging;version="[3.0,4.0)",
                             org.jboss.modules;version="[1.0,2.0);resolution:=optional",
+                            org.jboss.osgi.metadata;version="[2.0,3.0)",
                             org.osgi.framework;version="[1.5,2.0)",
                         </Import-Package>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Embed-Dependency>
-                            jbosgi-metadata;inline=true,
-                            jbosgi-resolver-apiv2;inline=true,
+                            jbosgi-resolver-api-v2;inline=true,
                         </Embed-Dependency>
                     </instructions>
                 </configuration>

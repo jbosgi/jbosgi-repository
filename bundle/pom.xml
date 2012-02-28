@@ -61,6 +61,7 @@
                         <Export-Package />
                         <Import-Package>
                             org.jboss.logging;version="[3.0,4.0)",
+                            org.jboss.osgi.metadata;version="[2.0,3.0)",
                             org.jboss.osgi.repository;version="[1.0,2.0)",
                             org.jboss.osgi.repository.spi;version="[1.0,2.0)",
                             org.jboss.osgi.resolver.v2;version="[2.0,3.0)",

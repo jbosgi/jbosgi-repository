@@ -38,8 +38,8 @@
         <version.jboss.arquillian.core>1.0.0.CR7</version.jboss.arquillian.core>
         <version.jboss.arquillian.osgi>1.0.0.CR5</version.jboss.arquillian.osgi>
         <version.jboss.logmanager>1.2.0.GA</version.jboss.logmanager>
-        <version.jboss.osgi.resolver>2.0.0.Alpha5</version.jboss.osgi.resolver>
-        <version.jboss.osgi.framework>1.1.0</version.jboss.osgi.framework>
+        <version.jboss.osgi.resolver>2.0.0.Beta2</version.jboss.osgi.resolver>
+        <version.jboss.osgi.framework>1.1.6</version.jboss.osgi.framework>
         <version.jboss.shrinkwrap>1.0.0-cr-1</version.jboss.shrinkwrap>
         <version.jboss.shrinkwrap.resolver>1.0.0-beta-5</version.jboss.shrinkwrap.resolver>
         <version.junit>4.10</version.junit>
@@ -72,7 +72,7 @@
             </dependency>
             <dependency>
                 <groupId>org.jboss.osgi.resolver</groupId>
-                <artifactId>jbosgi-resolver-apiv2</artifactId>
+                <artifactId>jbosgi-resolver-api-v2</artifactId>
                 <version>${version.jboss.osgi.resolver}</version>
             </dependency>
             <dependency>

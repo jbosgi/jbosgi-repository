@@ -31,6 +31,7 @@ import org.jboss.osgi.repository.spi.AbstractRepositoryCachePlugin;
 import org.jboss.osgi.resolver.v2.MavenCoordinates;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
 import org.jboss.osgi.resolver.v2.XRequirementBuilder;
+import org.jboss.osgi.resolver.v2.XResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Version;
@@ -78,7 +79,7 @@ public class ShrinkwrapProviderTestCase {
         assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());
         assertEquals(IDENTITY_TYPE_BUNDLE, icap.getType());
 
-        InputStream content = icap.getResource().getContent();
+        InputStream content = ((XResource)icap.getResource()).getContent();
         Manifest manifest = new JarInputStream(content).getManifest();
         OSGiMetaData metaData = OSGiMetaDataBuilder.load(manifest);
         assertEquals("org.apache.felix.configadmin", metaData.getBundleSymbolicName());

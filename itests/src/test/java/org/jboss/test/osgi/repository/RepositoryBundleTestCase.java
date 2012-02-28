@@ -22,6 +22,7 @@ import org.jboss.osgi.resolver.v2.MavenCoordinates;
 import org.jboss.osgi.resolver.v2.XRequirementBuilder;
 import org.jboss.osgi.resolver.v2.XCapability;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
+import org.jboss.osgi.resolver.v2.XResource;
 import org.jboss.osgi.testing.OSGiManifestBuilder;
 import org.jboss.osgi.testing.OSGiTestHelper;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -90,7 +91,7 @@ public class RepositoryBundleTestCase {
 
         XIdentityCapability xcap = (XIdentityCapability) caps.iterator().next();
         assertEquals("org.apache.felix.configadmin", xcap.getSymbolicName());
-        InputStream content = xcap.getResource().getContent();
+        InputStream content = ((XResource)xcap.getResource()).getContent();
         try {
             Bundle bundle = context.installBundle(xcap.getSymbolicName(), content);
             try {

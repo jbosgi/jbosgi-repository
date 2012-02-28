@@ -121,7 +121,7 @@ public class FileBasedRepositoryCachePlugin extends AbstractRepositoryCachePlugi
         int len = 0;
         byte[] buf = new byte[4096];
         contentFile.getParentFile().mkdirs();
-        InputStream in = resource.getContent();
+        InputStream in = ((XResource)resource).getContent();
         OutputStream out = new FileOutputStream(contentFile);
         while ((len = in.read(buf)) >= 0) {
             out.write(buf, 0, len);
