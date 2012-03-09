@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.jboss.osgi</groupId>
         <artifactId>jboss-osgi-parent</artifactId>
-        <version>1.0.15</version>
+        <version>1.0.18</version>
     </parent>
 
     <name>JBossOSGi Repository</name>
@@ -35,6 +35,7 @@
 
     <!-- Properties -->
     <properties>
+    	<bundle.version>1.0.5</bundle.version>
         <version.jboss.arquillian.core>1.0.0.CR7</version.jboss.arquillian.core>
         <version.jboss.arquillian.osgi>1.0.0.CR5</version.jboss.arquillian.osgi>
         <version.jboss.logmanager>1.2.0.GA</version.jboss.logmanager>

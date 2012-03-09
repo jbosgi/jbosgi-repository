@@ -20,7 +20,6 @@
 
     <name>JBossOSGi Repository: Bundle</name>
 
-    <groupId>org.jboss.osgi.repository</groupId>
     <artifactId>jbosgi-repository</artifactId>
     <packaging>bundle</packaging>
 
@@ -57,8 +56,8 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Version>${bundle.version}</Bundle-Version>
                         <Bundle-Activator>org.jboss.osgi.repository.internal.RepositoryActivator</Bundle-Activator>
-                        <Export-Package />
                         <Import-Package>
                             org.jboss.logging;version="[3.0,4.0)",
                             org.jboss.osgi.metadata;version="[2.0,3.0)",
