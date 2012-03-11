@@ -47,22 +47,17 @@
                         <Export-Package>
                             org.jboss.osgi.repository;version=${bundle.version},
                             org.jboss.osgi.repository.spi;version=${bundle.version},
-                            org.jboss.osgi.resolver.v2;version=${version.jboss.osgi.resolver},
-                            org.osgi.framework.resource;version=1.0,
-                            org.osgi.framework.wiring;version=1.1,
                             org.osgi.service.repository;version=1.0,
-                            org.osgi.service.resolver;version=1.0,
                         </Export-Package>
                         <Import-Package>
                             org.jboss.logging;version="[3.0,4.0)",
                             org.jboss.modules;version="[1.0,2.0);resolution:=optional",
                             org.jboss.osgi.metadata;version="[2.0,3.0)",
+                            org.jboss.osgi.resolver.v2;version="[2.0,3.0)",
+                            org.jboss.osgi.resolver.v2.spi;version="[2.0,3.0)",
                             org.osgi.framework;version="[1.5,2.0)",
+                            org.osgi.framework.resource;version="[1.0,2.0]"
                         </Import-Package>
-                        <Embed-Transitive>true</Embed-Transitive>
-                        <Embed-Dependency>
-                            jbosgi-resolver-api-v2;inline=true,
-                        </Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>

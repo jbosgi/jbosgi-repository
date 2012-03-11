@@ -23,8 +23,7 @@ import org.jboss.osgi.resolver.v2.XRequirementBuilder;
 import org.jboss.osgi.resolver.v2.XCapability;
 import org.jboss.osgi.resolver.v2.XIdentityCapability;
 import org.jboss.osgi.resolver.v2.XResource;
-import org.jboss.osgi.testing.OSGiManifestBuilder;
-import org.jboss.osgi.testing.OSGiTestHelper;
+import org.jboss.osgi.spi.OSGiManifestBuilder;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -96,7 +95,7 @@ public class RepositoryBundleTestCase {
             Bundle bundle = context.installBundle(xcap.getSymbolicName(), content);
             try {
                 bundle.start();
-                OSGiTestHelper.assertBundleState(Bundle.ACTIVE, bundle.getState());
+                assertEquals(Bundle.ACTIVE, bundle.getState());
             } finally {
                 bundle.uninstall();
             }
