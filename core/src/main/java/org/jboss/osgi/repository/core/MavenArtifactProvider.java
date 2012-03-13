@@ -24,9 +24,9 @@ package org.jboss.osgi.repository.core;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.jboss.osgi.repository.RepositoryResolutionException;
-import org.jboss.osgi.resolver.v2.MavenCoordinates;
-import org.jboss.osgi.resolver.v2.XResource;
-import org.jboss.osgi.resolver.v2.XResourceBuilder;
+import org.jboss.osgi.resolver.MavenCoordinates;
+import org.jboss.osgi.resolver.XResource;
+import org.jboss.osgi.resolver.XResourceBuilder;
 import org.osgi.framework.resource.Capability;
 import org.osgi.framework.resource.Requirement;
 
@@ -39,7 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.jboss.osgi.resolver.v2.XResourceConstants.MAVEN_IDENTITY_NAMESPACE;
+import static org.jboss.osgi.resolver.XResourceConstants.MAVEN_IDENTITY_NAMESPACE;
 
 
 /**

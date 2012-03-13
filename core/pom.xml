@@ -19,8 +19,6 @@
     </parent>
 
     <name>JBossOSGi Repository: Core</name>
-
-    <groupId>org.jboss.osgi.repository</groupId>
     <artifactId>jbosgi-repository-core</artifactId>
     <packaging>jar</packaging>
 

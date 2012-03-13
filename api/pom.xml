@@ -26,7 +26,7 @@
     <dependencies>
         <dependency>
             <groupId>org.jboss.osgi.resolver</groupId>
-            <artifactId>jbosgi-resolver-api-v2</artifactId>
+            <artifactId>jbosgi-resolver-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -53,8 +53,8 @@
                             org.jboss.logging;version="[3.0,4.0)",
                             org.jboss.modules;version="[1.0,2.0);resolution:=optional",
                             org.jboss.osgi.metadata;version="[2.0,3.0)",
-                            org.jboss.osgi.resolver.v2;version="[2.0,3.0)",
-                            org.jboss.osgi.resolver.v2.spi;version="[2.0,3.0)",
+                            org.jboss.osgi.resolver;version="[2.0,3.0)",
+                            org.jboss.osgi.resolver.spi;version="[2.0,3.0)",
                             org.osgi.framework;version="[1.5,2.0)",
                             org.osgi.framework.resource;version="[1.0,2.0]"
                         </Import-Package>
