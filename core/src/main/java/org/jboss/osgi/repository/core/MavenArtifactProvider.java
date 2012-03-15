@@ -35,6 +35,7 @@ import java.util.List;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.jboss.osgi.repository.RepositoryResolutionException;
+import org.jboss.osgi.repository.URLBasedResourceBuilder;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XResource;
 import org.osgi.framework.resource.Capability;

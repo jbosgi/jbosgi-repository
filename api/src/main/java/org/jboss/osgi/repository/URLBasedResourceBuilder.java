@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.osgi.repository.core;
+package org.jboss.osgi.repository;
 
 import static org.jboss.osgi.resolver.XResourceConstants.CONTENT_PATH;
 import static org.jboss.osgi.resolver.XResourceConstants.CONTENT_URL;
@@ -33,7 +33,6 @@ import java.util.jar.Manifest;
 
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
-import org.jboss.osgi.repository.URLBasedResource;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
@@ -49,9 +48,9 @@ import org.osgi.framework.Version;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-final class URLBasedResourceBuilder {
+public final class URLBasedResourceBuilder {
 
-    static XResource createResource(URL baseURL, String contentPath) {
+    public static XResource createResource(URL baseURL, String contentPath) {
         final URLBasedResource urlres = new URLBasedResource(baseURL, contentPath);
         XResourceBuilderFactory factory = new XResourceBuilderFactory() {
             

@@ -37,6 +37,7 @@ import java.util.List;
 
 import org.jboss.osgi.repository.RepositoryResolutionException;
 import org.jboss.osgi.repository.RepositoryStorageException;
+import org.jboss.osgi.repository.URLBasedResourceBuilder;
 import org.jboss.osgi.repository.spi.AbstractRepositoryCachePlugin;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XIdentityCapability;
