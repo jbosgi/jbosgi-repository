@@ -21,17 +21,8 @@
  */
 package org.jboss.osgi.repository.core;
 
-import org.jboss.logging.Logger;
-import org.jboss.osgi.repository.RepositoryResolutionException;
-import org.jboss.osgi.repository.RepositoryStorageException;
-import org.jboss.osgi.repository.spi.AbstractRepositoryCachePlugin;
-import org.jboss.osgi.resolver.MavenCoordinates;
-import org.jboss.osgi.resolver.XIdentityCapability;
-import org.jboss.osgi.resolver.XResource;
-import org.jboss.osgi.resolver.XResourceBuilder;
-import org.osgi.framework.resource.Capability;
-import org.osgi.framework.resource.Requirement;
-import org.osgi.framework.resource.Resource;
+import static org.jboss.osgi.resolver.XResourceConstants.CONTENT_PATH;
+import static org.jboss.osgi.resolver.XResourceConstants.MAVEN_IDENTITY_NAMESPACE;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,8 +35,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.jboss.osgi.resolver.XResourceConstants.CONTENT_PATH;
-import static org.jboss.osgi.resolver.XResourceConstants.MAVEN_IDENTITY_NAMESPACE;
+import org.jboss.osgi.repository.RepositoryResolutionException;
+import org.jboss.osgi.repository.RepositoryStorageException;
+import org.jboss.osgi.repository.spi.AbstractRepositoryCachePlugin;
+import org.jboss.osgi.resolver.MavenCoordinates;
+import org.jboss.osgi.resolver.XIdentityCapability;
+import org.jboss.osgi.resolver.XResource;
+import org.osgi.framework.resource.Capability;
+import org.osgi.framework.resource.Requirement;
+import org.osgi.framework.resource.Resource;
 
 
 /**
@@ -56,8 +54,6 @@ import static org.jboss.osgi.resolver.XResourceConstants.MAVEN_IDENTITY_NAMESPAC
  * @since 16-Jan-2012
  */
 public class FileBasedRepositoryCachePlugin extends AbstractRepositoryCachePlugin {
-
-    private static Logger log = Logger.getLogger(FileBasedRepositoryCachePlugin.class);
 
     private final File repository;
 
@@ -81,7 +77,7 @@ public class FileBasedRepositoryCachePlugin extends AbstractRepositoryCachePlugi
             if (new File(url.getPath()).exists()) {
                 String contentPath = url.toExternalForm();
                 contentPath = contentPath.substring(baseURL.toExternalForm().length());
-                XResource resource = XResourceBuilder.create(baseURL, contentPath).getResource();
+                XResource resource = URLBasedResourceBuilder.createResource(baseURL, contentPath);
                 result.add(resource.getIdentityCapability());
             }
             return Collections.unmodifiableList(result);
@@ -113,8 +109,8 @@ public class FileBasedRepositoryCachePlugin extends AbstractRepositoryCachePlugi
     private XIdentityCapability recreateIdentity(File contentFile) throws IOException {
         URL baseURL = repository.toURI().toURL();
         String contentPath = contentFile.getPath().substring(repository.getAbsolutePath().length() + 1);
-        XResourceBuilder builder = XResourceBuilder.create(baseURL, contentPath);
-        return builder.getResource().getIdentityCapability();
+        XResource resource = URLBasedResourceBuilder.createResource(baseURL, contentPath);
+        return resource.getIdentityCapability();
     }
 
     private void copyResourceContent(Resource resource, File contentFile) throws IOException {

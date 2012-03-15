@@ -21,14 +21,7 @@
  */
 package org.jboss.osgi.repository.core;
 
-import org.jboss.logging.Logger;
-import org.jboss.osgi.repository.ArtifactProviderPlugin;
-import org.jboss.osgi.repository.RepositoryResolutionException;
-import org.jboss.osgi.resolver.MavenCoordinates;
-import org.jboss.osgi.resolver.XResource;
-import org.jboss.osgi.resolver.XResourceBuilder;
-import org.osgi.framework.resource.Capability;
-import org.osgi.framework.resource.Requirement;
+import static org.jboss.osgi.resolver.XResourceConstants.MAVEN_IDENTITY_NAMESPACE;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +32,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.jboss.osgi.resolver.XResourceConstants.MAVEN_IDENTITY_NAMESPACE;
+import org.jboss.logging.Logger;
+import org.jboss.osgi.repository.ArtifactProviderPlugin;
+import org.jboss.osgi.repository.RepositoryResolutionException;
+import org.jboss.osgi.resolver.MavenCoordinates;
+import org.jboss.osgi.resolver.XResource;
+import org.osgi.framework.resource.Capability;
+import org.osgi.framework.resource.Requirement;
 
 
 /**
@@ -84,7 +83,7 @@ public class MavenArtifactProvider implements ArtifactProviderPlugin {
                         url.openStream().close();
                         String contentPath = url.toExternalForm();
                         contentPath = contentPath.substring(baseURL.toExternalForm().length());
-                        XResource resource = XResourceBuilder.create(baseURL, contentPath).getResource();
+                        XResource resource = URLBasedResourceBuilder.createResource(baseURL, contentPath);
                         result.add(resource.getIdentityCapability());
                         break;
                     } catch (IOException e) {

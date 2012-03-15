@@ -64,6 +64,7 @@
                             org.jboss.osgi.repository;version="[1.0,2.0)",
                             org.jboss.osgi.repository.spi;version="[1.0,2.0)",
                             org.jboss.osgi.resolver;version="[2.0,3.0)",
+                            org.jboss.osgi.resolver.spi;version="[2.0,3.0)",
                             org.osgi.framework;version="[1.5,2.0)",
                             org.osgi.framework.resource;version="[1.0,2.0)",
                             org.osgi.framework.wiring;version="[1.0,2.0)",
