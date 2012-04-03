@@ -23,8 +23,8 @@ package org.jboss.osgi.repository.spi;
 
 import org.jboss.osgi.repository.RepositoryCachePlugin;
 import org.jboss.osgi.repository.RepositoryStorageException;
-import org.osgi.framework.resource.Capability;
-import org.osgi.framework.resource.Requirement;
+import org.osgi.resource.Capability;
+import org.osgi.resource.Requirement;
 
 import java.util.Collection;
 import java.util.Collections;

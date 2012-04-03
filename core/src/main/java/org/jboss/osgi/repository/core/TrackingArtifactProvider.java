@@ -23,8 +23,8 @@ package org.jboss.osgi.repository.core;
 
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.resource.Capability;
-import org.osgi.framework.resource.Requirement;
+import org.osgi.resource.Capability;
+import org.osgi.resource.Requirement;
 import org.osgi.util.tracker.ServiceTracker;
 
 import java.util.ArrayList;

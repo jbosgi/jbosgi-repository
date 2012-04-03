@@ -38,8 +38,8 @@ import org.jboss.osgi.repository.RepositoryResolutionException;
 import org.jboss.osgi.repository.URLBasedResourceBuilder;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XResource;
-import org.osgi.framework.resource.Capability;
-import org.osgi.framework.resource.Requirement;
+import org.osgi.resource.Capability;
+import org.osgi.resource.Requirement;
 
 
 /**

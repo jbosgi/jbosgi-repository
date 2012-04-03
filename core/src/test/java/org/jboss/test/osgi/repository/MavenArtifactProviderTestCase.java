@@ -36,20 +36,20 @@ import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Version;
-import org.osgi.framework.resource.Capability;
-import org.osgi.framework.resource.Requirement;
-import org.osgi.framework.resource.Resource;
+import org.osgi.framework.namespace.IdentityNamespace;
+import org.osgi.resource.Capability;
+import org.osgi.resource.Requirement;
 import org.osgi.service.repository.Repository;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
 import static org.junit.Assert.assertEquals;
-import static org.osgi.framework.resource.ResourceConstants.IDENTITY_TYPE_BUNDLE;
 
 /**
  * Test the default resolver integration.
@@ -73,7 +73,7 @@ public class MavenArtifactProviderTestCase {
     public void testFindProvidersByMavenId() throws Exception {
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
         Requirement req = XRequirementBuilder.createArtifactRequirement(mavenid);
-        Collection<Capability> caps = repository.findProviders(req);
+        Collection<Capability> caps = repository.findProviders(Collections.singleton(req)).get(req);
         assertEquals("One capability", 1, caps.size());
         Capability cap = caps.iterator().next();
         verifyProvider(cap);
@@ -85,7 +85,7 @@ public class MavenArtifactProviderTestCase {
         XIdentityCapability icap = (XIdentityCapability) cap;
         assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
         assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());
-        assertEquals(IDENTITY_TYPE_BUNDLE, icap.getType());
+        assertEquals(IdentityNamespace.TYPE_BUNDLE, icap.getType());
 
         InputStream content = ((XResource) icap.getResource()).getContent();
         Manifest manifest = new JarInputStream(content).getManifest();

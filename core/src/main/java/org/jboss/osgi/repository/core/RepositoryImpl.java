@@ -24,8 +24,8 @@ package org.jboss.osgi.repository.core;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.jboss.osgi.repository.RepositoryCachePlugin;
-import org.osgi.framework.resource.Capability;
-import org.osgi.framework.resource.Requirement;
+import org.osgi.resource.Capability;
+import org.osgi.resource.Requirement;
 import org.osgi.service.repository.Repository;
 
 import java.util.Collection;
@@ -52,29 +52,23 @@ public final class RepositoryImpl implements Repository {
     }
 
     @Override
-    public Collection<Capability> findProviders(Requirement req) {
-        log.infof("find providers for: %s", req);
-
-        // First get the matching capabilities from the cache
-        Collection<Capability> caps = cache.findProviders(req);
-        if (caps.isEmpty()) {
-            // Next, get matching capabilities from the provider
-            caps = provider.findProviders(req);
-
-            // Store the provided cpabilities in the cache
-            caps = cache.storeCapabilities(caps);
-        }
-
-        log.infof("found matching caps: %s", caps);
-        return Collections.unmodifiableCollection(caps);
-    }
-
-    @Override
     public Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> reqs) {
+        log.infof("find providers for: %s", reqs);
         Map<Requirement, Collection<Capability>> result = new HashMap<Requirement, Collection<Capability>>();
         for (Requirement req : reqs) {
-            Collection<Capability> caps = findProviders(req);
-            result.put(req, caps);
+            
+            // First get the matching capabilities from the cache
+            Collection<Capability> caps = cache.findProviders(req);
+            if (caps.isEmpty()) {
+                
+                // Next, get matching capabilities from the provider
+                caps = provider.findProviders(req);
+
+                // Store the provided cpabilities in the cache
+                caps = cache.storeCapabilities(caps);
+            }
+            log.infof("found matching caps: %s", caps);
+            result.put(req, Collections.unmodifiableCollection(caps));
         }
         return Collections.unmodifiableMap(result);
     }

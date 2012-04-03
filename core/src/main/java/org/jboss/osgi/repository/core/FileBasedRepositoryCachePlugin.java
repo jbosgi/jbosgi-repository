@@ -42,9 +42,9 @@ import org.jboss.osgi.repository.spi.AbstractRepositoryCachePlugin;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XResource;
-import org.osgi.framework.resource.Capability;
-import org.osgi.framework.resource.Requirement;
-import org.osgi.framework.resource.Resource;
+import org.osgi.resource.Capability;
+import org.osgi.resource.Requirement;
+import org.osgi.resource.Resource;
 
 
 /**

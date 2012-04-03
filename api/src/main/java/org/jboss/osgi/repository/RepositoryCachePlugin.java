@@ -21,12 +21,10 @@
  */
 package org.jboss.osgi.repository;
 
-import org.osgi.framework.resource.Capability;
-import org.osgi.framework.resource.Requirement;
-import org.osgi.framework.resource.Resource;
-
-import java.net.URL;
 import java.util.Collection;
+
+import org.osgi.resource.Capability;
+import org.osgi.resource.Requirement;
 
 /**
  * Handles storage of repository artifacts
