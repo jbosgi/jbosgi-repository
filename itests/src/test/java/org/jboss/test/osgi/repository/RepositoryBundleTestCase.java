@@ -16,13 +16,21 @@
  */
 package org.jboss.test.osgi.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Collections;
+
+import javax.inject.Inject;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XRequirementBuilder;
-import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.spi.OSGiManifestBuilder;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
@@ -37,14 +45,7 @@ import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
 import org.osgi.service.repository.Repository;
-
-import javax.inject.Inject;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.osgi.service.repository.RepositoryContent;
 
 /**
  * Test simple OSGi bundle deployment
@@ -91,9 +92,10 @@ public class RepositoryBundleTestCase {
 
         XIdentityCapability xcap = (XIdentityCapability) caps.iterator().next();
         assertEquals("org.apache.felix.configadmin", xcap.getSymbolicName());
-        InputStream content = ((XResource)xcap.getResource()).getContent();
+        RepositoryContent content = (RepositoryContent) xcap.getResource();
+        InputStream input = content.getContent();
         try {
-            Bundle bundle = context.installBundle(xcap.getSymbolicName(), content);
+            Bundle bundle = context.installBundle(xcap.getSymbolicName(), input);
             try {
                 bundle.start();
                 assertEquals(Bundle.ACTIVE, bundle.getState());
@@ -101,7 +103,7 @@ public class RepositoryBundleTestCase {
                 bundle.uninstall();
             }
         } finally {
-            content.close();
+            input.close();
         }
     }
 }

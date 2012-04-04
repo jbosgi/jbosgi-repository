@@ -44,7 +44,7 @@ import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
-import org.osgi.resource.Resource;
+import org.osgi.service.repository.RepositoryContent;
 
 
 /**
@@ -94,10 +94,11 @@ public class FileBasedRepositoryCachePlugin extends AbstractRepositoryCachePlugi
             XIdentityCapability icap = (XIdentityCapability) cap;
             String contentPath = (String) icap.getAttribute(CONTENT_PATH);
             if (contentPath != null) {
-                File contentFile = new File(repository.getAbsolutePath() + File.separator + contentPath);
+                File targetFile = new File(repository.getAbsolutePath() + File.separator + contentPath);
                 try {
-                    copyResourceContent(cap.getResource(), contentFile);
-                    XIdentityCapability newid = recreateIdentity(contentFile);
+                    RepositoryContent content = (RepositoryContent) cap.getResource();
+                    copyResourceContent(content, targetFile);
+                    XIdentityCapability newid = recreateIdentity(targetFile);
                     result.add(newid);
                 } catch (IOException ex) {
                     new RepositoryStorageException(ex);
@@ -114,12 +115,12 @@ public class FileBasedRepositoryCachePlugin extends AbstractRepositoryCachePlugi
         return resource.getIdentityCapability();
     }
 
-    private void copyResourceContent(Resource resource, File contentFile) throws IOException {
+    private void copyResourceContent(RepositoryContent content, File targetFile) throws IOException {
         int len = 0;
         byte[] buf = new byte[4096];
-        contentFile.getParentFile().mkdirs();
-        InputStream in = ((XResource)resource).getContent();
-        OutputStream out = new FileOutputStream(contentFile);
+        targetFile.getParentFile().mkdirs();
+        InputStream in = content.getContent();
+        OutputStream out = new FileOutputStream(targetFile);
         while ((len = in.read(buf)) >= 0) {
             out.write(buf, 0, len);
         }

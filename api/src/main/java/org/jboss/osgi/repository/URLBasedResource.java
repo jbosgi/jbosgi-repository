@@ -29,6 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.jboss.osgi.resolver.spi.AbstractResource;
+import org.osgi.service.repository.RepositoryContent;
 
 /**
  * A resource based on an URL
@@ -36,7 +37,7 @@ import org.jboss.osgi.resolver.spi.AbstractResource;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-final class URLBasedResource extends AbstractResource {
+final class URLBasedResource extends AbstractResource implements RepositoryContent {
 
     private final String contentPath;
     private final URL contentURL;

@@ -22,6 +22,15 @@ package org.jboss.test.osgi.repository;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
+
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
@@ -32,7 +41,6 @@ import org.jboss.osgi.repository.core.RepositoryImpl;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XRequirementBuilder;
-import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Version;
@@ -40,16 +48,7 @@ import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.service.repository.Repository;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.jar.JarInputStream;
-import java.util.jar.Manifest;
-
-import static org.junit.Assert.assertEquals;
+import org.osgi.service.repository.RepositoryContent;
 
 /**
  * Test the default resolver integration.
@@ -87,8 +86,8 @@ public class MavenArtifactProviderTestCase {
         assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());
         assertEquals(IdentityNamespace.TYPE_BUNDLE, icap.getType());
 
-        InputStream content = ((XResource) icap.getResource()).getContent();
-        Manifest manifest = new JarInputStream(content).getManifest();
+        RepositoryContent content = (RepositoryContent) icap.getResource();
+        Manifest manifest = new JarInputStream(content.getContent()).getManifest();
         OSGiMetaData metaData = OSGiMetaDataBuilder.load(manifest);
         assertEquals("org.apache.felix.configadmin", metaData.getBundleSymbolicName());
         assertEquals(Version.parseVersion("1.2.8"), metaData.getBundleVersion());
