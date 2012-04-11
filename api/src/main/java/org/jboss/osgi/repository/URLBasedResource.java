@@ -49,8 +49,8 @@ final class URLBasedResource extends AbstractResource implements RepositoryConte
             if (!(base.endsWith("/") || contentPath.startsWith("/")))
                 base += "/";
             this.contentURL = new URL(base + contentPath);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(e);
+        } catch (MalformedURLException ex) {
+            throw new IllegalArgumentException(ex);
         }
     }
 

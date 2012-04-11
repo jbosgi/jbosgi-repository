@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.jboss.logging.Logger;
 import org.jboss.osgi.repository.ArtifactProviderPlugin;
 import org.jboss.osgi.repository.RepositoryResolutionException;
 import org.jboss.osgi.repository.URLBasedResourceBuilder;
@@ -50,8 +49,6 @@ import org.osgi.resource.Requirement;
  * @since 16-Jan-2012
  */
 public class MavenArtifactProvider implements ArtifactProviderPlugin {
-
-    private static Logger log = Logger.getLogger(MavenArtifactProvider.class);
 
     private static String JBOSS_NEXUS_BASE = "http://repository.jboss.org/nexus/content/groups/public";
     private static String MAVEN_CENTRAL_BASE = "http://repo1.maven.org/maven2";
