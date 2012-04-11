@@ -24,7 +24,7 @@
     <artifactId>jbosgi-repository-parent</artifactId>
     <packaging>pom</packaging>
 
-    <version>1.2.0.CR1</version>
+    <version>1.2.0.CR2-SNAPSHOT</version>
 
     <!-- Source -->
     <scm>
