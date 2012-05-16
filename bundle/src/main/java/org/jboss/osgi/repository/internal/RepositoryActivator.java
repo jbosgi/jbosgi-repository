@@ -21,15 +21,21 @@
  */
 package org.jboss.osgi.repository.internal;
 
-import org.jboss.osgi.repository.ArtifactProviderPlugin;
-import org.jboss.osgi.repository.RepositoryCachePlugin;
-import org.jboss.osgi.repository.core.FileBasedRepositoryCachePlugin;
-import org.jboss.osgi.repository.core.MavenArtifactProvider;
-import org.jboss.osgi.repository.core.RepositoryImpl;
-import org.jboss.osgi.repository.core.TrackingArtifactProvider;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import org.jboss.osgi.repository.RepositoryStorage;
+import org.jboss.osgi.repository.XRepository;
+import org.jboss.osgi.repository.core.FileBasedRepositoryStorage;
+import org.jboss.osgi.repository.core.MavenArtifactRepository;
+import org.jboss.osgi.repository.spi.AbstractCachingRepository;
+import org.jboss.osgi.repository.spi.AggregatingRepository;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.repository.Repository;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * An activator for the {@link Repository} service.
@@ -39,19 +45,66 @@ import org.osgi.service.repository.Repository;
  */
 public class RepositoryActivator implements BundleActivator {
 
+    private final String[] SERVICE_NAMES = new String[] { XRepository.class.getName(), Repository.class.getName() };
+
+    private XRepository repository;
+
     @Override
     public void start(final BundleContext context) throws Exception {
-        // Register the MavenArtifactProvider
-        MavenArtifactProvider simpleProvider = new MavenArtifactProvider();
-        context.registerService(ArtifactProviderPlugin.class.getName(), simpleProvider, null);
-        // Register the Repository
-        ArtifactProviderPlugin provider = new TrackingArtifactProvider(context);
-        RepositoryCachePlugin cache = new FileBasedRepositoryCachePlugin(context.getDataFile("repository"));
-        RepositoryImpl service = new RepositoryImpl(provider, cache);
-        context.registerService(Repository.class.getName(), service, null);
+
+        // Register the repository storage service
+        RepositoryStorage storage = new FileBasedRepositoryStorage(context.getDataFile("repository"));
+        context.registerService(RepositoryStorage.class.getName(), storage, null);
+
+        // Register the maven artifact repository
+        Dictionary<String, Object> props = new Hashtable<String, Object>();
+        props.put(Constants.SERVICE_DESCRIPTION, "JBossOSGi Maven Artifact Repository");
+        context.registerService(SERVICE_NAMES, new MavenArtifactRepository(), props);
+
+        ServiceTracker storageTracker = new ServiceTracker(context, RepositoryStorage.class.getName(), null) {
+            @Override
+            public Object addingService(ServiceReference reference) {
+                RepositoryStorage storage = (RepositoryStorage) super.addingService(reference);
+                if (repository == null) {
+                    Dictionary<String, Object> props = new Hashtable<String, Object>();
+                    props.put(Constants.SERVICE_RANKING, Integer.MAX_VALUE);
+                    props.put(Constants.SERVICE_DESCRIPTION, "JBossOSGi Aggregating Repository");
+                    repository = new AbstractCachingRepository(storage, new RepositoryDelegate(context));
+                    context.registerService(SERVICE_NAMES, repository, props);
+                }
+                return storage;
+            }
+        };
+        storageTracker.open();
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
+    }
+
+    class RepositoryDelegate extends AggregatingRepository {
+
+        public RepositoryDelegate(final BundleContext context) {
+            ServiceTracker repoTracker = new ServiceTracker(context, XRepository.class.getName(), null) {
+                @Override
+                public Object addingService(ServiceReference reference) {
+                    XRepository repo = (XRepository) super.addingService(reference);
+                    if (repo != repository) {
+                        addRepository(repo);
+                    }
+                    return repo;
+                }
+
+                @Override
+                public void removedService(ServiceReference reference, Object service) {
+                    XRepository repo = (XRepository) service;
+                    if (repo != repository) {
+                        removeRepository(repo);
+                    }
+                    super.removedService(reference, service);
+                }
+            };
+            repoTracker.open();
+        }
     }
 }

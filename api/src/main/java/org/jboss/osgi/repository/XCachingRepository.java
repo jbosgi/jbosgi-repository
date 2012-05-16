@@ -1,8 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2005, JBoss Inc., and individual contributors as indicated
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2011, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -21,20 +21,24 @@
  */
 package org.jboss.osgi.repository;
 
-import java.util.Collection;
-
-import org.osgi.resource.Capability;
-import org.osgi.resource.Requirement;
-
 /**
- * Handles storage of repository artifacts
+ * An extension of the {@link XRepository} that provides capability caching.
+ *
+ * Implementations are expected to first search the cache for matching capabilities.
+ * If there is no capability in the cache the search continues in the repository delegate.
  *
  * @author thomas.diesler@jboss.com
- * @since 16-Jan-2012
+ * @since 11-May-2012
  */
-public interface RepositoryCachePlugin {
+public interface XCachingRepository extends XRepository {
 
-    Collection<Capability> findProviders(Requirement req);
+    /**
+     * Get the associated repository storage
+     */
+    RepositoryStorage getRepositoryStorage();
 
-    Collection<Capability> storeCapabilities(Collection<Capability> caps) throws RepositoryStorageException;
+    /**
+     * Get the associated repository delegate
+     */
+    XRepository getRepositoryDelegate();
 }

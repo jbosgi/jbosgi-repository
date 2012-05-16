@@ -17,7 +17,6 @@
             <outputFileNameMapping>${artifact.artifactId}${dashClassifier?}.${artifact.extension}
             </outputFileNameMapping>
             <includes>
-                <include>*:jbosgi-repository-api:jar</include>
                 <include>*:jbosgi-repository:jar</include>
             </includes>
             <useStrictFiltering>true</useStrictFiltering>

@@ -1,8 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2011, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
+ * JBoss, Home of Professional Open Source
+ * Copyright 2005, JBoss Inc., and individual contributors as indicated
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -21,22 +21,17 @@
  */
 package org.jboss.osgi.repository;
 
+import java.io.InputStream;
+
+import javax.xml.stream.XMLStreamException;
+
 /**
- * Signals a failure during artifact storage.
+ * A reader for a repository XML
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class RepositoryStorageException extends RuntimeException {
-    public RepositoryStorageException(String message) {
-        super(message);
-    }
+public interface RepositoryXMLReader {
 
-    public RepositoryStorageException(Throwable cause) {
-        super(cause);
-    }
-
-    public RepositoryStorageException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    void parse(InputStream input, RepositoryProcessor processor) throws XMLStreamException;
 }

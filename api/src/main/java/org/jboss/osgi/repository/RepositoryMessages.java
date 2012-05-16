@@ -19,12 +19,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.jboss.osgi.repository;
 
-package org.jboss.osgi.repository.core;
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLStreamException;
 
+import org.jboss.logging.Cause;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageBundle;
 import org.jboss.logging.Messages;
+import org.jboss.osgi.resolver.XResource;
 
 /**
  * Logging Id ranges: 20500-20599
@@ -41,4 +45,24 @@ public interface RepositoryMessages {
     @Message(id = 20500, value = "%s is null")
     IllegalArgumentException illegalArgumentNull(String name);
 
+    @Message(id = 20501, value = "Resource already exists: %s")
+    IllegalStateException illegalStateResourceAlreadyExists(XResource res);
+
+    @Message(id = 20502, value = "Invalid resource description at: %s")
+    XMLStreamException xmlInvalidResourceDecription(@Cause Throwable th, Location location);
+
+    @Message(id = 20503, value = "Cannot obtain content capability: %s")
+    RepositoryStorageException storageCannotObtainContentCapablility(XResource res);
+
+    @Message(id = 20504, value = "Cannot obtain content URL: %s")
+    RepositoryStorageException storageCannotObtainContentURL(XResource res);
+
+    @Message(id = 20505, value = "No such digest algorithm: %s")
+    RepositoryStorageException storageNoSuchAlgorithm(@Cause Throwable th, String algorithm);
+
+    @Message(id = 20506, value = "Cannot add resource to storage: %s")
+    RepositoryStorageException storageCannotAddResourceToStorage(@Cause Throwable th, String mime);
+
+    @Message(id = 20507, value = "Cannot obtain input stream for: %s")
+    RepositoryStorageException storageCannotObtainInputStream(@Cause Throwable th, XResource res);
 }

@@ -21,6 +21,8 @@
  */
 package org.jboss.osgi.repository;
 
+import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,21 +39,17 @@ import org.osgi.service.repository.RepositoryContent;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-final class URLBasedResource extends AbstractResource implements RepositoryContent {
+final class URLResource extends AbstractResource implements RepositoryContent {
 
     private final String contentPath;
     private final URL contentURL;
 
-    public URLBasedResource(URL baseURL, String contentPath) {
+    public URLResource(URL baseURL, String contentPath) throws MalformedURLException {
         this.contentPath = contentPath;
-        try {
-            String base = baseURL.toExternalForm();
-            if (!(base.endsWith("/") || contentPath.startsWith("/")))
-                base += "/";
-            this.contentURL = new URL(base + contentPath);
-        } catch (MalformedURLException ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        String base = baseURL.toExternalForm();
+        if (!(base.endsWith("/") || contentPath.startsWith("/")))
+            base += "/";
+        this.contentURL = new URL(base + contentPath);
     }
 
     public URL getContentURL() {
@@ -71,7 +69,7 @@ final class URLBasedResource extends AbstractResource implements RepositoryConte
                 return contentURL.openStream();
             }
         } catch (IOException ex) {
-            throw new IllegalStateException(ex);
+            throw MESSAGES.storageCannotObtainInputStream(ex, this);
         }
     }
 }

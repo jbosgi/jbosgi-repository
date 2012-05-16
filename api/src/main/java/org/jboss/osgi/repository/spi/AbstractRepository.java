@@ -19,24 +19,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.osgi.repository;
+package org.jboss.osgi.repository.spi;
+
+import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.jboss.osgi.repository.XRepository;
+import org.osgi.resource.Capability;
+import org.osgi.resource.Requirement;
 
 /**
- * Signals a failure during artifact storage.
+ * An abstract  {@link XRepository} that does nothing.
  *
  * @author thomas.diesler@jboss.com
- * @since 16-Jan-2012
+ * @since 11-May-2012
  */
-public class RepositoryStorageException extends RuntimeException {
-    public RepositoryStorageException(String message) {
-        super(message);
+public abstract class AbstractRepository implements XRepository {
+
+    @Override
+    public Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> requirements) {
+        if (requirements == null)
+            throw MESSAGES.illegalArgumentNull("requirements");
+
+        Map<Requirement, Collection<Capability>> result = new HashMap<Requirement, Collection<Capability>>();
+        for (Requirement req : requirements) {
+            Collection<Capability> providers = findProviders(req);
+            result.put(req, providers);
+        }
+        return result;
     }
 
-    public RepositoryStorageException(Throwable cause) {
-        super(cause);
-    }
-
-    public RepositoryStorageException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    @Override
+    public abstract Collection<Capability> findProviders(Requirement req);
 }

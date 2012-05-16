@@ -19,32 +19,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.jboss.osgi.repository;
 
-package org.jboss.osgi.repository.core;
+import java.util.Collection;
 
-import static org.jboss.logging.Logger.Level.INFO;
-
-import org.jboss.logging.BasicLogger;
-import org.jboss.logging.LogMessage;
-import org.jboss.logging.Logger;
-import org.jboss.logging.Message;
-import org.jboss.logging.MessageLogger;
-import org.osgi.framework.Bundle;
+import org.osgi.resource.Capability;
+import org.osgi.resource.Requirement;
+import org.osgi.service.repository.Repository;
 
 /**
- * Logging Id ranges: 20400-20499
+ * An extension of the {@link Repository} interface
  *
- * https://docs.jboss.org/author/display/JBOSGI/JBossOSGi+Logging
- *
- * @author Thomas.Diesler@jboss.com
+ * @author thomas.diesler@jboss.com
+ * @since 11-May-2012
  */
-@MessageLogger(projectCode = "JBOSGI")
-public interface RepositoryLogger extends BasicLogger {
+public interface XRepository extends Repository {
 
-    RepositoryLogger LOGGER = Logger.getMessageLogger(RepositoryLogger.class, "org.jboss.osgi.repository");
-
-    @LogMessage(level = INFO)
-    @Message(id = 20400, value = "Bundle installed [%d]: %s")
-    void infoBundleInstalled(long bundleId, Bundle bundle);
-
+    /**
+     * Find the capabilities that match the specified requirement.
+     *
+     * @param requirement The requirements for which matching capabilities
+     *        should be returned. Must not be {@code null}.
+     * @return A collection of matching capabilities for the specified requirements.
+     *         If there are no matching capabilities an empty collection is returned.
+     *         The returned collection is the property of the caller and can be modified by the caller.
+     */
+    Collection<Capability> findProviders(Requirement requirement);
 }

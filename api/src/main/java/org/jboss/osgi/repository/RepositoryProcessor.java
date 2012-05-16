@@ -21,18 +21,20 @@
  */
 package org.jboss.osgi.repository;
 
-import java.util.Collection;
+import java.util.Map;
 
-import org.osgi.resource.Capability;
-import org.osgi.resource.Requirement;
+import org.jboss.osgi.resolver.XResource;
+
 
 /**
- * Handles resolution of repository artifacts
+ * A callback interface for the {@link RepositoryXMLReader}
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public interface ArtifactProviderPlugin {
+public interface RepositoryProcessor {
 
-    Collection<Capability> findProviders(Requirement req);
+    boolean addRepository(String namespace, Map<String, String> attributes);
+
+    boolean addResource(XResource resource);
 }
