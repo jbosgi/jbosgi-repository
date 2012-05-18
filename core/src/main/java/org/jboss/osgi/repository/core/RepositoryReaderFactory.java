@@ -22,9 +22,9 @@
 package org.jboss.osgi.repository.core;
 
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
+import static javax.xml.stream.XMLStreamConstants.START_DOCUMENT;
+import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
-import static org.jboss.osgi.repository.RepositoryNamespace.REPOSITORY_NAMESPACE;
-import static org.jboss.osgi.repository.RepositoryNamespace.Element.REPOSITORY;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -40,14 +39,10 @@ import javax.xml.stream.XMLStreamReader;
 import org.jboss.osgi.repository.RepositoryNamespace.Attribute;
 import org.jboss.osgi.repository.RepositoryNamespace.Element;
 import org.jboss.osgi.repository.RepositoryNamespace.Type;
-import org.jboss.osgi.repository.RepositoryProcessor;
-import org.jboss.osgi.repository.RepositoryXMLReader;
+import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.XResourceBuilderFactory;
-import org.jboss.staxmapper.XMLElementReader;
-import org.jboss.staxmapper.XMLExtendedStreamReader;
-import org.jboss.staxmapper.XMLMapper;
 import org.osgi.framework.Version;
 
 /**
@@ -56,48 +51,67 @@ import org.osgi.framework.Version;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class RepositoryXMLReaderImpl implements RepositoryXMLReader {
+public class RepositoryReaderFactory {
 
-    private final XMLMapper mapper;
-
-    public RepositoryXMLReaderImpl() {
-        mapper = XMLMapper.Factory.create();
-        RepositoryElementReader elementReader = new RepositoryElementReader();
-        mapper.registerRootElement(new QName(REPOSITORY_NAMESPACE, REPOSITORY.getLocalName()), elementReader);
+    public static RepositoryReader create(InputStream input) {
+        return new RepositoryXMLReader(input);
     }
 
-    @Override
-    public void parse(InputStream input, RepositoryProcessor model) throws XMLStreamException {
-        XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(input);
-        mapper.parseDocument(model, reader);
-    }
+    static class RepositoryXMLReader implements RepositoryReader {
 
-    class RepositoryElementReader implements XMLElementReader<RepositoryProcessor> {
+        private final Map<String, String> attributes = new HashMap<String, String>();
+        private final XMLStreamReader reader;
 
-        @Override
-        public void readElement(XMLExtendedStreamReader reader, RepositoryProcessor processor) throws XMLStreamException {
-
-            Map<String, String> attributes = new HashMap<String, String>();
-            for (int i = 0; i < reader.getAttributeCount(); i++) {
-                attributes.put(reader.getAttributeLocalName(i), reader.getAttributeValue(i));
+        RepositoryXMLReader(InputStream input) {
+            try {
+                reader = XMLInputFactory.newInstance().createXMLStreamReader(input);
+            } catch (Exception ex) {
+                throw MESSAGES.illegalStateCannotInitializeRepositoryReader(ex);
             }
-            if (!processor.addRepository(reader.getNamespaceURI(), attributes))
-                return;
-
-            while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
-                Element element = Element.forName(reader.getLocalName());
-                switch (element) {
-                    case RESOURCE: {
-                        XResource resource = readResourceElement(reader);
-                        if (!processor.addResource(resource)) {
-                            return;
-                        }
-                    }
+            try {
+                reader.require(START_DOCUMENT, null, null);
+                reader.nextTag();
+                reader.require(START_ELEMENT, null, null);
+                for (int i = 0; i < reader.getAttributeCount(); i++) {
+                    attributes.put(reader.getAttributeLocalName(i), reader.getAttributeValue(i));
                 }
+            } catch (Exception ex) {
+                throw MESSAGES.storageCannotReadResourceElement(ex, reader.getLocation());
             }
         }
 
-        private XResource readResourceElement(XMLExtendedStreamReader reader) throws XMLStreamException {
+        @Override
+        public Map<String, String> getRepositoryAttributes() {
+            return attributes;
+        }
+
+        @Override
+        public XResource nextResource() {
+            try {
+                while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
+                    Element element = Element.forName(reader.getLocalName());
+                    switch (element) {
+                        case RESOURCE: {
+                            return readResourceElement(reader);
+                        }
+                    }
+                }
+            } catch (XMLStreamException ex) {
+                throw MESSAGES.storageCannotReadResourceElement(ex, reader.getLocation());
+            }
+            return null;
+        }
+
+        @Override
+        public void close() {
+            try {
+                reader.close();
+            } catch (XMLStreamException ex) {
+                // ignore
+            }
+        }
+
+        private XResource readResourceElement(XMLStreamReader reader) throws XMLStreamException {
             XResourceBuilder builder = XResourceBuilderFactory.create();
             while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
                 Element element = Element.forName(reader.getLocalName());
@@ -115,7 +129,7 @@ public class RepositoryXMLReaderImpl implements RepositoryXMLReader {
             return builder.getResource();
         }
 
-        private void readCapabilityElement(XMLExtendedStreamReader reader, XResourceBuilder builder) throws XMLStreamException {
+        private void readCapabilityElement(XMLStreamReader reader, XResourceBuilder builder) throws XMLStreamException {
             String namespace = reader.getAttributeValue(null, Attribute.NAMESPACE.toString());
             Map<String, Object> attributes = new HashMap<String, Object>();
             Map<String, String> directives = new HashMap<String, String>();
@@ -123,11 +137,11 @@ public class RepositoryXMLReaderImpl implements RepositoryXMLReader {
             try {
                 builder.addGenericCapability(namespace, attributes, directives);
             } catch (RuntimeException ex) {
-                throw MESSAGES.xmlInvalidResourceDecription(ex, reader.getLocation());
+                throw MESSAGES.storageCannotReadResourceElement(ex, reader.getLocation());
             }
         }
 
-        private void readRequirementElement(XMLExtendedStreamReader reader, XResourceBuilder builder) throws XMLStreamException {
+        private void readRequirementElement(XMLStreamReader reader, XResourceBuilder builder) throws XMLStreamException {
             String namespace = reader.getAttributeValue(null, Attribute.NAMESPACE.toString());
             Map<String, Object> attributes = new HashMap<String, Object>();
             Map<String, String> directives = new HashMap<String, String>();
@@ -135,29 +149,27 @@ public class RepositoryXMLReaderImpl implements RepositoryXMLReader {
             try {
                 builder.addGenericRequirement(namespace, attributes, directives);
             } catch (RuntimeException ex) {
-                throw MESSAGES.xmlInvalidResourceDecription(ex, reader.getLocation());
+                throw MESSAGES.storageCannotReadResourceElement(ex, reader.getLocation());
             }
         }
 
-        private void readAttributesAndDirectives(XMLExtendedStreamReader reader, Map<String, Object> atts, Map<String, String> dirs) throws XMLStreamException {
+        private void readAttributesAndDirectives(XMLStreamReader reader, Map<String, Object> atts, Map<String, String> dirs) throws XMLStreamException {
             while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
                 Element element = Element.forName(reader.getLocalName());
                 switch (element) {
                     case ATTRIBUTE: {
                         readAttributeElement(reader, atts);
-                        reader.discardRemainder();
                         break;
                     }
                     case DIRECTIVE: {
                         readDirectiveElement(reader, dirs);
-                        reader.discardRemainder();
                         break;
                     }
                 }
             }
         }
 
-        private void readAttributeElement(XMLExtendedStreamReader reader, Map<String, Object> attributes) throws XMLStreamException {
+        private void readAttributeElement(XMLStreamReader reader, Map<String, Object> attributes) throws XMLStreamException {
             String name = reader.getAttributeValue(null, Attribute.NAME.toString());
             String valstr = reader.getAttributeValue(null, Attribute.VALUE.toString());
             String typespec = reader.getAttributeValue(null, Attribute.TYPE.toString());
@@ -218,13 +230,16 @@ public class RepositoryXMLReaderImpl implements RepositoryXMLReader {
                     break;
             }
             attributes.put(name, value);
+            while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
+            }
         }
 
-        private void readDirectiveElement(XMLExtendedStreamReader reader, Map<String, String> directives) throws XMLStreamException {
+        private void readDirectiveElement(XMLStreamReader reader, Map<String, String> directives) throws XMLStreamException {
             String name = reader.getAttributeValue(null, Attribute.NAME.toString());
             String value = reader.getAttributeValue(null, Attribute.VALUE.toString());
             directives.put(name, value);
+            while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
+            }
         }
     }
-
 }

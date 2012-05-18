@@ -46,7 +46,6 @@
         <version.jboss.osgi.spi>3.1.1.CR1</version.jboss.osgi.spi>
         <version.jboss.osgi.testing>1.0.4</version.jboss.osgi.testing>
         <version.jboss.shrinkwrap>1.0.0-cr-1</version.jboss.shrinkwrap>
-        <version.jboss.staxmapper>1.1.0.Final</version.jboss.staxmapper>
         <version.junit>4.10</version.junit>
         <version.mockito>1.8.4</version.mockito>
         <version.osgi>4.2.0</version.osgi>
@@ -105,11 +104,6 @@
 	            <artifactId>shrinkwrap-impl-base</artifactId>
 	            <version>${version.jboss.shrinkwrap}</version>
 	        </dependency>
-            <dependency>
-			    <groupId>org.jboss</groupId>
-			    <artifactId>staxmapper</artifactId>
-                <version>${version.jboss.staxmapper}</version>
-            </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.core</artifactId>

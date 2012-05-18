@@ -37,11 +37,6 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-		<dependency>
-			<groupId>org.jboss</groupId>
-			<artifactId>staxmapper</artifactId>
-            <scope>provided</scope>
-		</dependency>
 
         <!-- Provided Dependencies -->
         <dependency>
@@ -82,7 +77,6 @@
                         <Embed-Dependency>
                             jbosgi-repository-core;inline=true,
                             jbosgi-repository-api;inline=true,
-                            staxmapper;inline=false,
                         </Embed-Dependency>
                         <_exportcontents>
                             org.osgi.service.repository;version="1.0",

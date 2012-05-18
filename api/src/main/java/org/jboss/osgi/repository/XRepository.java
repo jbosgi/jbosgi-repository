@@ -36,6 +36,11 @@ import org.osgi.service.repository.Repository;
 public interface XRepository extends Repository {
 
     /**
+     * Get the name for this repository
+     */
+    String getName();
+
+    /**
      * Find the capabilities that match the specified requirement.
      *
      * @param requirement The requirements for which matching capabilities

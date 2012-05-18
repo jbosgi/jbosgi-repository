@@ -39,12 +39,12 @@ import org.osgi.resource.Requirement;
  * @author thomas.diesler@jboss.com
  * @since 11-May-2012
  */
-public class AbstractCachingRepository extends AbstractRepository implements XCachingRepository {
+public class DefaultStorageRepository extends AbstractRepository implements XCachingRepository {
 
     private final RepositoryStorage storage;
     private final XRepository delegate;
 
-    public AbstractCachingRepository(RepositoryStorage storage, XRepository delegate) {
+    public DefaultStorageRepository(RepositoryStorage storage, XRepository delegate) {
         this.storage = storage;
         this.delegate = delegate;
     }

@@ -42,6 +42,11 @@ public class AggregatingRepository extends AbstractRepository {
     private final List<XRepository> repositories = new ArrayList<XRepository>();
 
     @Override
+    public String getName() {
+        return "Aggragating Repository";
+    }
+
+    @Override
     public Collection<Capability> findProviders(Requirement req) {
         Collection<Capability> providers = new ArrayList<Capability>();
         LOGGER.debugf("Find providers for: %s", req);

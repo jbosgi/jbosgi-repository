@@ -21,18 +21,14 @@
  */
 package org.jboss.test.osgi.repository;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.jboss.osgi.repository.RepositoryNamespace;
-import org.jboss.osgi.repository.RepositoryProcessor;
+import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryXMLReader;
-import org.jboss.osgi.repository.core.RepositoryXMLReaderImpl;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.junit.Test;
@@ -50,47 +46,30 @@ import org.osgi.service.repository.ContentNamespace;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class RepositoryXMLReaderTestCase extends AbstractRepositoryTest {
+public class RepositoryReaderTestCase extends AbstractRepositoryTest {
 
     @Test
     public void testSampleRepositoryXML() throws Exception {
 
-        final StringBuffer namespace = new StringBuffer();
-        final Map<String, String> attributes = new HashMap<String, String>();
-        final List<XResource> resources = new ArrayList<XResource>();
-        RepositoryProcessor processor = new RepositoryProcessor() {
-            @Override
-            public boolean addRepository(String nsuri, Map<String, String> atts) {
-                namespace.append(nsuri);
-                attributes.putAll(atts);
-                return true;
-            }
-            @Override
-            public boolean addResource(XResource res) {
-                resources.add(res);
-                return true;
-            }
-        };
-        RepositoryXMLReader reader = new RepositoryXMLReaderImpl();
-        InputStream input = getClass().getClassLoader().getResourceAsStream("xml/sample-repository.xml");
-        reader.parse(input, processor);
+        RepositoryReader reader = getRepositoryReader("xml/sample-repository.xml");
 
-        Assert.assertEquals(RepositoryNamespace.REPOSITORY_NAMESPACE, namespace.toString());
+        Map<String, String> attributes = reader.getRepositoryAttributes();
         Assert.assertEquals("Two attributes", 2, attributes.size());
         Assert.assertEquals("OSGi Repository", attributes.get(RepositoryNamespace.Attribute.NAME.getLocalName()));
         Assert.assertEquals("13582741", attributes.get(RepositoryNamespace.Attribute.INCREMENT.getLocalName()));
 
-        Assert.assertEquals("One resource", 1, resources.size());
-        XResource res = resources.get(0);
+        XResource resource = reader.nextResource();
+        Assert.assertNotNull("Resource not null", resource);
+        Assert.assertNull("One resource", reader.nextResource());
 
         // osgi.identity
-        XIdentityCapability icap = res.getIdentityCapability();
+        XIdentityCapability icap = resource.getIdentityCapability();
         Assert.assertEquals("org.acme.pool", icap.getSymbolicName());
         Assert.assertEquals(Version.parseVersion("1.5.6"), icap.getVersion());
         Assert.assertEquals(IdentityNamespace.TYPE_BUNDLE, icap.getType());
 
         // osgi.content
-        List<Capability> caps = res.getCapabilities(ContentNamespace.CONTENT_NAMESPACE);
+        List<Capability> caps = resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE);
         Assert.assertEquals("One capability", 1, caps.size());
         Capability cap = caps.get(0);
         Map<String, Object> atts = cap.getAttributes();
@@ -103,7 +82,7 @@ public class RepositoryXMLReaderTestCase extends AbstractRepositoryTest {
         Assert.assertEquals("No directives", 0, dirs.size());
 
         // osgi.wiring.bundle
-        caps = res.getCapabilities(BundleNamespace.BUNDLE_NAMESPACE);
+        caps = resource.getCapabilities(BundleNamespace.BUNDLE_NAMESPACE);
         Assert.assertEquals("One capability", 1, caps.size());
         cap = caps.get(0);
         atts = cap.getAttributes();
@@ -114,7 +93,7 @@ public class RepositoryXMLReaderTestCase extends AbstractRepositoryTest {
         Assert.assertEquals("No directives", 0, dirs.size());
 
         // osgi.wiring.package
-        caps = res.getCapabilities(PackageNamespace.PACKAGE_NAMESPACE);
+        caps = resource.getCapabilities(PackageNamespace.PACKAGE_NAMESPACE);
         Assert.assertEquals("One capability", 1, caps.size());
         cap = caps.get(0);
         atts = cap.getAttributes();
@@ -128,7 +107,7 @@ public class RepositoryXMLReaderTestCase extends AbstractRepositoryTest {
         Assert.assertEquals("org.acme.pool,org.acme.util", dirs.get(PackageNamespace.CAPABILITY_USES_DIRECTIVE));
 
         // osgi.wiring.package
-        List<Requirement> reqs = res.getRequirements(PackageNamespace.PACKAGE_NAMESPACE);
+        List<Requirement> reqs = resource.getRequirements(PackageNamespace.PACKAGE_NAMESPACE);
         Assert.assertEquals("One requirement", 1, reqs.size());
         Requirement req = reqs.get(0);
         atts = req.getAttributes();
@@ -138,7 +117,7 @@ public class RepositoryXMLReaderTestCase extends AbstractRepositoryTest {
         Assert.assertEquals("(&(osgi.wiring.package=org.apache.commons.pool)(version>=1.5.6))", dirs.get(PackageNamespace.REQUIREMENT_FILTER_DIRECTIVE));
 
         // osgi.identity
-        reqs = res.getRequirements(IdentityNamespace.IDENTITY_NAMESPACE);
+        reqs = resource.getRequirements(IdentityNamespace.IDENTITY_NAMESPACE);
         Assert.assertEquals("One requirement", 1, reqs.size());
         req = reqs.get(0);
         atts = req.getAttributes();

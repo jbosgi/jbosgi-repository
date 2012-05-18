@@ -22,7 +22,6 @@
 package org.jboss.osgi.repository;
 
 import javax.xml.stream.Location;
-import javax.xml.stream.XMLStreamException;
 
 import org.jboss.logging.Cause;
 import org.jboss.logging.Message;
@@ -48,21 +47,27 @@ public interface RepositoryMessages {
     @Message(id = 20501, value = "Resource already exists: %s")
     IllegalStateException illegalStateResourceAlreadyExists(XResource res);
 
-    @Message(id = 20502, value = "Invalid resource description at: %s")
-    XMLStreamException xmlInvalidResourceDecription(@Cause Throwable th, Location location);
+    @Message(id = 20502, value = "Cannot initialize repository reader")
+    IllegalStateException illegalStateCannotInitializeRepositoryReader(@Cause Throwable th);
 
-    @Message(id = 20503, value = "Cannot obtain content capability: %s")
+    @Message(id = 20503, value = "Cannot read repository element: %s")
+    IllegalStateException illegalStateCannotReadRepositoryElement(@Cause Throwable th, Location location);
+
+    @Message(id = 20504, value = "Cannot read resource element: %s")
+    IllegalStateException storageCannotReadResourceElement(@Cause Throwable th, Location location);
+
+    @Message(id = 20505, value = "Cannot obtain content capability: %s")
     RepositoryStorageException storageCannotObtainContentCapablility(XResource res);
 
-    @Message(id = 20504, value = "Cannot obtain content URL: %s")
+    @Message(id = 20506, value = "Cannot obtain content URL: %s")
     RepositoryStorageException storageCannotObtainContentURL(XResource res);
 
-    @Message(id = 20505, value = "No such digest algorithm: %s")
+    @Message(id = 20507, value = "No such digest algorithm: %s")
     RepositoryStorageException storageNoSuchAlgorithm(@Cause Throwable th, String algorithm);
 
-    @Message(id = 20506, value = "Cannot add resource to storage: %s")
+    @Message(id = 20508, value = "Cannot add resource to storage: %s")
     RepositoryStorageException storageCannotAddResourceToStorage(@Cause Throwable th, String mime);
 
-    @Message(id = 20507, value = "Cannot obtain input stream for: %s")
+    @Message(id = 20509, value = "Cannot obtain input stream for: %s")
     RepositoryStorageException storageCannotObtainInputStream(@Cause Throwable th, XResource res);
 }

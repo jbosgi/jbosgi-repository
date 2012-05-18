@@ -68,7 +68,7 @@ public class FileRepositoryStorageTestCase extends AbstractRepositoryTest {
     @Test
     public void testResourceStorage() throws Exception {
 
-        Assert.assertFalse(storage.getResources().hasNext());
+        Assert.assertNull(storage.getRepositoryReader().nextResource());
 
         // Add a bundle resource
         JavaArchive archiveA = getBundleA();

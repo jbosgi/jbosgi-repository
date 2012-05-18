@@ -40,6 +40,11 @@ import org.osgi.resource.Requirement;
 public abstract class AbstractRepository implements XRepository {
 
     @Override
+    public String getName() {
+        return getClass().getName();
+    }
+
+    @Override
     public Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> requirements) {
         if (requirements == null)
             throw MESSAGES.illegalArgumentNull("requirements");

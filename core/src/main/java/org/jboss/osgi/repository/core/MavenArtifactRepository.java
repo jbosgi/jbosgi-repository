@@ -68,6 +68,11 @@ public class MavenArtifactRepository extends AbstractRepository implements XRepo
     }
 
     @Override
+    public String getName() {
+        return "Maven Artifact Repository";
+    }
+
+    @Override
     public Collection<Capability> findProviders(Requirement req) {
         String namespace = req.getNamespace();
         List<Capability> result = new ArrayList<Capability>();

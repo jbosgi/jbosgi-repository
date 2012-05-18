@@ -26,13 +26,16 @@ import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jboss.osgi.repository.RepositoryMessages;
+import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageException;
 import org.jboss.osgi.resolver.XIdentityCapability;
@@ -48,14 +51,44 @@ import org.osgi.resource.Requirement;
  */
 public class DefaultRepositoryStorage implements RepositoryStorage {
 
+    private final AtomicLong increment = new AtomicLong();
     private final Map<CacheKey, XResource> resourceCache = new HashMap<CacheKey, XResource>();
     private final Map<CacheKey, Set<Capability>> capabilityCache = new HashMap<CacheKey, Set<Capability>>();
 
     @Override
-    public Iterator<XResource> getResources() {
-        // synchronize on capabilityCache intentionally
+    public String getName() {
+        return "Default Repository Storage";
+    }
+
+    @Override
+    public RepositoryReader getRepositoryReader() {
         synchronized (capabilityCache) {
-            return resourceCache.values().iterator();
+            return new RepositoryReader() {
+                private final Iterator<XResource> iterator;
+                {
+                    synchronized (capabilityCache) {
+                        iterator = new HashSet<XResource>(resourceCache.values()).iterator();
+                    }
+                }
+
+                @Override
+                public Map<String, String> getRepositoryAttributes() {
+                    HashMap<String, String> attributes = new HashMap<String, String>();
+                    attributes.put("name", getName());
+                    attributes.put("increment", new Long(increment.incrementAndGet()).toString());
+                    return Collections.unmodifiableMap(attributes);
+                }
+
+                @Override
+                public XResource nextResource() {
+                    return iterator.hasNext() ? iterator.next() : null;
+                }
+
+                @Override
+                public void close() {
+                    // do nothing
+                }
+            };
         }
     }
 

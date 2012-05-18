@@ -22,11 +22,10 @@
 package org.jboss.test.osgi.repository;
 
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 import junit.framework.Assert;
 
+import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.spi.DefaultRepositoryStorage;
 import org.jboss.osgi.resolver.XCapability;
@@ -51,16 +50,17 @@ public class DefaultRepositoryStorageTestCase extends AbstractRepositoryTest {
     @Before
     public void setUp() throws Exception {
         storage = new DefaultRepositoryStorage();
-        List<XResource> resources = getResources("xml/sample-repository.xml");
-        storage.addResource(resources.get(0));
+        RepositoryReader reader = getRepositoryReader("xml/sample-repository.xml");
+        storage.addResource(reader.nextResource());
     }
 
     @Test
     public void testRequireBundle() throws Exception {
 
-        Iterator<XResource> it = storage.getResources();
-        XResource resource = it.next();
-        Assert.assertFalse(it.hasNext());
+        RepositoryReader reader = storage.getRepositoryReader();
+        XResource resource = reader.nextResource();
+        Assert.assertNotNull("Resource not null", resource);
+        Assert.assertNull("One resource only", reader.nextResource());
 
         XRequirement req = XRequirementBuilder.createRequirement(BundleNamespace.BUNDLE_NAMESPACE, "org.acme.pool");
 

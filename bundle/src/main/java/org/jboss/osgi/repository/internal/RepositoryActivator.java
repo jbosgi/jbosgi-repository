@@ -28,7 +28,7 @@ import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.core.FileBasedRepositoryStorage;
 import org.jboss.osgi.repository.core.MavenArtifactRepository;
-import org.jboss.osgi.repository.spi.AbstractCachingRepository;
+import org.jboss.osgi.repository.spi.DefaultStorageRepository;
 import org.jboss.osgi.repository.spi.AggregatingRepository;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -69,7 +69,7 @@ public class RepositoryActivator implements BundleActivator {
                     Dictionary<String, Object> props = new Hashtable<String, Object>();
                     props.put(Constants.SERVICE_RANKING, Integer.MAX_VALUE);
                     props.put(Constants.SERVICE_DESCRIPTION, "JBossOSGi Aggregating Repository");
-                    repository = new AbstractCachingRepository(storage, new RepositoryDelegate(context));
+                    repository = new DefaultStorageRepository(storage, new RepositoryDelegate(context));
                     context.registerService(SERVICE_NAMES, repository, props);
                 }
                 return storage;
