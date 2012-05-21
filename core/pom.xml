@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.jboss.osgi.repository</groupId>
         <artifactId>jbosgi-repository-parent</artifactId>
-        <version>1.3.0.Beta2-SNAPSHOT</version>
+        <version>1.3.0.Beta2</version>
     </parent>
 
     <name>JBossOSGi Repository: Core</name>
