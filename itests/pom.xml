@@ -47,11 +47,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.osgi.framework</groupId>
-            <artifactId>jbosgi-framework-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.jboss.osgi.testing</groupId>
             <artifactId>jbosgi-testing</artifactId>
             <scope>test</scope>
@@ -66,41 +61,105 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>bundles</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>directory-single</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>test-libs</finalName>
-                            <ignoreDirFormatExtensions>true</ignoreDirFormatExtensions>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <descriptors>
-                                <descriptor>scripts/assembly-bundles.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <systemProperties>
-                        <property>
-                            <name>test.archive.directory</name>
-                            <value>${project.build.directory}/test-libs</value>
-                        </property>
-                        <property>
-                            <name>java.util.logging.manager</name>
-                            <value>org.jboss.logmanager.LogManager</value>
-                        </property>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                        <jboss.osgi.framework.properties>${jboss.osgi.framework.properties}</jboss.osgi.framework.properties>
+                        <test.archive.directory>${project.build.directory}/test-libs</test.archive.directory>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
+	<profiles>
+		<profile>
+			<id>equinox</id>
+			<activation>
+				<property>
+					<name>framework</name>
+					<value>equinox</value>
+				</property>
+			</activation>
+			<properties>
+				<jboss.osgi.framework.properties>jboss-osgi-equinox.properties</jboss.osgi.framework.properties>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.osgi.equinox</groupId>
+					<artifactId>jboss-osgi-equinox</artifactId>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>bundles</id>
+								<phase>test-compile</phase>
+								<goals>
+									<goal>directory-single</goal>
+								</goals>
+								<configuration>
+									<finalName>test-libs</finalName>
+									<ignoreDirFormatExtensions>true</ignoreDirFormatExtensions>
+									<appendAssemblyId>false</appendAssemblyId>
+									<descriptors>
+										<descriptor>scripts/assembly-bundles-equinox.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>jboss</id>
+			<activation>
+				<property>
+					<name>!framework</name>
+				</property>
+			</activation>
+			<properties>
+				<jboss.osgi.framework.properties>jboss-osgi-framework.properties</jboss.osgi.framework.properties>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.osgi.framework</groupId>
+					<artifactId>jbosgi-framework-core</artifactId>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>bundles</id>
+								<phase>test-compile</phase>
+								<goals>
+									<goal>directory-single</goal>
+								</goals>
+								<configuration>
+									<finalName>test-libs</finalName>
+									<ignoreDirFormatExtensions>true</ignoreDirFormatExtensions>
+									<appendAssemblyId>false</appendAssemblyId>
+									<descriptors>
+										<descriptor>scripts/assembly-bundles.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
