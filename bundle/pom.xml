@@ -37,6 +37,16 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.osgi.resolver</groupId>
+            <artifactId>jbosgi-resolver-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.osgi.metadata</groupId>
+            <artifactId>jbosgi-metadata</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Provided Dependencies -->
         <dependency>
@@ -73,15 +83,21 @@
                             org.osgi.resource;version="[1.0,2.0)",
                             org.osgi.service.resolver;version="[1.0,2.0)",
                             org.osgi.util.tracker;version="[1.4,2.0)",
+                            org.jboss.modules;resolution:=optional
                         </Import-Package>
                         <Embed-Dependency>
                             jbosgi-repository-core;inline=true,
                             jbosgi-repository-api;inline=true,
+                            jbosgi-resolver-api;inline=false,
+                            jbosgi-metadata;inline=false,
                         </Embed-Dependency>
                         <_exportcontents>
                             org.osgi.service.repository;version="1.0",
                             org.jboss.osgi.repository;version="${bundle.version}",
                             org.jboss.osgi.repository.spi;version="${bundle.version}",
+                            org.jboss.osgi.resolver;version="${version.jboss.osgi.resolver}",
+                            org.jboss.osgi.resolver.spi;version="${version.jboss.osgi.resolver}",
+                            org.jboss.osgi.metadata;version="${version.jboss.osgi.metadata}",
                         </_exportcontents>
                     </instructions>
                 </configuration>

@@ -37,8 +37,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.osgi.repository.RepositoryNamespace.Attribute;
+import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageException;
+import org.jboss.osgi.repository.RepositoryWriter;
+import org.jboss.osgi.repository.RepositoryXMLReader;
+import org.jboss.osgi.repository.RepositoryXMLWriter;
 import org.jboss.osgi.repository.URLResourceBuilderFactory;
 import org.jboss.osgi.repository.spi.MemoryRepositoryStorage;
 import org.jboss.osgi.resolver.XCapability;
@@ -59,20 +64,45 @@ import org.osgi.service.repository.RepositoryContent;
  */
 public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
 
-    private final File repository;
+    private final File storageDir;
+    private final File repoFile;
 
-    public FileBasedRepositoryStorage(File repository) {
-        this.repository = repository;
+    public FileBasedRepositoryStorage(File storageDir) {
+        this.storageDir = storageDir;
+        this.repoFile = new File(storageDir.getAbsolutePath() + File.separator + "repository.xml");
+
+        // Initialize repository content
+        if (repoFile.exists()) {
+            RepositoryReader reader;
+            try {
+                reader = RepositoryXMLReader.create(new FileInputStream(repoFile));
+            } catch (IOException ex) {
+                throw MESSAGES.illegalStateCannotInitializeRepositoryReader(ex);
+            }
+            Long increment = new Long(reader.getRepositoryAttributes().get(Attribute.INCREMENT.getLocalName()));
+            XResource res = reader.nextResource();
+            while(res != null) {
+                addResourceInternal(res, false);
+                res = reader.nextResource();
+            }
+            long delta = increment - getAtomicIncrement().get();
+            getAtomicIncrement().addAndGet(delta);
+            reader.close();
+        }
     }
 
     @Override
     public XResource addResource(String mime, InputStream input) throws RepositoryStorageException {
         XResourceBuilder builder = createResourceInternal(input, mime, true);
-        return addResource(builder.getResource());
+        return addResourceInternal(builder.getResource(), true);
     }
 
     @Override
     public XResource addResource(XResource res) throws RepositoryStorageException {
+        return addResourceInternal(res, true);
+    }
+
+    private synchronized XResource addResourceInternal(XResource res, boolean writeXML) throws RepositoryStorageException {
         List<Capability> ccaps = res.getCapabilities(ContentNamespace.CONTENT_NAMESPACE);
         if (ccaps.isEmpty())
             throw MESSAGES.storageCannotObtainContentCapablility(res);
@@ -103,13 +133,19 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
         } else {
             result = res;
         }
-
         result = super.addResource(result);
+        if (writeXML == true) {
+            writeRepositoryXML();
+        }
         return result;
     }
 
     @Override
     public boolean removeResource(XResource res) throws RepositoryStorageException {
+        return removeResourceInternal(res, true);
+    }
+
+    private synchronized boolean removeResourceInternal(XResource res, boolean writeXML) {
         XCapability ccap = (XCapability) res.getCapabilities(ContentNamespace.CONTENT_NAMESPACE).get(0);
         URL fileURL = (URL) ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE);
         File contentFile = new File(fileURL.getPath());
@@ -117,7 +153,11 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
         if (contentFile.exists()) {
             result = deleteRecursive(contentFile.getParentFile());
         }
-        return result && super.removeResource(res);
+        result &= super.removeResource(res);
+        if (writeXML == true) {
+            writeRepositoryXML();
+        }
+        return result;
     }
 
     private XResourceBuilder createResourceInternal(InputStream input, String mime, boolean loadMetadata) {
@@ -134,9 +174,9 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
     }
 
     private String addResourceContent(InputStream input, Map<String, Object> atts) throws IOException {
-        synchronized (repository) {
+        synchronized (storageDir) {
             // Copy the input stream to temporary storage
-            File tempFile = new File(repository.getAbsolutePath() + File.separator + "temp-content");
+            File tempFile = new File(storageDir.getAbsolutePath() + File.separator + "temp-content");
             Long size = copyResourceContent(input, tempFile);
             atts.put(ContentNamespace.CAPABILITY_SIZE_ATTRIBUTE, size);
             // Calculate the SHA-256
@@ -151,7 +191,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             // Move the content to storage location
             String contentPath = sha256.substring(0, 2) + File.separator + sha256.substring(2) + File.separator + "content";
             atts.put(XResourceConstants.CAPABILITY_PATH_ATTRIBUTE, contentPath);
-            File targetFile = new File(repository.getAbsolutePath() + File.separator + contentPath);
+            File targetFile = new File(storageDir.getAbsolutePath() + File.separator + contentPath);
             targetFile.getParentFile().mkdirs();
             tempFile.renameTo(targetFile);
             return contentPath;
@@ -196,11 +236,31 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
 
     private URL getBaseURL() {
         try {
-            return repository.toURI().toURL();
+            return storageDir.toURI().toURL();
         } catch (MalformedURLException e) {
             // ignore
             return null;
         }
+    }
+
+    private void writeRepositoryXML() {
+        RepositoryWriter writer;
+        try {
+            writer = RepositoryXMLWriter.create(new FileOutputStream(repoFile));
+        } catch (IOException ex) {
+            throw MESSAGES.illegalStateCannotInitializeRepositoryWriter(ex);
+        }
+        Map<String, String> attributes = new HashMap<String, String>();
+        attributes.put(Attribute.NAME.getLocalName(), getName());
+        attributes.put(Attribute.INCREMENT.getLocalName(), new Long(getAtomicIncrement().get()).toString());
+        writer.writeRepositoryAttributes(attributes);
+        RepositoryReader reader = getRepositoryReader();
+        XResource resource = reader.nextResource();
+        while(resource != null) {
+            writer.writeResource(resource);
+            resource = reader.nextResource();
+        }
+        writer.close();
     }
 
     private boolean deleteRecursive(File file) {
