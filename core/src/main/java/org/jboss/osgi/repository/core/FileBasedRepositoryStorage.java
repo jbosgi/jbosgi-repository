@@ -40,7 +40,7 @@ import java.util.Map;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageException;
 import org.jboss.osgi.repository.URLResourceBuilderFactory;
-import org.jboss.osgi.repository.spi.DefaultRepositoryStorage;
+import org.jboss.osgi.repository.spi.MemoryRepositoryStorage;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
@@ -57,7 +57,7 @@ import org.osgi.service.repository.RepositoryContent;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class FileBasedRepositoryStorage extends DefaultRepositoryStorage {
+public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
 
     private final File repository;
 

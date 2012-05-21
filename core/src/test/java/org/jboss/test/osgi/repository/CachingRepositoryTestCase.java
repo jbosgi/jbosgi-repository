@@ -37,7 +37,7 @@ import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.core.FileBasedRepositoryStorage;
 import org.jboss.osgi.repository.core.MavenArtifactRepository;
-import org.jboss.osgi.repository.spi.DefaultStorageRepository;
+import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
@@ -53,7 +53,7 @@ import org.osgi.service.repository.ContentNamespace;
 import org.osgi.service.repository.RepositoryContent;
 
 /**
- * Test the {@link DefaultStorageRepository}
+ * Test the {@link AbstractPersistentRepository}
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
@@ -68,7 +68,7 @@ public class CachingRepositoryTestCase extends AbstractRepositoryTest {
         cacheFile = new File("./target/repository").getCanonicalFile();
         FileBasedRepositoryStorage storage = new FileBasedRepositoryStorage(cacheFile);
         MavenArtifactRepository delegate = new MavenArtifactRepository();
-        repository = new DefaultStorageRepository(storage, delegate) {};
+        repository = new AbstractPersistentRepository(storage, delegate) {};
         deleteRecursive(cacheFile);
     }
 

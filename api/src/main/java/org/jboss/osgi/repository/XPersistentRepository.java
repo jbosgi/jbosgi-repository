@@ -1,8 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2005, JBoss Inc., and individual contributors as indicated
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2011, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,28 +19,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.osgi.repository.spi;
-
-import java.util.Map;
-
-import org.jboss.osgi.repository.RepositoryProcessor;
-import org.jboss.osgi.resolver.XResource;
+package org.jboss.osgi.repository;
 
 /**
- * A {@link RepositoryProcessor} that does nothing.
+ * An extension of the {@link XRepository} that provides capability persistence.
  *
  * @author thomas.diesler@jboss.com
  * @since 11-May-2012
  */
-public class AbstractRepositoryProcessor implements RepositoryProcessor {
+public interface XPersistentRepository extends XRepository {
 
-    @Override
-    public boolean addRepository(String namespace, Map<String, String> attributes) {
-        return true;
-    }
-
-    @Override
-    public boolean addResource(XResource resource) {
-        return true;
-    }
+    /**
+     * Get the associated repository storage
+     */
+    RepositoryStorage getRepositoryStorage();
 }

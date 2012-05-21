@@ -22,44 +22,43 @@
 package org.jboss.test.osgi.repository;
 
 import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.List;
-
-import javax.xml.stream.XMLStreamException;
+import java.util.Map;
 
 import org.jboss.osgi.repository.RepositoryReader;
+import org.jboss.osgi.repository.RepositoryWriter;
 import org.jboss.osgi.repository.RepositoryXMLReader;
+import org.jboss.osgi.repository.RepositoryXMLWriter;
 import org.jboss.osgi.resolver.XResource;
+import org.junit.Test;
 
 /**
+ * Test the the {@link RepositoryXMLWriter}.
  *
  * @author thomas.diesler@jboss.com
- * @since 16-Jan-2012
+ * @since 21-May-2012
  */
-public abstract class AbstractRepositoryTest {
+public class RepositoryWriterTestCase extends AbstractRepositoryTest {
 
-    protected RepositoryReader getRepositoryReader(String xmlres) throws XMLStreamException {
-        InputStream input = getClass().getClassLoader().getResourceAsStream(xmlres);
-        return RepositoryXMLReader.create(input);
-    }
+    @Test
+    public void testSampleRepositoryXML() throws Exception {
 
-    protected List<XResource> getResources(RepositoryReader reader) {
-        List<XResource> resources = new ArrayList<XResource>();
-        XResource resource = reader.nextResource();
-        while (resource != null) {
-            resources.add(resource);
-            resource = reader.nextResource();
+        RepositoryReader reader = getRepositoryReader("xml/sample-repository.xml");
+        Map<String, String> attributes = reader.getRepositoryAttributes();
+        List<XResource> resources = getResources(reader);
+
+        File file = new File("target/repository.xml");
+        RepositoryWriter writer = RepositoryXMLWriter.create(new FileOutputStream(file));
+        writer.writeRepositoryAttributes(attributes);
+        for (XResource res : resources) {
+            writer.writeResource(res);
         }
-        return resources;
-    }
+        writer.close();
 
-    protected void deleteRecursive(File file) {
-        if (file.isDirectory()) {
-            for (File aux : file.listFiles())
-                deleteRecursive(aux);
-        }
-        file.delete();
+        reader = RepositoryXMLReader.create(new FileInputStream(file));
+        RepositoryReaderTestCase.verifyContent(reader.getRepositoryAttributes(), getResources(reader));
     }
 
 }

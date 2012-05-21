@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.jboss.osgi.repository.RepositoryStorage;
-import org.jboss.osgi.repository.XCachingRepository;
+import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XResource;
@@ -39,12 +39,12 @@ import org.osgi.resource.Requirement;
  * @author thomas.diesler@jboss.com
  * @since 11-May-2012
  */
-public class DefaultStorageRepository extends AbstractRepository implements XCachingRepository {
+public class AbstractPersistentRepository extends AbstractRepository implements XPersistentRepository {
 
     private final RepositoryStorage storage;
     private final XRepository delegate;
 
-    public DefaultStorageRepository(RepositoryStorage storage, XRepository delegate) {
+    public AbstractPersistentRepository(RepositoryStorage storage, XRepository delegate) {
         this.storage = storage;
         this.delegate = delegate;
     }
@@ -81,10 +81,4 @@ public class DefaultStorageRepository extends AbstractRepository implements XCac
     public RepositoryStorage getRepositoryStorage() {
         return storage;
     }
-
-    @Override
-    public XRepository getRepositoryDelegate() {
-        return delegate;
-    }
-
 }

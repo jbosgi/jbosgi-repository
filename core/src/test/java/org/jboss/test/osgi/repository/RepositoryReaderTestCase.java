@@ -54,13 +54,18 @@ public class RepositoryReaderTestCase extends AbstractRepositoryTest {
         RepositoryReader reader = getRepositoryReader("xml/sample-repository.xml");
 
         Map<String, String> attributes = reader.getRepositoryAttributes();
+        List<XResource> resources = getResources(reader);
+        verifyContent(attributes, resources);
+    }
+
+    static void verifyContent(Map<String, String> attributes, List<XResource> resources) {
         Assert.assertEquals("Two attributes", 2, attributes.size());
         Assert.assertEquals("OSGi Repository", attributes.get(RepositoryNamespace.Attribute.NAME.getLocalName()));
         Assert.assertEquals("13582741", attributes.get(RepositoryNamespace.Attribute.INCREMENT.getLocalName()));
 
-        XResource resource = reader.nextResource();
+        Assert.assertEquals("One resource", 1, resources.size());
+        XResource resource = resources.get(0);
         Assert.assertNotNull("Resource not null", resource);
-        Assert.assertNull("One resource", reader.nextResource());
 
         // osgi.identity
         XIdentityCapability icap = resource.getIdentityCapability();

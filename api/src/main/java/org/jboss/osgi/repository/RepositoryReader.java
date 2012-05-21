@@ -24,7 +24,7 @@ import java.util.Map;
 import org.jboss.osgi.resolver.XResource;
 
 /**
- * A reader for a repository XML
+ * A reader for repository artifacts.
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012

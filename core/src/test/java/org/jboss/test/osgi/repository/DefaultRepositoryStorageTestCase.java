@@ -27,7 +27,7 @@ import junit.framework.Assert;
 
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
-import org.jboss.osgi.repository.spi.DefaultRepositoryStorage;
+import org.jboss.osgi.repository.spi.MemoryRepositoryStorage;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XRequirementBuilder;
@@ -38,7 +38,7 @@ import org.osgi.framework.namespace.BundleNamespace;
 import org.osgi.resource.Capability;
 
 /**
- * Test the {@link DefaultRepositoryStorage}
+ * Test the {@link MemoryRepositoryStorage}
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
@@ -49,7 +49,7 @@ public class DefaultRepositoryStorageTestCase extends AbstractRepositoryTest {
 
     @Before
     public void setUp() throws Exception {
-        storage = new DefaultRepositoryStorage();
+        storage = new MemoryRepositoryStorage();
         RepositoryReader reader = getRepositoryReader("xml/sample-repository.xml");
         storage.addResource(reader.nextResource());
     }

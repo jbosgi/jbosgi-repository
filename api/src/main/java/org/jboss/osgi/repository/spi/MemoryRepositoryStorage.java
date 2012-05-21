@@ -49,7 +49,7 @@ import org.osgi.resource.Requirement;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class DefaultRepositoryStorage implements RepositoryStorage {
+public class MemoryRepositoryStorage implements RepositoryStorage {
 
     private final AtomicLong increment = new AtomicLong();
     private final Map<CacheKey, XResource> resourceCache = new HashMap<CacheKey, XResource>();
