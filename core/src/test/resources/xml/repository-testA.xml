@@ -1,0 +1,25 @@
+<?xml version='1.0' ?>
+<repository xmlns='http://www.osgi.org/xmlns/repository/v1.0.0' increment='1' name='MockedRepo'>
+	<resource>
+		<capability namespace='osgi.content'>
+			<attribute name='mime' value='application/vnd.osgi.bundle'></attribute>
+			<attribute name='url' value='file:./target/bundleA.jar'></attribute>
+		</capability>
+		<capability namespace='osgi.identity'>
+			<attribute name='osgi.identity' value='bundleA'></attribute>
+			<attribute name='type' value='osgi.bundle'></attribute>
+			<attribute name='version' value='0.0.0' type='Version'></attribute>
+		</capability>
+		<capability namespace='osgi.wiring.bundle'>
+			<attribute name='osgi.wiring.bundle' value='bundleA'></attribute>
+			<attribute name='bundle-version' value='0.0.0' type='Version'></attribute>
+		</capability>
+		<capability namespace='osgi.wiring.host'>
+			<attribute name='osgi.wiring.host' value='bundleA'></attribute>
+			<attribute name='bundle-version' value='0.0.0' type='Version'></attribute>
+		</capability>
+		<capability namespace='osgi.wiring.package'>
+			<attribute name='osgi.wiring.package' value='org.acme.foo'></attribute>
+		</capability>
+	</resource>
+</repository>

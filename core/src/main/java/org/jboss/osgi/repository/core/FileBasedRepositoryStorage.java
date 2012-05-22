@@ -65,6 +65,8 @@ import org.osgi.service.repository.RepositoryContent;
  */
 public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
 
+    public static final String REPOSITORY_XML_NAME = "repository.xml";
+
     private final File storageDir;
     private final File repoFile;
 
@@ -74,7 +76,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             throw MESSAGES.illegalArgumentNull("storageDir");
 
         this.storageDir = storageDir;
-        this.repoFile = new File(storageDir.getAbsolutePath() + File.separator + "repository.xml");
+        this.repoFile = new File(storageDir.getAbsolutePath() + File.separator + REPOSITORY_XML_NAME);
 
         // Initialize repository content
         if (repoFile.exists()) {
@@ -121,7 +123,16 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
 
         // Copy the resource to this storage, if the content URL does not match
         if (contentURL.startsWith(getBaseURL().toExternalForm()) == false) {
-            InputStream input = ((RepositoryContent) res).getContent();
+            InputStream input;
+            if (res instanceof RepositoryContent) {
+                input = ((RepositoryContent) res).getContent();
+            } else {
+                try {
+                    input = new URL(contentURL).openStream();
+                } catch (IOException ex) {
+                    throw MESSAGES.storageCannotAccessContentURL(ex, contentURL);
+                }
+            }
             String mime = (String) ccap.getAttribute(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE);
             XResourceBuilder builder = createResourceInternal(input, mime, false);
             for (Capability cap : res.getCapabilities(null)) {

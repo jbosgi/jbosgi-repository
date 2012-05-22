@@ -63,15 +63,15 @@ import org.osgi.service.repository.RepositoryContent;
 public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
 
     private XRepository repository;
-    private File cacheFile;
+    private File storageDir;
 
     @Before
     public void setUp() throws IOException {
-        cacheFile = new File("./target/repository");
-        deleteRecursive(cacheFile);
+        storageDir = new File("./target/repository");
+        deleteRecursive(storageDir);
         repository = new AbstractPersistentRepository(new RepositoryStorageFactory() {
             public RepositoryStorage create(XRepository repository) {
-                return new FileBasedRepositoryStorage(repository, cacheFile);
+                return new FileBasedRepositoryStorage(repository, storageDir);
             }
         }, new MavenArtifactRepository());
     }
@@ -101,6 +101,6 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         assertEquals("One capability", 1, caps.size());
         cap = (XCapability) caps.iterator().next();
         URL url = new URL((String) cap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE));
-        Assert.assertTrue("Local path: " + url, url.getPath().startsWith(cacheFile.getAbsolutePath()));
+        Assert.assertTrue("Local path: " + url, url.getPath().startsWith(storageDir.getAbsolutePath()));
     }
 }
