@@ -41,16 +41,15 @@ public abstract class AbstractRepository implements XRepository {
 
     @Override
     public String getName() {
-        return getClass().getName();
+        return getClass().getSimpleName();
     }
 
     @Override
-    public Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> requirements) {
-        if (requirements == null)
-            throw MESSAGES.illegalArgumentNull("requirements");
-
+    public Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> reqs) {
+        if (reqs == null)
+            throw MESSAGES.illegalArgumentNull("reqs");
         Map<Requirement, Collection<Capability>> result = new HashMap<Requirement, Collection<Capability>>();
-        for (Requirement req : requirements) {
+        for (Requirement req : reqs) {
             Collection<Capability> providers = findProviders(req);
             result.put(req, providers);
         }

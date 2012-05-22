@@ -21,11 +21,14 @@
  */
 package org.jboss.osgi.repository.spi;
 
+import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.jboss.osgi.repository.RepositoryStorage;
+import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XCapability;
@@ -44,13 +47,21 @@ public class AbstractPersistentRepository extends AbstractRepository implements 
     private final RepositoryStorage storage;
     private final XRepository delegate;
 
-    public AbstractPersistentRepository(RepositoryStorage storage, XRepository delegate) {
-        this.storage = storage;
+    public AbstractPersistentRepository(RepositoryStorageFactory factory, XRepository delegate) {
+        if (factory == null)
+            throw MESSAGES.illegalArgumentNull("factory");
+        if (delegate == null)
+            throw MESSAGES.illegalArgumentNull("delegate");
+
+        this.storage = factory.create(this);
         this.delegate = delegate;
     }
 
     @Override
     public Collection<Capability> findProviders(Requirement req) {
+        if (req == null)
+            throw MESSAGES.illegalArgumentNull("req");
+
         Collection<Capability> providers = storage.findProviders(req);
         if (providers.isEmpty()) {
             providers = delegate.findProviders(req);

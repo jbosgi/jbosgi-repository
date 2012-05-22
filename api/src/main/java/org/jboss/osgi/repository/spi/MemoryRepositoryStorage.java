@@ -38,6 +38,7 @@ import org.jboss.osgi.repository.RepositoryMessages;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageException;
+import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.osgi.resource.Capability;
@@ -51,17 +52,24 @@ import org.osgi.resource.Requirement;
  */
 public class MemoryRepositoryStorage implements RepositoryStorage {
 
+    private final XRepository repository;
     private final AtomicLong increment = new AtomicLong();
     private final Map<CacheKey, XResource> resourceCache = new HashMap<CacheKey, XResource>();
     private final Map<CacheKey, Set<Capability>> capabilityCache = new HashMap<CacheKey, Set<Capability>>();
 
-    @Override
-    public String getName() {
-        return getClass().getSimpleName();
+    public MemoryRepositoryStorage(XRepository repository) {
+        if (repository == null)
+            throw MESSAGES.illegalArgumentNull("repository");
+        this.repository = repository;
     }
 
     protected AtomicLong getAtomicIncrement() {
         return increment;
+    }
+
+    @Override
+    public XRepository getRepository() {
+        return repository;
     }
 
     @Override
@@ -78,8 +86,8 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
                 @Override
                 public Map<String, String> getRepositoryAttributes() {
                     HashMap<String, String> attributes = new HashMap<String, String>();
-                    attributes.put("name", getName());
-                    attributes.put("increment", new Long(increment.incrementAndGet()).toString());
+                    attributes.put("name", getRepository().getName());
+                    attributes.put("increment", new Long(increment.get()).toString());
                     return Collections.unmodifiableMap(attributes);
                 }
 

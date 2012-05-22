@@ -22,9 +22,12 @@
 package org.jboss.osgi.repository.internal;
 
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import org.jboss.osgi.repository.RepositoryStorage;
+import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.core.FileBasedRepositoryStorage;
 import org.jboss.osgi.repository.core.MavenArtifactRepository;
@@ -34,6 +37,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.repository.Repository;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -47,32 +51,39 @@ public class RepositoryActivator implements BundleActivator {
 
     private final String[] SERVICE_NAMES = new String[] { XRepository.class.getName(), Repository.class.getName() };
 
+    private final Set<ServiceRegistration> registrations = new HashSet<ServiceRegistration>();
     private XRepository repository;
 
     @Override
     public void start(final BundleContext context) throws Exception {
 
-        // Register the repository storage service
-        RepositoryStorage storage = new FileBasedRepositoryStorage(context.getDataFile("repository"));
-        context.registerService(RepositoryStorage.class.getName(), storage, null);
+        // Register the repository storage factory
+        RepositoryStorageFactory factory = new RepositoryStorageFactory() {
+            @Override
+            public RepositoryStorage create(XRepository repository) {
+                return new FileBasedRepositoryStorage(repository, context.getDataFile("repository"));
+            }
+        };
+        registrations.add(context.registerService(RepositoryStorageFactory.class.getName(), factory, null));
 
         // Register the maven artifact repository
+        MavenArtifactRepository delegate = new MavenArtifactRepository();
         Dictionary<String, Object> props = new Hashtable<String, Object>();
-        props.put(Constants.SERVICE_DESCRIPTION, "JBossOSGi Maven Artifact Repository");
-        context.registerService(SERVICE_NAMES, new MavenArtifactRepository(), props);
+        props.put(Constants.SERVICE_DESCRIPTION, delegate.getName());
+        registrations.add(context.registerService(SERVICE_NAMES, delegate, props));
 
-        ServiceTracker storageTracker = new ServiceTracker(context, RepositoryStorage.class.getName(), null) {
+        ServiceTracker storageTracker = new ServiceTracker(context, RepositoryStorageFactory.class.getName(), null) {
             @Override
             public Object addingService(ServiceReference reference) {
-                RepositoryStorage storage = (RepositoryStorage) super.addingService(reference);
+                RepositoryStorageFactory factory = (RepositoryStorageFactory) super.addingService(reference);
                 if (repository == null) {
+                    repository = new AbstractPersistentRepository(factory, new RepositoryDelegate(context));
                     Dictionary<String, Object> props = new Hashtable<String, Object>();
                     props.put(Constants.SERVICE_RANKING, Integer.MAX_VALUE);
-                    props.put(Constants.SERVICE_DESCRIPTION, "JBossOSGi Aggregating Repository");
-                    repository = new AbstractPersistentRepository(storage, new RepositoryDelegate(context));
-                    context.registerService(SERVICE_NAMES, repository, props);
+                    props.put(Constants.SERVICE_DESCRIPTION, repository.getName());
+                    registrations.add(context.registerService(SERVICE_NAMES, repository, props));
                 }
-                return storage;
+                return factory;
             }
         };
         storageTracker.open();
@@ -80,6 +91,11 @@ public class RepositoryActivator implements BundleActivator {
 
     @Override
     public void stop(BundleContext context) throws Exception {
+        for (ServiceRegistration reg : registrations) {
+            reg.unregister();
+        }
+        registrations.clear();
+        repository = null;
     }
 
     class RepositoryDelegate extends AggregatingRepository {

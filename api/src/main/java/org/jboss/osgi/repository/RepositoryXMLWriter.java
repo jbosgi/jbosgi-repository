@@ -41,6 +41,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.jboss.osgi.repository.RepositoryNamespace.Type;
 import org.jboss.osgi.resolver.XResource;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
@@ -129,12 +130,13 @@ public class RepositoryXMLWriter implements RepositoryWriter {
                 writer.writeAttribute(VALUE.getLocalName(), valstr);
                 Class<?> type = ((List<?>)value).toArray().getClass().getComponentType();
                 if (type != String.class) {
-                    writer.writeAttribute(TYPE.getLocalName(), type.getSimpleName());
+                    writer.writeAttribute(TYPE.getLocalName(), "List<" + type.getSimpleName() + ">");
                 }
             } else {
                 writer.writeAttribute(VALUE.getLocalName(), value.toString());
                 if (clazz != String.class) {
-                    writer.writeAttribute(TYPE.getLocalName(), clazz.getSimpleName());
+                    Type type = Type.valueOf(clazz.getSimpleName());
+                    writer.writeAttribute(TYPE.getLocalName(), type.toString());
                 }
             }
             writer.writeEndElement();

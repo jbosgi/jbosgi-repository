@@ -45,6 +45,7 @@ import org.jboss.osgi.repository.RepositoryWriter;
 import org.jboss.osgi.repository.RepositoryXMLReader;
 import org.jboss.osgi.repository.RepositoryXMLWriter;
 import org.jboss.osgi.repository.URLResourceBuilderFactory;
+import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.MemoryRepositoryStorage;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XResource;
@@ -67,7 +68,11 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
     private final File storageDir;
     private final File repoFile;
 
-    public FileBasedRepositoryStorage(File storageDir) {
+    public FileBasedRepositoryStorage(XRepository repository, File storageDir) {
+        super(repository);
+        if (storageDir == null)
+            throw MESSAGES.illegalArgumentNull("storageDir");
+
         this.storageDir = storageDir;
         this.repoFile = new File(storageDir.getAbsolutePath() + File.separator + "repository.xml");
 
@@ -108,14 +113,14 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             throw MESSAGES.storageCannotObtainContentCapablility(res);
 
         XCapability ccap = (XCapability) ccaps.get(0);
-        URL contentURL = (URL) ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE);
+        String contentURL = (String)ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE);
         if (contentURL == null)
             throw MESSAGES.storageCannotObtainContentURL(res);
 
         XResource result;
 
         // Copy the resource to this storage, if the content URL does not match
-        if (contentURL.getPath().startsWith(getBaseURL().getPath()) == false) {
+        if (contentURL.startsWith(getBaseURL().toExternalForm()) == false) {
             InputStream input = ((RepositoryContent) res).getContent();
             String mime = (String) ccap.getAttribute(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE);
             XResourceBuilder builder = createResourceInternal(input, mime, false);
@@ -147,8 +152,8 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
 
     private synchronized boolean removeResourceInternal(XResource res, boolean writeXML) {
         XCapability ccap = (XCapability) res.getCapabilities(ContentNamespace.CONTENT_NAMESPACE).get(0);
-        URL fileURL = (URL) ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE);
-        File contentFile = new File(fileURL.getPath());
+        String fileURL = (String) ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE);
+        File contentFile = new File(fileURL.substring("file:".length()));
         boolean result = true;
         if (contentFile.exists()) {
             result = deleteRecursive(contentFile.getParentFile());
@@ -251,7 +256,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             throw MESSAGES.illegalStateCannotInitializeRepositoryWriter(ex);
         }
         Map<String, String> attributes = new HashMap<String, String>();
-        attributes.put(Attribute.NAME.getLocalName(), getName());
+        attributes.put(Attribute.NAME.getLocalName(), getRepository().getName());
         attributes.put(Attribute.INCREMENT.getLocalName(), new Long(getAtomicIncrement().get()).toString());
         writer.writeRepositoryAttributes(attributes);
         RepositoryReader reader = getRepositoryReader();

@@ -34,6 +34,8 @@ import junit.framework.Assert;
 
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
+import org.jboss.osgi.repository.RepositoryStorage;
+import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.core.FileBasedRepositoryStorage;
 import org.jboss.osgi.repository.core.MavenArtifactRepository;
@@ -58,18 +60,20 @@ import org.osgi.service.repository.RepositoryContent;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class CachingRepositoryTestCase extends AbstractRepositoryTest {
+public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
 
     private XRepository repository;
     private File cacheFile;
 
     @Before
     public void setUp() throws IOException {
-        cacheFile = new File("./target/repository").getCanonicalFile();
-        FileBasedRepositoryStorage storage = new FileBasedRepositoryStorage(cacheFile);
-        MavenArtifactRepository delegate = new MavenArtifactRepository();
-        repository = new AbstractPersistentRepository(storage, delegate) {};
+        cacheFile = new File("./target/repository");
         deleteRecursive(cacheFile);
+        repository = new AbstractPersistentRepository(new RepositoryStorageFactory() {
+            public RepositoryStorage create(XRepository repository) {
+                return new FileBasedRepositoryStorage(repository, cacheFile);
+            }
+        }, new MavenArtifactRepository());
     }
 
     @Test
@@ -96,7 +100,7 @@ public class CachingRepositoryTestCase extends AbstractRepositoryTest {
         caps = resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE);
         assertEquals("One capability", 1, caps.size());
         cap = (XCapability) caps.iterator().next();
-        URL url = (URL) cap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE);
+        URL url = new URL((String) cap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE));
         Assert.assertTrue("Local path: " + url, url.getPath().startsWith(cacheFile.getAbsolutePath()));
     }
 }

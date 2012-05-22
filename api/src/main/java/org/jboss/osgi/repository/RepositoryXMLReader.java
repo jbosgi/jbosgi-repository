@@ -169,11 +169,15 @@ public class RepositoryXMLReader implements RepositoryReader {
     }
 
     private void readAttributeElement(XMLStreamReader reader, Map<String, Object> attributes) throws XMLStreamException {
+        boolean listType = false;
         String name = reader.getAttributeValue(null, Attribute.NAME.toString());
         String valstr = reader.getAttributeValue(null, Attribute.VALUE.toString());
         String typespec = reader.getAttributeValue(null, Attribute.TYPE.toString());
         Type type = typespec != null ? Type.valueOf(typespec) : Type.String;
-        boolean listType = valstr.indexOf(",") > 0;
+        if (valstr.startsWith("List<") && valstr.endsWith(">")) {
+            valstr = valstr.substring(5, valstr.length() - 1);
+            listType = true;
+        }
         Object value;
         switch (type) {
             case String:

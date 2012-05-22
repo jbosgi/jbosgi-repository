@@ -29,7 +29,7 @@ import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 
 /**
- * Handles capability caching
+ * Repository resource storage
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
@@ -37,9 +37,9 @@ import org.osgi.resource.Requirement;
 public interface RepositoryStorage {
 
     /**
-     * Get the name for this repository storage
+     * Get the associated reposistory;
      */
-    String getName();
+    XRepository getRepository();
 
     /**
      * Find the capabilities that match the specified requirement.
