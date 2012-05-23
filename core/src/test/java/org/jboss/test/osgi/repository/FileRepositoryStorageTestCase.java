@@ -33,11 +33,11 @@ import junit.framework.Assert;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.XRepository;
+import org.jboss.osgi.repository.XRequirementBuilder;
 import org.jboss.osgi.repository.core.FileBasedRepositoryStorage;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XPackageCapability;
 import org.jboss.osgi.resolver.XRequirement;
-import org.jboss.osgi.resolver.XRequirementBuilder;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.spi.OSGiManifestBuilder;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -112,7 +112,7 @@ public class FileRepositoryStorageTestCase extends AbstractRepositoryTest {
         URL fileURL = new URL((String) ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE));
         Assert.assertTrue("File exists: " + fileURL, new File(fileURL.getPath()).exists());
 
-        XRequirement req = XRequirementBuilder.createRequirement(PackageNamespace.PACKAGE_NAMESPACE, "org.acme.foo");
+        XRequirement req = XRequirementBuilder.create(PackageNamespace.PACKAGE_NAMESPACE, "org.acme.foo").getRequirement();
         Collection<Capability> providers = storage.findProviders(req);
         Assert.assertNotNull(providers);
         Assert.assertEquals(1, providers.size());

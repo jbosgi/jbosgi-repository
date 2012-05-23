@@ -33,11 +33,11 @@ import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
+import org.jboss.osgi.repository.XRequirementBuilder;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XPackageCapability;
 import org.jboss.osgi.resolver.XRequirement;
-import org.jboss.osgi.resolver.XRequirementBuilder;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.spi.OSGiManifestBuilder;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -92,7 +92,7 @@ public class RepositoryBundleTestCase {
     public void testMavenCoordinates() throws Exception {
 
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
-        Requirement req = XRequirementBuilder.createArtifactRequirement(mavenid);
+        Requirement req = XRequirementBuilder.create(mavenid).getRequirement();
         Assert.assertNotNull("Requirement not null", req);
 
         Collection<Capability> providers = getRepository().findProviders(req);
@@ -141,8 +141,9 @@ public class RepositoryBundleTestCase {
         bundle.start();
         Assert.assertNotNull(getRepository());
 
-        XRequirement req = XRequirementBuilder.createRequirement(PackageNamespace.PACKAGE_NAMESPACE, "org.apache.felix.cm");
-        req.getAttributes().put(PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE, Version.parseVersion("1.0"));
+        XRequirementBuilder builder = XRequirementBuilder.create(PackageNamespace.PACKAGE_NAMESPACE, "org.apache.felix.cm");
+        builder.getAttributes().put(PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE, Version.parseVersion("1.0"));
+        XRequirement req = builder.getRequirement();
 
         Collection<Capability> providers = getRepository().findProviders(req);
         Assert.assertEquals("Capability not null", 1, providers.size());

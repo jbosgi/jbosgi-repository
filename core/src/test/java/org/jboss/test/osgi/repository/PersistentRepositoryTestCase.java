@@ -37,13 +37,13 @@ import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XRepository;
+import org.jboss.osgi.repository.XRequirementBuilder;
 import org.jboss.osgi.repository.core.FileBasedRepositoryStorage;
 import org.jboss.osgi.repository.core.MavenArtifactRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
-import org.jboss.osgi.resolver.XRequirementBuilder;
 import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,7 +80,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
     public void testFindProvidersByMavenId() throws Exception {
 
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
-        Requirement req = XRequirementBuilder.createArtifactRequirement(mavenid);
+        Requirement req = XRequirementBuilder.create(mavenid).getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
         assertEquals("One capability", 1, caps.size());
         XCapability cap = (XCapability) caps.iterator().next();

@@ -79,4 +79,7 @@ public interface RepositoryMessages {
 
     @Message(id = 20512, value = "Cannot write repository element")
     IllegalStateException illegalStateCannotWriteRepositoryElement(@Cause Throwable th);
+
+    @Message(id = 20513, value = "Invalid filter directive: %s")
+    IllegalArgumentException illegalArgumentInvalidFilterDirective(String filter);
 }
