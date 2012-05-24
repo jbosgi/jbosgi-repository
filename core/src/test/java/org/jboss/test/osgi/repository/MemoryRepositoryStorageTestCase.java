@@ -68,11 +68,11 @@ public class MemoryRepositoryStorageTestCase extends AbstractRepositoryTest {
         XRequirement req = builder.getRequirement();
 
         Collection<Capability> providers = storage.findProviders(req);
-        Assert.assertNotNull(providers);
-        Assert.assertEquals(1, providers.size());
+        Assert.assertNotNull("Providers not null", providers);
+        Assert.assertEquals("One provider", 1, providers.size());
 
         XCapability cap = (XCapability) providers.iterator().next();
-        Assert.assertNotNull(cap);
+        Assert.assertNotNull("Capability not null", cap);
         Assert.assertSame(resource, cap.getResource());
     }
 
@@ -84,10 +84,7 @@ public class MemoryRepositoryStorageTestCase extends AbstractRepositoryTest {
         XRequirement req = builder.getRequirement();
 
         Collection<Capability> providers = storage.findProviders(req);
-        Assert.assertNotNull(providers);
-        Assert.assertEquals(1, providers.size());
-
-        XCapability cap = (XCapability) providers.iterator().next();
-        Assert.assertNotNull(cap);
+        Assert.assertNotNull("Providers not null", providers);
+        Assert.assertEquals("One provider", 1, providers.size());
     }
 }

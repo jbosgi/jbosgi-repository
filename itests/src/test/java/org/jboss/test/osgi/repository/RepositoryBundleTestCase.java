@@ -142,7 +142,7 @@ public class RepositoryBundleTestCase {
         Assert.assertNotNull(getRepository());
 
         XRequirementBuilder builder = XRequirementBuilder.create(PackageNamespace.PACKAGE_NAMESPACE, "org.apache.felix.cm");
-        builder.getAttributes().put(PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE, Version.parseVersion("1.0"));
+        builder.getAttributes().put(PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE, "[1.0,2.0)");
         XRequirement req = builder.getRequirement();
 
         Collection<Capability> providers = getRepository().findProviders(req);

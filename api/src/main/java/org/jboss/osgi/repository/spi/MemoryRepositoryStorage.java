@@ -23,6 +23,7 @@ package org.jboss.osgi.repository.spi;
 
 import static org.jboss.osgi.repository.RepositoryLogger.LOGGER;
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
+import static org.jboss.osgi.resolver.spi.AbstractRequirement.namespaceValueFromFilter;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -201,13 +202,7 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
             String value = (String) req.getAttributes().get(namespace);
             if (value == null) {
                 Filter filter = getRequiredFilter(req);
-                String filterstr = filter.toString();
-                int index = filterstr.indexOf("(" + namespace + "=");
-                if (index >= 0) {
-                    value = filterstr.substring(index + namespace.length() + 2);
-                    index = value.indexOf(")");
-                    value = value.substring(0, index);
-                }
+                value = namespaceValueFromFilter(filter, namespace);
             }
             return new CacheKey(namespace, value);
         }
