@@ -34,7 +34,7 @@ import java.util.Map;
  * @author Thomas.Diesler@jboss.com
  * @since 14-May-2012
  */
-public interface RepositoryNamespace {
+public interface Namespace100 {
 
     String REPOSITORY_NAMESPACE = "http://www.osgi.org/xmlns/repository/v1.0.0";
 

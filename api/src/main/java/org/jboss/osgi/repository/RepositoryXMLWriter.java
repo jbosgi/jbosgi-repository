@@ -20,17 +20,17 @@
 package org.jboss.osgi.repository;
 
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
-import static org.jboss.osgi.repository.RepositoryNamespace.REPOSITORY_NAMESPACE;
-import static org.jboss.osgi.repository.RepositoryNamespace.Attribute.NAME;
-import static org.jboss.osgi.repository.RepositoryNamespace.Attribute.NAMESPACE;
-import static org.jboss.osgi.repository.RepositoryNamespace.Attribute.TYPE;
-import static org.jboss.osgi.repository.RepositoryNamespace.Attribute.VALUE;
-import static org.jboss.osgi.repository.RepositoryNamespace.Element.ATTRIBUTE;
-import static org.jboss.osgi.repository.RepositoryNamespace.Element.CAPABILITY;
-import static org.jboss.osgi.repository.RepositoryNamespace.Element.DIRECTIVE;
-import static org.jboss.osgi.repository.RepositoryNamespace.Element.REPOSITORY;
-import static org.jboss.osgi.repository.RepositoryNamespace.Element.REQUIREMENT;
-import static org.jboss.osgi.repository.RepositoryNamespace.Element.RESOURCE;
+import static org.jboss.osgi.repository.Namespace100.REPOSITORY_NAMESPACE;
+import static org.jboss.osgi.repository.Namespace100.Attribute.NAME;
+import static org.jboss.osgi.repository.Namespace100.Attribute.NAMESPACE;
+import static org.jboss.osgi.repository.Namespace100.Attribute.TYPE;
+import static org.jboss.osgi.repository.Namespace100.Attribute.VALUE;
+import static org.jboss.osgi.repository.Namespace100.Element.ATTRIBUTE;
+import static org.jboss.osgi.repository.Namespace100.Element.CAPABILITY;
+import static org.jboss.osgi.repository.Namespace100.Element.DIRECTIVE;
+import static org.jboss.osgi.repository.Namespace100.Element.REPOSITORY;
+import static org.jboss.osgi.repository.Namespace100.Element.REQUIREMENT;
+import static org.jboss.osgi.repository.Namespace100.Element.RESOURCE;
 
 import java.io.OutputStream;
 import java.util.List;
@@ -41,7 +41,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.jboss.osgi.repository.RepositoryNamespace.Type;
+import org.jboss.osgi.repository.Namespace100.Type;
 import org.jboss.osgi.resolver.XResource;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;

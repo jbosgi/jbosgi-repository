@@ -24,9 +24,12 @@ package org.jboss.test.osgi.repository;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
+
+import junit.framework.Assert;
 
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
@@ -34,13 +37,16 @@ import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.XRequirementBuilder;
 import org.jboss.osgi.repository.core.MavenArtifactRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
+import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
+import org.jboss.osgi.resolver.XRequirement;
+import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Version;
 import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
-import org.osgi.resource.Requirement;
+import org.osgi.service.repository.ContentNamespace;
 import org.osgi.service.repository.RepositoryContent;
 
 /**
@@ -61,17 +67,28 @@ public class MavenArtifactRepositoryTestCase {
     @Test
     public void testFindProvidersByMavenId() throws Exception {
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
-        Requirement req = XRequirementBuilder.create(mavenid).getRequirement();
+        XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
         assertEquals("One capability", 1, caps.size());
-        Capability cap = caps.iterator().next();
+        XCapability cap = (XCapability) caps.iterator().next();
 
-        XIdentityCapability icap = (XIdentityCapability) cap;
+        verifyCapability(cap, req);
+    }
+
+    void verifyCapability(XCapability cap, XRequirement req) throws IOException, MalformedURLException {
+
+        Assert.assertTrue("Capability matches", req.matches(cap));
+
+        XResource resource = (XResource) cap.getResource();
+        XIdentityCapability icap = resource.getIdentityCapability();
         assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
         assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());
         assertEquals(IdentityNamespace.TYPE_BUNDLE, icap.getType());
 
-        RepositoryContent content = (RepositoryContent) icap.getResource();
+        Collection<Capability> caps = resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE);
+        assertEquals("One capability", 1, caps.size());
+
+        RepositoryContent content = (RepositoryContent) resource;
         Manifest manifest = new JarInputStream(content.getContent()).getManifest();
         OSGiMetaData metaData = OSGiMetaDataBuilder.load(manifest);
         assertEquals("org.apache.felix.configadmin", metaData.getBundleSymbolicName());

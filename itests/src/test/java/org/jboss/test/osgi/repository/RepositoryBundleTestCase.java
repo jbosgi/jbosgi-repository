@@ -35,6 +35,7 @@ import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.XRequirementBuilder;
 import org.jboss.osgi.resolver.MavenCoordinates;
+import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XPackageCapability;
 import org.jboss.osgi.resolver.XRequirement;
@@ -54,7 +55,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.framework.namespace.PackageNamespace;
 import org.osgi.resource.Capability;
-import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
 import org.osgi.service.repository.Repository;
 import org.osgi.service.repository.RepositoryContent;
@@ -92,18 +92,22 @@ public class RepositoryBundleTestCase {
     public void testMavenCoordinates() throws Exception {
 
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
-        Requirement req = XRequirementBuilder.create(mavenid).getRequirement();
+        XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
         Assert.assertNotNull("Requirement not null", req);
 
         Collection<Capability> providers = getRepository().findProviders(req);
         Assert.assertEquals("Capability not null", 1, providers.size());
 
-        XIdentityCapability xcap = (XIdentityCapability) providers.iterator().next();
-        Assert.assertEquals("org.apache.felix.configadmin", xcap.getSymbolicName());
-        RepositoryContent content = (RepositoryContent) xcap.getResource();
+        XCapability cap = (XCapability) providers.iterator().next();
+        Assert.assertTrue("Capability matches", req.matches(cap));
+        XResource resource = (XResource) cap.getResource();
+
+        XIdentityCapability icap = resource.getIdentityCapability();
+        Assert.assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
+        RepositoryContent content = (RepositoryContent) icap.getResource();
         InputStream input = content.getContent();
         try {
-            Bundle bundle = context.installBundle(xcap.getSymbolicName(), input);
+            Bundle bundle = context.installBundle(icap.getSymbolicName(), input);
             try {
                 bundle.start();
                 Assert.assertEquals(Bundle.ACTIVE, bundle.getState());

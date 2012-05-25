@@ -22,10 +22,10 @@
 
 package org.jboss.osgi.repository;
 
-import static org.jboss.osgi.resolver.XResourceConstants.MAVEN_IDENTITY_NAMESPACE;
-import static org.jboss.osgi.resolver.XResourceConstants.MODULE_IDENTITY_NAMESPACE;
 
-import java.util.Collections;
+import static org.jboss.osgi.repository.XRepository.MAVEN_IDENTITY_NAMESPACE;
+import static org.jboss.osgi.repository.XRepository.MODULE_IDENTITY_NAMESPACE;
+
 import java.util.Map;
 
 import org.jboss.modules.ModuleIdentifier;
@@ -58,11 +58,13 @@ public final class XRequirementBuilder {
         return create(namespace, null);
     }
 
-    public static XRequirementBuilder create(String namespace, String value) {
+    public static XRequirementBuilder create(String namespace, String nsvalue) {
         XResourceBuilder builder = XResourceBuilderFactory.create();
-        Map<String, Object> attr = value != null ? Collections.singletonMap(namespace, (Object)value) : null;
-        XRequirement requirement = builder.addGenericRequirement(namespace, attr, null);
-        return new XRequirementBuilder(builder, requirement);
+        XRequirement req = builder.addGenericRequirement(namespace);
+        if (nsvalue != null) {
+            req.getAttributes().put(namespace, nsvalue);
+        }
+        return new XRequirementBuilder(builder, req);
     }
 
     private XRequirementBuilder(XResourceBuilder builder, XRequirement requirement) {

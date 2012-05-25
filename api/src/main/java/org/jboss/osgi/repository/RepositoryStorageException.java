@@ -28,6 +28,9 @@ package org.jboss.osgi.repository;
  * @since 16-Jan-2012
  */
 public class RepositoryStorageException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
+
     public RepositoryStorageException(String message) {
         super(message);
     }

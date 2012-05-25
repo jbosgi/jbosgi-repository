@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.jar.JarInputStream;
@@ -44,13 +45,13 @@ import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
+import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Version;
 import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
-import org.osgi.resource.Requirement;
 import org.osgi.service.repository.ContentNamespace;
 import org.osgi.service.repository.RepositoryContent;
 
@@ -80,27 +81,41 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
     public void testFindProvidersByMavenId() throws Exception {
 
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
-        Requirement req = XRequirementBuilder.create(mavenid).getRequirement();
+        XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
         assertEquals("One capability", 1, caps.size());
         XCapability cap = (XCapability) caps.iterator().next();
 
-        XIdentityCapability icap = (XIdentityCapability) cap;
+        verifyCapability(cap, req);
+
+        // Find the same requirement again
+        caps = repository.findProviders(req);
+        assertEquals("One capability", 1, caps.size());
+        cap = (XCapability) caps.iterator().next();
+
+        verifyCapability(cap, req);
+    }
+
+    private void verifyCapability(XCapability cap, XRequirement req) throws IOException, MalformedURLException {
+
+        Assert.assertTrue("Capability matches", req.matches(cap));
+
+        XResource resource = (XResource) cap.getResource();
+        XIdentityCapability icap = resource.getIdentityCapability();
         assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
         assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());
         assertEquals(IdentityNamespace.TYPE_BUNDLE, icap.getType());
 
-        XResource resource = (XResource) icap.getResource();
+        Collection<Capability> caps = resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE);
+        assertEquals("One capability", 1, caps.size());
+        cap = (XCapability) caps.iterator().next();
+        URL url = new URL((String) cap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE));
+        Assert.assertTrue("Local path: " + url, url.getPath().startsWith(storageDir.getAbsolutePath()));
+
         RepositoryContent content = (RepositoryContent) resource;
         Manifest manifest = new JarInputStream(content.getContent()).getManifest();
         OSGiMetaData metaData = OSGiMetaDataBuilder.load(manifest);
         assertEquals("org.apache.felix.configadmin", metaData.getBundleSymbolicName());
         assertEquals(Version.parseVersion("1.2.8"), metaData.getBundleVersion());
-
-        caps = resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE);
-        assertEquals("One capability", 1, caps.size());
-        cap = (XCapability) caps.iterator().next();
-        URL url = new URL((String) cap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE));
-        Assert.assertTrue("Local path: " + url, url.getPath().startsWith(storageDir.getAbsolutePath()));
     }
 }

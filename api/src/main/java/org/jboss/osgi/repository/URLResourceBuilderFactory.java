@@ -22,9 +22,12 @@
 
 package org.jboss.osgi.repository;
 
+import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.jar.JarInputStream;
@@ -36,9 +39,9 @@ import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.XResourceBuilderFactory;
-import org.jboss.osgi.resolver.XResourceConstants;
+import org.jboss.osgi.resolver.spi.AbstractResource;
 import org.osgi.service.repository.ContentNamespace;
-
+import org.osgi.service.repository.RepositoryContent;
 
 /**
  * Create an URL based resource
@@ -54,14 +57,13 @@ public final class URLResourceBuilderFactory extends XResourceBuilderFactory {
         this.urlres = urlres;
     }
 
-    public static XResourceBuilder create(URL baseURL, String contentPath, Map<String, Object> atts, boolean loadMetadata) throws MalformedURLException {
-        final URLResource urlres = new URLResource(baseURL, contentPath);
+    public static XResourceBuilder create(URL contentURL, Map<String, Object> contentAtts, boolean loadMetadata) {
+        URLResource urlres = new URLResource(contentURL);
         URLResourceBuilderFactory factory = new URLResourceBuilderFactory(urlres);
 
         XResourceBuilder builder = XResourceBuilderFactory.create(factory);
-        XCapability ccap = builder.addGenericCapability(ContentNamespace.CONTENT_NAMESPACE, atts, null);
-        ccap.getAttributes().put(ContentNamespace.CAPABILITY_URL_ATTRIBUTE, urlres.getContentURL().toExternalForm());
-        ccap.getAttributes().put(XResourceConstants.CAPABILITY_PATH_ATTRIBUTE, urlres.getContentPath());
+        XCapability ccap = builder.addGenericCapability(ContentNamespace.CONTENT_NAMESPACE, contentAtts, null);
+        ccap.getAttributes().put(ContentNamespace.CAPABILITY_URL_ATTRIBUTE, contentURL.toExternalForm());
 
         if (loadMetadata) {
             InputStream content = urlres.getContent();
@@ -70,7 +72,6 @@ public final class URLResourceBuilderFactory extends XResourceBuilderFactory {
                 OSGiMetaData metaData = OSGiMetaDataBuilder.load(manifest);
                 builder.loadFrom(metaData);
             } catch (Exception ex) {
-                URL contentURL = urlres.getContentURL();
                 throw new IllegalStateException("Cannot create capability from: " + contentURL, ex);
             } finally {
                 if (content != null) {
@@ -88,5 +89,33 @@ public final class URLResourceBuilderFactory extends XResourceBuilderFactory {
     @Override
     public XResource createResource() {
         return urlres;
+    }
+
+    static class URLResource extends AbstractResource implements RepositoryContent {
+
+        private final URL contentURL;
+
+        URLResource(URL contentURL) {
+            if (contentURL == null)
+                throw MESSAGES.illegalArgumentNull("contentURL");
+            this.contentURL = contentURL;
+        }
+
+        URL getContentURL() {
+            return contentURL;
+        }
+
+        @Override
+        public InputStream getContent() {
+            try {
+                if (contentURL.getProtocol().equals("file")) {
+                    return new FileInputStream(new File(contentURL.getPath()));
+                } else {
+                    return contentURL.openStream();
+                }
+            } catch (IOException ex) {
+                throw MESSAGES.storageCannotObtainInputStream(ex, this);
+            }
+        }
     }
 }

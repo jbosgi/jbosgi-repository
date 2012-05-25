@@ -65,25 +65,23 @@ public class AbstractPersistentRepository extends AbstractRepository implements 
         Collection<Capability> providers = storage.findProviders(req);
         if (providers.isEmpty()) {
             providers = delegate.findProviders(req);
-            if (providers.isEmpty() == false) {
-                List<Capability> caplist = new ArrayList<Capability>(providers);
-                for (int i =0; i < caplist.size(); i++) {
-                    XCapability orgcap = (XCapability) caplist.get(i);
-                    XResource orgres = (XResource) orgcap.getResource();
-                    XResource newres = storage.addResource(orgres);
-                    if (newres != orgres) {
-                        String namespace = orgcap.getNamespace();
-                        Object orgval = orgcap.getAttributes().get(namespace);
-                        for (Capability newcap : newres.getCapabilities(namespace)) {
-                            Object newval = newcap.getAttributes().get(namespace);
-                            if (orgval.equals(newval)) {
-                                caplist.set(i, newcap);
-                            }
+            List<Capability> caplist = new ArrayList<Capability>(providers);
+            for (int i = 0; i < caplist.size(); i++) {
+                XCapability orgcap = (XCapability) caplist.get(i);
+                XResource orgres = (XResource) orgcap.getResource();
+                XResource newres = storage.addResource(orgres);
+                if (newres != orgres) {
+                    String namespace = orgcap.getNamespace();
+                    Object orgval = orgcap.getAttributes().get(namespace);
+                    for (Capability newcap : newres.getCapabilities(namespace)) {
+                        Object newval = newcap.getAttributes().get(namespace);
+                        if (orgval.equals(newval)) {
+                            caplist.set(i, newcap);
                         }
                     }
                 }
-                providers = caplist;
             }
+            providers = caplist;
         }
         return providers;
     }

@@ -26,7 +26,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.jboss.osgi.repository.RepositoryNamespace;
+import org.jboss.osgi.repository.Namespace100;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryXMLReader;
 import org.jboss.osgi.resolver.XIdentityCapability;
@@ -39,6 +39,7 @@ import org.osgi.framework.namespace.PackageNamespace;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.service.repository.ContentNamespace;
+import org.osgi.service.repository.RepositoryContent;
 
 /**
  * Test the the {@link RepositoryXMLReader}.
@@ -60,12 +61,13 @@ public class RepositoryReaderTestCase extends AbstractRepositoryTest {
 
     static void verifyContent(Map<String, String> attributes, List<XResource> resources) {
         Assert.assertEquals("Two attributes", 2, attributes.size());
-        Assert.assertEquals("OSGi Repository", attributes.get(RepositoryNamespace.Attribute.NAME.getLocalName()));
-        Assert.assertEquals("13582741", attributes.get(RepositoryNamespace.Attribute.INCREMENT.getLocalName()));
+        Assert.assertEquals("OSGi Repository", attributes.get(Namespace100.Attribute.NAME.getLocalName()));
+        Assert.assertEquals("13582741", attributes.get(Namespace100.Attribute.INCREMENT.getLocalName()));
 
         Assert.assertEquals("One resource", 1, resources.size());
         XResource resource = resources.get(0);
         Assert.assertNotNull("Resource not null", resource);
+        Assert.assertTrue("RepositoryContent", resource instanceof RepositoryContent);
 
         // osgi.identity
         XIdentityCapability icap = resource.getIdentityCapability();

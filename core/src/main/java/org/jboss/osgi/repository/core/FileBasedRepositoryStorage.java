@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jboss.osgi.repository.RepositoryNamespace.Attribute;
+import org.jboss.osgi.repository.Namespace100.Attribute;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageException;
@@ -50,7 +50,6 @@ import org.jboss.osgi.repository.spi.MemoryRepositoryStorage;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
-import org.jboss.osgi.resolver.XResourceConstants;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.service.repository.ContentNamespace;
@@ -177,19 +176,19 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
     }
 
     private XResourceBuilder createResourceInternal(InputStream input, String mime, boolean loadMetadata) {
-        Map<String, Object> atts = new HashMap<String, Object>();
+        Map<String, Object> contentAtts = new HashMap<String, Object>();
         if (mime != null) {
-            atts.put(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE, mime);
+            contentAtts.put(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE, mime);
         }
         try {
-            String contentPath = addResourceContent(input, atts);
-            return URLResourceBuilderFactory.create(getBaseURL(), contentPath, atts, loadMetadata);
+            URL contentURL = addResourceContent(input, contentAtts);
+            return URLResourceBuilderFactory.create(contentURL, contentAtts, loadMetadata);
         } catch (IOException ex) {
             throw MESSAGES.storageCannotAddResourceToStorage(ex, mime);
         }
     }
 
-    private String addResourceContent(InputStream input, Map<String, Object> atts) throws IOException {
+    private URL addResourceContent(InputStream input, Map<String, Object> atts) throws IOException {
         synchronized (storageDir) {
             // Copy the input stream to temporary storage
             File tempFile = new File(storageDir.getAbsolutePath() + File.separator + "temp-content");
@@ -206,11 +205,11 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             }
             // Move the content to storage location
             String contentPath = sha256.substring(0, 2) + File.separator + sha256.substring(2) + File.separator + "content";
-            atts.put(XResourceConstants.CAPABILITY_PATH_ATTRIBUTE, contentPath);
             File targetFile = new File(storageDir.getAbsolutePath() + File.separator + contentPath);
             targetFile.getParentFile().mkdirs();
             tempFile.renameTo(targetFile);
-            return contentPath;
+            URL url = targetFile.toURI().toURL();
+            return url;
         }
     }
 

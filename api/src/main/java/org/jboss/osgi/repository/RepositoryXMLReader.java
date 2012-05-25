@@ -24,11 +24,13 @@ package org.jboss.osgi.repository;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.START_DOCUMENT;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
+import static org.jboss.osgi.repository.Namespace100.REPOSITORY_NAMESPACE;
+import static org.jboss.osgi.repository.Namespace100.Element.REPOSITORY;
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
-import static org.jboss.osgi.repository.RepositoryNamespace.REPOSITORY_NAMESPACE;
-import static org.jboss.osgi.repository.RepositoryNamespace.Element.REPOSITORY;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,13 +40,17 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.jboss.osgi.repository.RepositoryNamespace.Attribute;
-import org.jboss.osgi.repository.RepositoryNamespace.Element;
-import org.jboss.osgi.repository.RepositoryNamespace.Type;
+import org.jboss.osgi.repository.Namespace100.Attribute;
+import org.jboss.osgi.repository.Namespace100.Element;
+import org.jboss.osgi.repository.Namespace100.Type;
+import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.XResourceBuilderFactory;
 import org.osgi.framework.Version;
+import org.osgi.resource.Capability;
+import org.osgi.resource.Requirement;
+import org.osgi.service.repository.ContentNamespace;
 
 /**
  * Read repository contnet from XML.
@@ -125,16 +131,44 @@ public class RepositoryXMLReader implements RepositoryReader {
                 }
             }
         }
-        return builder.getResource();
+        XResource resource = builder.getResource();
+
+        // Transform the resource into an URLResource
+        List<Capability> caps = resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE);
+        if (caps.size() > 0) {
+            XCapability ccap = (XCapability) caps.get(0);
+            String urlspec = (String) ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE);
+            if (urlspec != null) {
+                URL contentURL;
+                try {
+                    contentURL = new URL(urlspec);
+                } catch (MalformedURLException ex) {
+                    throw MESSAGES.storageInvalidContentURL(urlspec);
+                }
+                builder = URLResourceBuilderFactory.create(contentURL, ccap.getAttributes(), false);
+                for (Capability cap : resource.getCapabilities(null)) {
+                    String namespace = cap.getNamespace();
+                    if (!namespace.equals(ContentNamespace.CONTENT_NAMESPACE)) {
+                        builder.addGenericCapability(namespace, cap.getAttributes(), cap.getDirectives());
+                    }
+                }
+                for (Requirement req : resource.getRequirements(null)) {
+                    String namespace = req.getNamespace();
+                    builder.addGenericRequirement(namespace, req.getAttributes(), req.getDirectives());
+                }
+                resource = builder.getResource();
+            }
+        }
+        return resource;
     }
 
     private void readCapabilityElement(XMLStreamReader reader, XResourceBuilder builder) throws XMLStreamException {
         String namespace = reader.getAttributeValue(null, Attribute.NAMESPACE.toString());
-        Map<String, Object> attributes = new HashMap<String, Object>();
-        Map<String, String> directives = new HashMap<String, String>();
-        readAttributesAndDirectives(reader, attributes, directives);
+        Map<String, Object> atts = new HashMap<String, Object>();
+        Map<String, String> dirs = new HashMap<String, String>();
+        readAttributesAndDirectives(reader, atts, dirs);
         try {
-            builder.addGenericCapability(namespace, attributes, directives);
+            builder.addGenericCapability(namespace, atts, dirs);
         } catch (RuntimeException ex) {
             throw MESSAGES.storageCannotReadResourceElement(ex, reader.getLocation());
         }
@@ -142,11 +176,11 @@ public class RepositoryXMLReader implements RepositoryReader {
 
     private void readRequirementElement(XMLStreamReader reader, XResourceBuilder builder) throws XMLStreamException {
         String namespace = reader.getAttributeValue(null, Attribute.NAMESPACE.toString());
-        Map<String, Object> attributes = new HashMap<String, Object>();
-        Map<String, String> directives = new HashMap<String, String>();
-        readAttributesAndDirectives(reader, attributes, directives);
+        Map<String, Object> atts = new HashMap<String, Object>();
+        Map<String, String> dirs = new HashMap<String, String>();
+        readAttributesAndDirectives(reader, atts, dirs);
         try {
-            builder.addGenericRequirement(namespace, attributes, directives);
+            builder.addGenericRequirement(namespace, atts, dirs);
         } catch (RuntimeException ex) {
             throw MESSAGES.storageCannotReadResourceElement(ex, reader.getLocation());
         }

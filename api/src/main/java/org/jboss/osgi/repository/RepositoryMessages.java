@@ -65,21 +65,24 @@ public interface RepositoryMessages {
     @Message(id = 20507, value = "Cannot access content URL: %s")
     RepositoryStorageException storageCannotAccessContentURL(@Cause Throwable th, String contentURL);
 
-    @Message(id = 20508, value = "No such digest algorithm: %s")
+    @Message(id = 20508, value = "Invalid content URL: %s")
+    RepositoryStorageException storageInvalidContentURL(String contentURL);
+
+    @Message(id = 20509, value = "No such digest algorithm: %s")
     RepositoryStorageException storageNoSuchAlgorithm(@Cause Throwable th, String algorithm);
 
-    @Message(id = 20509, value = "Cannot add resource to storage: %s")
+    @Message(id = 20510, value = "Cannot add resource to storage: %s")
     RepositoryStorageException storageCannotAddResourceToStorage(@Cause Throwable th, String mime);
 
-    @Message(id = 20510, value = "Cannot obtain input stream for: %s")
+    @Message(id = 20511, value = "Cannot obtain input stream for: %s")
     RepositoryStorageException storageCannotObtainInputStream(@Cause Throwable th, XResource res);
 
-    @Message(id = 20511, value = "Cannot initialize repository writer")
+    @Message(id = 20512, value = "Cannot initialize repository writer")
     IllegalStateException illegalStateCannotInitializeRepositoryWriter(@Cause Throwable th);
 
-    @Message(id = 20512, value = "Cannot write repository element")
+    @Message(id = 20513, value = "Cannot write repository element")
     IllegalStateException illegalStateCannotWriteRepositoryElement(@Cause Throwable th);
 
-    @Message(id = 20513, value = "Invalid filter directive: %s")
+    @Message(id = 20514, value = "Invalid filter directive: %s")
     IllegalArgumentException illegalArgumentInvalidFilterDirective(String filter);
 }

@@ -29,6 +29,8 @@ package org.jboss.osgi.repository;
  */
 public class RepositoryResolutionException extends RuntimeException {
 
+    private static final long serialVersionUID = 1L;
+
     public RepositoryResolutionException(String message) {
         super(message);
     }

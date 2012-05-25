@@ -36,6 +36,22 @@ import org.osgi.service.repository.Repository;
 public interface XRepository extends Repository {
 
     /**
+     * The service names that repositories are registered under
+     */
+    String[] SERVICE_NAMES = new String[] { XRepository.class.getName(), Repository.class.getName() };
+
+    /**
+     * Artifact coordinates may be given in simple groupId:artifactId:version form,
+     * or they may be fully qualified in the form groupId:artifactId:type:version[:classifier]
+     */
+    String MAVEN_IDENTITY_NAMESPACE = "maven.identity";
+
+    /**
+     * Artifact coordinates may be given by {@link org.jboss.modules.ModuleIdentifier}
+     */
+    String MODULE_IDENTITY_NAMESPACE = "module.identity";
+
+    /**
      * Get the name for this repository
      */
     String getName();
