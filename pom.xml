@@ -45,7 +45,7 @@
         <version.jboss.osgi.framework>1.4.0.CR3</version.jboss.osgi.framework>
         <version.jboss.osgi.metadata>2.1.1.CR2</version.jboss.osgi.metadata>
         <version.jboss.osgi.resolver>2.1.1.CR5</version.jboss.osgi.resolver>
-        <version.jboss.osgi.spi>3.1.1.CR2</version.jboss.osgi.spi>
+        <version.jboss.osgi.spi>3.1.1.CR3</version.jboss.osgi.spi>
         <version.jboss.osgi.testing>1.0.4</version.jboss.osgi.testing>
         <version.jboss.shrinkwrap>1.0.0</version.jboss.shrinkwrap>
         <version.junit>4.10</version.junit>

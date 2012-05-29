@@ -46,7 +46,9 @@ import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.XResourceBuilderFactory;
+import org.jboss.osgi.spi.BundleInfo;
 import org.jboss.osgi.spi.OSGiManifestBuilder;
+import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
@@ -143,6 +145,21 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
 
         RepositoryStorage other = new FileBasedRepositoryStorage(repository, storageDir);
         verifyProviders(other);
+    }
+
+    @Test
+    public void testBundleInfo() throws Exception {
+
+        // Add a resource from XML
+        RepositoryReader reader = getRepositoryReader("xml/repository-testA.xml");
+        XResource resource = storage.addResource(reader.nextResource());
+
+        XCapability ccap = (XCapability) resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE).get(0);
+        URL fileURL = new URL((String) ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE));
+
+        BundleInfo binfo = BundleInfo.createBundleInfo(AbstractVFS.toVirtualFile(fileURL), "location");
+        OSGiMetaData metadata = binfo.getOSGiMetadata();
+        Assert.assertEquals("bundleA", metadata.getBundleSymbolicName());
     }
 
     private void verifyResource(XResource resource) throws Exception {
