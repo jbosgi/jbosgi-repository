@@ -31,13 +31,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.jboss.osgi.repository.Namespace100.Attribute;
+import org.jboss.osgi.repository.RepositoryContentHelper;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageException;
@@ -137,12 +137,12 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             for (Capability cap : res.getCapabilities(null)) {
                 String namespace = cap.getNamespace();
                 if (!namespace.equals(ContentNamespace.CONTENT_NAMESPACE)) {
-                    builder.addGenericCapability(namespace, cap.getAttributes(), cap.getDirectives());
+                    builder.addCapability(namespace, cap.getAttributes(), cap.getDirectives());
                 }
             }
             for (Requirement req : res.getRequirements(null)) {
                 String namespace = req.getNamespace();
-                builder.addGenericRequirement(namespace, req.getAttributes(), req.getDirectives());
+                builder.addRequirement(namespace, req.getAttributes(), req.getDirectives());
             }
             result = builder.getResource();
         } else {
@@ -198,7 +198,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             String algorithm = "SHA-256";
             String sha256;
             try {
-                sha256 = getDigest(tempFile, algorithm);
+                sha256 = RepositoryContentHelper.getDigest(new FileInputStream(tempFile), algorithm);
                 atts.put(ContentNamespace.CONTENT_NAMESPACE, sha256);
             } catch (NoSuchAlgorithmException ex) {
                 throw MESSAGES.storageNoSuchAlgorithm(ex, algorithm);
@@ -226,27 +226,6 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
         input.close();
         out.close();
         return total;
-    }
-
-    private String getDigest(File sourceFile, String algorithm) throws IOException, NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance(algorithm);
-        FileInputStream fis = new FileInputStream(sourceFile);
-
-        int nread = 0;
-        byte[] dataBytes = new byte[1024];
-        while ((nread = fis.read(dataBytes)) != -1) {
-            md.update(dataBytes, 0, nread);
-        }
-        ;
-        byte[] mdbytes = md.digest();
-
-        // Convert the byte to hex format method 2
-        StringBuffer result = new StringBuffer();
-        for (int i = 0; i < mdbytes.length; i++) {
-            result.append(Integer.toHexString(0xFF & mdbytes[i]));
-        }
-
-        return result.toString();
     }
 
     private URL getBaseURL() {

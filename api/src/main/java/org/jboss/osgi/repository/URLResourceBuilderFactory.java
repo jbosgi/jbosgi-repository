@@ -62,7 +62,7 @@ public final class URLResourceBuilderFactory extends XResourceBuilderFactory {
         URLResourceBuilderFactory factory = new URLResourceBuilderFactory(urlres);
 
         XResourceBuilder builder = XResourceBuilderFactory.create(factory);
-        XCapability ccap = builder.addGenericCapability(ContentNamespace.CONTENT_NAMESPACE, contentAtts, null);
+        XCapability ccap = builder.addCapability(ContentNamespace.CONTENT_NAMESPACE, contentAtts, null);
         ccap.getAttributes().put(ContentNamespace.CAPABILITY_URL_ATTRIBUTE, contentURL.toExternalForm());
 
         if (loadMetadata) {

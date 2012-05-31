@@ -21,6 +21,7 @@
  */
 package org.jboss.osgi.repository.core;
 
+import static org.jboss.osgi.repository.RepositoryContentHelper.UNKNOWN_DIGEST;
 import static org.jboss.osgi.repository.RepositoryLogger.LOGGER;
 
 import java.io.File;
@@ -29,7 +30,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.jboss.osgi.repository.URLResourceBuilderFactory;
 import org.jboss.osgi.repository.XRepository;
@@ -38,6 +41,7 @@ import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
+import org.osgi.service.repository.ContentNamespace;
 
 
 /**
@@ -82,8 +86,9 @@ public class MavenArtifactRepository extends AbstractRepository implements XRepo
                     continue;
                 }
                 try {
-                    XResourceBuilder builder = URLResourceBuilderFactory.create(url, null, true);
-                    result.add(builder.addGenericCapability(MAVEN_IDENTITY_NAMESPACE, mavenId));
+                    Map<String, Object> atts = Collections.singletonMap(ContentNamespace.CONTENT_NAMESPACE, (Object)UNKNOWN_DIGEST);
+                    XResourceBuilder builder = URLResourceBuilderFactory.create(url, atts, true);
+                    result.add(builder.addCapability(MAVEN_IDENTITY_NAMESPACE, mavenId));
                     LOGGER.infoFoundMavenResource(builder.getResource());
                     break;
                 } catch (Exception ex) {

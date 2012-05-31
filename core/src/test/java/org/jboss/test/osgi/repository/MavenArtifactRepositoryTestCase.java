@@ -65,7 +65,7 @@ public class MavenArtifactRepositoryTestCase {
     }
 
     @Test
-    public void testFindProvidersByMavenId() throws Exception {
+    public void testFindProviders() throws Exception {
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
@@ -73,6 +73,14 @@ public class MavenArtifactRepositoryTestCase {
         XCapability cap = (XCapability) caps.iterator().next();
 
         verifyCapability(cap, req);
+    }
+
+    @Test
+    public void testFindProvidersFails() throws Exception {
+        MavenCoordinates mavenid = MavenCoordinates.parse("foo:bar:1.2.8");
+        XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
+        Collection<Capability> caps = repository.findProviders(req);
+        assertEquals("No capability", 0, caps.size());
     }
 
     void verifyCapability(XCapability cap, XRequirement req) throws IOException, MalformedURLException {

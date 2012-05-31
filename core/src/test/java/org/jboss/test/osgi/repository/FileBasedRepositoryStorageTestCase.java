@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -35,6 +36,7 @@ import junit.framework.Assert;
 
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
+import org.jboss.osgi.repository.RepositoryContentHelper;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.XRepository;
@@ -124,9 +126,10 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         builder.loadFrom(metadata);
 
         Map<String, Object> atts = new HashMap<String, Object>();
+        atts.put(ContentNamespace.CONTENT_NAMESPACE, RepositoryContentHelper.UNKNOWN_DIGEST);
         atts.put(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE, "application/vnd.osgi.bundle");
         atts.put(ContentNamespace.CAPABILITY_URL_ATTRIBUTE, "file:./target/bundleA.jar");
-        builder.addGenericCapability(ContentNamespace.CONTENT_NAMESPACE, atts, null);
+        builder.addCapability(ContentNamespace.CONTENT_NAMESPACE, atts, null);
 
         XResource resource = storage.addResource(builder.getResource());
         verifyResource(resource);
@@ -162,6 +165,28 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         Assert.assertEquals("bundleA", metadata.getBundleSymbolicName());
     }
 
+    @Test
+    public void testCustomNamespace() throws Exception {
+
+        // Add a resource from XML
+        RepositoryReader reader = getRepositoryReader("xml/repository-testA.xml");
+        XResource resource = storage.addResource(reader.nextResource());
+
+        verifyResource(resource);
+        verifyProviders(storage);
+
+        List<Capability> allcaps = resource.getCapabilities(null);
+        Assert.assertEquals("Six capabilities", 6, allcaps.size());
+
+        XRequirement req = XRequirementBuilder.create("custom.namespace", "custom.value").getRequirement();
+        Collection<Capability> providers = storage.findProviders(req);
+        Assert.assertEquals("One provider", 1, providers.size());
+
+        req = XRequirementBuilder.create("custom.namespace", "bogus").getRequirement();
+        providers = storage.findProviders(req);
+        Assert.assertEquals("No provider", 0, providers.size());
+    }
+
     private void verifyResource(XResource resource) throws Exception {
         InputStream input = ((RepositoryContent)resource).getContent();
         Assert.assertNotNull("RepositoryContent not null", input);
@@ -180,11 +205,12 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         Assert.assertNotNull(providers);
         Assert.assertEquals(1, providers.size());
 
-        XPackageCapability cap = (XPackageCapability) providers.iterator().next();
-        Assert.assertNotNull(cap);
-        Assert.assertEquals("org.acme.foo", cap.getPackageName());
+        XCapability cap = (XCapability) providers.iterator().next();
+        XPackageCapability pcap = cap.adapt(XPackageCapability.class);
+        Assert.assertNotNull(pcap);
+        Assert.assertEquals("org.acme.foo", pcap.getPackageName());
 
-        verifyResource((XResource) cap.getResource());
+        verifyResource((XResource) pcap.getResource());
     }
 
     private JavaArchive getBundleA() {

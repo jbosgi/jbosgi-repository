@@ -48,10 +48,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleReference;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.framework.namespace.PackageNamespace;
 import org.osgi.resource.Capability;
@@ -66,7 +64,7 @@ import org.osgi.service.repository.RepositoryContent;
  * @since 18-Jan-2012
  */
 @RunWith(Arquillian.class)
-public class RepositoryBundleTestCase {
+public class RepositoryBundleTestCase extends RepositoryBundleTest {
 
     @Inject
     public BundleContext context;
@@ -74,18 +72,24 @@ public class RepositoryBundleTestCase {
     @Deployment
     public static JavaArchive createdeployment() {
         final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "example-bundle");
+        archive.addClasses(RepositoryBundleTest.class);
         archive.setManifest(new Asset() {
             @Override
             public InputStream openStream() {
                 OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
                 builder.addBundleSymbolicName(archive.getName());
                 builder.addBundleManifestVersion(2);
-                builder.addImportPackages(BundleActivator.class, Repository.class, Resource.class);
-                builder.addImportPackages(XResource.class);
+                builder.addImportPackages(Repository.class, Resource.class);
+                builder.addImportPackages(XRepository.class, XResource.class);
                 return builder.openStream();
             }
         });
         return archive;
+    }
+
+    @Override
+    BundleContext getBundleContext() {
+        return context;
     }
 
     @Test
@@ -96,12 +100,24 @@ public class RepositoryBundleTestCase {
         Assert.assertNotNull("Requirement not null", req);
 
         Collection<Capability> providers = getRepository().findProviders(req);
-        Assert.assertEquals("Capability not null", 1, providers.size());
+        Assert.assertEquals("One capability", 1, providers.size());
 
         XCapability cap = (XCapability) providers.iterator().next();
         Assert.assertTrue("Capability matches", req.matches(cap));
-        XResource resource = (XResource) cap.getResource();
 
+        XRequirementBuilder builder = XRequirementBuilder.create(PackageNamespace.PACKAGE_NAMESPACE, "org.apache.felix.cm");
+        builder.getAttributes().put(PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE, "[1.0,2.0)");
+        req = builder.getRequirement();
+
+        providers = getRepository().findProviders(req);
+        Assert.assertEquals("One capability", 1, providers.size());
+
+        cap = (XCapability) providers.iterator().next();
+        XPackageCapability pcap = cap.adapt(XPackageCapability.class);
+        Assert.assertEquals("org.apache.felix.cm", pcap.getPackageName());
+        Assert.assertEquals(Version.parseVersion("1.0.0"), pcap.getVersion());
+
+        XResource resource = (XResource) cap.getResource();
         XIdentityCapability icap = resource.getIdentityCapability();
         Assert.assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
         RepositoryContent content = (RepositoryContent) icap.getResource();
@@ -150,15 +166,11 @@ public class RepositoryBundleTestCase {
         XRequirement req = builder.getRequirement();
 
         Collection<Capability> providers = getRepository().findProviders(req);
-        Assert.assertEquals("Capability not null", 1, providers.size());
+        Assert.assertEquals("One capability", 1, providers.size());
 
-        XPackageCapability pcap = (XPackageCapability) providers.iterator().next();
+        XCapability cap = (XCapability) providers.iterator().next();
+        XPackageCapability pcap = cap.adapt(XPackageCapability.class);
         Assert.assertEquals("org.apache.felix.cm", pcap.getPackageName());
         Assert.assertEquals(Version.parseVersion("1.0.0"), pcap.getVersion());
-    }
-
-    private XRepository getRepository() {
-        ServiceReference sref = context.getServiceReference(XRepository.class.getName());
-        return sref != null ? (XRepository) context.getService(sref) : null;
     }
 }

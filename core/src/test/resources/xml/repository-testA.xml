@@ -2,24 +2,28 @@
 <repository xmlns='http://www.osgi.org/xmlns/repository/v1.0.0' increment='1' name='MockedRepo'>
 	<resource>
 		<capability namespace='osgi.content'>
-			<attribute name='mime' value='application/vnd.osgi.bundle'></attribute>
-			<attribute name='url' value='file:./target/bundleA.jar'></attribute>
+			<attribute name='osgi.content' value='unknown-digest' />
+			<attribute name='mime' value='application/vnd.osgi.bundle'/>
+			<attribute name='url' value='file:./target/bundleA.jar'/>
 		</capability>
 		<capability namespace='osgi.identity'>
-			<attribute name='osgi.identity' value='bundleA'></attribute>
-			<attribute name='type' value='osgi.bundle'></attribute>
-			<attribute name='version' value='0.0.0' type='Version'></attribute>
+			<attribute name='osgi.identity' value='bundleA'/>
+			<attribute name='type' value='osgi.bundle'/>
+			<attribute name='version' value='0.0.0' type='Version'/>
 		</capability>
 		<capability namespace='osgi.wiring.bundle'>
-			<attribute name='osgi.wiring.bundle' value='bundleA'></attribute>
-			<attribute name='bundle-version' value='0.0.0' type='Version'></attribute>
+			<attribute name='osgi.wiring.bundle' value='bundleA'/>
+			<attribute name='bundle-version' value='0.0.0' type='Version'/>
 		</capability>
 		<capability namespace='osgi.wiring.host'>
-			<attribute name='osgi.wiring.host' value='bundleA'></attribute>
-			<attribute name='bundle-version' value='0.0.0' type='Version'></attribute>
+			<attribute name='osgi.wiring.host' value='bundleA'/>
+			<attribute name='bundle-version' value='0.0.0' type='Version'/>
 		</capability>
 		<capability namespace='osgi.wiring.package'>
-			<attribute name='osgi.wiring.package' value='org.acme.foo'></attribute>
+			<attribute name='osgi.wiring.package' value='org.acme.foo'/>
+		</capability>
+		<capability namespace='custom.namespace'>
+			<attribute name='custom.namespace' value='custom.value'/>
 		</capability>
 	</resource>
 </repository>

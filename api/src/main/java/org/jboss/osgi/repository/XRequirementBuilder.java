@@ -60,10 +60,7 @@ public final class XRequirementBuilder {
 
     public static XRequirementBuilder create(String namespace, String nsvalue) {
         XResourceBuilder builder = XResourceBuilderFactory.create();
-        XRequirement req = builder.addGenericRequirement(namespace);
-        if (nsvalue != null) {
-            req.getAttributes().put(namespace, nsvalue);
-        }
+        XRequirement req = builder.addRequirement(namespace, nsvalue);
         return new XRequirementBuilder(builder, req);
     }
 

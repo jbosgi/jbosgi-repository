@@ -149,12 +149,12 @@ public class RepositoryXMLReader implements RepositoryReader {
                 for (Capability cap : resource.getCapabilities(null)) {
                     String namespace = cap.getNamespace();
                     if (!namespace.equals(ContentNamespace.CONTENT_NAMESPACE)) {
-                        builder.addGenericCapability(namespace, cap.getAttributes(), cap.getDirectives());
+                        builder.addCapability(namespace, cap.getAttributes(), cap.getDirectives());
                     }
                 }
                 for (Requirement req : resource.getRequirements(null)) {
                     String namespace = req.getNamespace();
-                    builder.addGenericRequirement(namespace, req.getAttributes(), req.getDirectives());
+                    builder.addRequirement(namespace, req.getAttributes(), req.getDirectives());
                 }
                 resource = builder.getResource();
             }
@@ -168,7 +168,7 @@ public class RepositoryXMLReader implements RepositoryReader {
         Map<String, String> dirs = new HashMap<String, String>();
         readAttributesAndDirectives(reader, atts, dirs);
         try {
-            builder.addGenericCapability(namespace, atts, dirs);
+            builder.addCapability(namespace, atts, dirs);
         } catch (RuntimeException ex) {
             throw MESSAGES.storageCannotReadResourceElement(ex, reader.getLocation());
         }
@@ -180,7 +180,7 @@ public class RepositoryXMLReader implements RepositoryReader {
         Map<String, String> dirs = new HashMap<String, String>();
         readAttributesAndDirectives(reader, atts, dirs);
         try {
-            builder.addGenericRequirement(namespace, atts, dirs);
+            builder.addRequirement(namespace, atts, dirs);
         } catch (RuntimeException ex) {
             throw MESSAGES.storageCannotReadResourceElement(ex, reader.getLocation());
         }

@@ -23,13 +23,14 @@ package org.jboss.osgi.repository.spi;
 
 import static org.jboss.osgi.repository.RepositoryLogger.LOGGER;
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
-import static org.jboss.osgi.resolver.spi.AbstractRequirement.namespaceValueFromFilter;
+import static org.osgi.framework.namespace.IdentityNamespace.IDENTITY_NAMESPACE;
 
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -40,14 +41,16 @@ import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageException;
 import org.jboss.osgi.repository.XRepository;
+import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
+import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResource;
+import org.jboss.osgi.resolver.spi.AbstractRequirement;
 import org.osgi.framework.Filter;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.namespace.AbstractWiringNamespace;
+import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
+import org.osgi.resource.Resource;
 
 /**
  * A {@link RepositoryStorage} that maintains its state in local memory
@@ -59,8 +62,7 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
 
     private final XRepository repository;
     private final AtomicLong increment = new AtomicLong();
-    private final Map<CacheKey, XResource> resourceCache = new HashMap<CacheKey, XResource>();
-    private final Map<CacheKey, Set<Capability>> capabilityCache = new HashMap<CacheKey, Set<Capability>>();
+    private final Map<String, Map<String, Set<XCapability>>> capabilityCache = new HashMap<String, Map<String, Set<XCapability>>>();
 
     public MemoryRepositoryStorage(XRepository repository) {
         if (repository == null)
@@ -84,7 +86,24 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
                 private final Iterator<XResource> iterator;
                 {
                     synchronized (capabilityCache) {
-                        iterator = new HashSet<XResource>(resourceCache.values()).iterator();
+                        final Set<XCapability> icaps = getCachedCapabilities(IDENTITY_NAMESPACE, null, false);
+                        final Iterator<XCapability> capit = icaps.iterator();
+                        iterator = new Iterator<XResource>() {
+                            @Override
+                            public boolean hasNext() {
+                                return capit.hasNext();
+                            }
+
+                            @Override
+                            public XResource next() {
+                                return (XResource) capit.next().getResource();
+                            }
+
+                            @Override
+                            public void remove() {
+                                throw new UnsupportedOperationException();
+                            }
+                        };
                     }
                 }
 
@@ -111,7 +130,7 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
 
     @Override
     public Collection<Capability> findProviders(Requirement req) {
-        Set<Capability> result = findCachedProviders(CacheKey.create(req), false);
+        Set<Capability> result = findCachedProviders(req);
         LOGGER.tracef("Find cached providers: %s => %s", req, result);
         return result;
     }
@@ -122,16 +141,21 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
             throw MESSAGES.illegalArgumentNull("resource");
 
         XIdentityCapability icap = res.getIdentityCapability();
-        CacheKey ikey = CacheKey.create(icap);
         synchronized (capabilityCache) {
-            if (capabilityCache.get(ikey) != null)
-                throw MESSAGES.illegalStateResourceAlreadyExists(res);
+            Set<XCapability> icaps = getCachedCapabilities(IdentityNamespace.IDENTITY_NAMESPACE, icap.getSymbolicName(), false);
+            for (XCapability aux : icaps) {
+                XIdentityCapability iaux = aux.adapt(XIdentityCapability.class);
+                if (icap.getVersion().equals(iaux.getVersion())) {
+                    throw MESSAGES.illegalStateResourceAlreadyExists(res);
+                }
+            }
 
-            resourceCache.put(ikey, res);
             for (Capability cap : res.getCapabilities(null)) {
-                CacheKey cachekey = CacheKey.create(cap);
-                Set<Capability> capset = findCachedProviders(cachekey, true);
-                capset.add(cap);
+                XCapability xcap = (XCapability) cap;
+                String namespace = cap.getNamespace();
+                String nsvalue = (String) xcap.getAttribute(namespace);
+                Set<XCapability> capset = getCachedCapabilities(namespace, nsvalue, true);
+                capset.add(xcap);
             }
             increment.incrementAndGet();
             LOGGER.infoResourceAdded(res);
@@ -149,101 +173,78 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
         if (res == null)
             throw RepositoryMessages.MESSAGES.illegalArgumentNull("resource");
 
-        XResource result = null;
-        XIdentityCapability icap = res.getIdentityCapability();
-        CacheKey ikey = CacheKey.create(icap);
+        boolean found = false;
         synchronized (capabilityCache) {
-            result = resourceCache.remove(ikey);
-            if (result != null) {
-                for (Capability cap : result.getCapabilities(null)) {
-                    CacheKey cachekey = CacheKey.create(cap);
-                    Set<Capability> capset = findCachedProviders(cachekey, true);
-                    capset.remove(cap);
+            for (Capability cap : res.getCapabilities(null)) {
+                XCapability xcap = (XCapability) cap;
+                String namespace = cap.getNamespace();
+                String nsvalue = (String) xcap.getAttribute(namespace);
+                Iterator<XCapability> capit = getCachedCapabilities(namespace, nsvalue, false).iterator();
+                while (capit.hasNext()) {
+                    Resource auxres = capit.next().getResource();
+                    if (res == auxres) {
+                        capit.remove();
+                        found = true;
+                    }
                 }
-                LOGGER.infoResourceRemoved(res);
             }
+            LOGGER.infoResourceRemoved(res);
         }
-        return result != null;
+        return found;
     }
 
-    private Set<Capability> findCachedProviders(CacheKey cachekey, boolean create) {
+    private Set<Capability> findCachedProviders(Requirement req) {
         synchronized (capabilityCache) {
-            Set<Capability> result = capabilityCache.get(cachekey);
-            if (result == null) {
-                result = new HashSet<Capability>();
-                if (create) {
-                    capabilityCache.put(cachekey, result);
-                }
+            Set<Capability> result = new HashSet<Capability>();
+            Set<XCapability> caps = getCachedCapabilities(req.getNamespace(), null, false);
+            for (XCapability cap : caps) {
+                if (matches(req, cap))
+                    result.add(cap);
             }
             return result;
         }
     }
 
-    /**
-     * An key to cached capabilities
-     */
-    static class CacheKey {
-
-        private final String key;
-
-        /**
-         * Create a cache key from the given capability
-         */
-        static CacheKey create(Capability cap) {
-            String namespace = cap.getNamespace();
-            return new CacheKey(namespace, (String) cap.getAttributes().get(namespace));
-        }
-
-        /**
-         * Create a cache key from the given requirement
-         */
-        static CacheKey create(Requirement req) {
-            String namespace = req.getNamespace();
-            String value = (String) req.getAttributes().get(namespace);
-            if (value == null) {
-                Filter filter = getRequiredFilter(req);
-                value = namespaceValueFromFilter(filter, namespace);
+    private Set<XCapability> getCachedCapabilities(String namespace, String nsvalue, boolean create) {
+        synchronized (capabilityCache) {
+            Map<String, Set<XCapability>> caps = capabilityCache.get(namespace);
+            if (caps == null) {
+                caps = new HashMap<String, Set<XCapability>>();
+                capabilityCache.put(namespace, caps);
             }
-            return new CacheKey(namespace, value);
-        }
-
-        private static Filter getRequiredFilter(Requirement req) {
-            String filterdir = req.getDirectives().get(AbstractWiringNamespace.REQUIREMENT_FILTER_DIRECTIVE);
-            try {
-                return FrameworkUtil.createFilter("" + filterdir);
-            } catch (InvalidSyntaxException e) {
-                throw MESSAGES.illegalArgumentInvalidFilterDirective(filterdir);
+            Set<XCapability> result;
+            if (nsvalue != null) {
+                result = caps.get(nsvalue);
+                if (result == null) {
+                    result = new HashSet<XCapability>();
+                    if (create == true) {
+                        caps.put(nsvalue, result);
+                    }
+                }
+            } else {
+                Set<XCapability> allcaps = new HashSet<XCapability>();
+                for (Set<XCapability> set : caps.values()) {
+                    allcaps.addAll(set);
+                }
+                result = allcaps;
             }
+            return result;
         }
+    }
 
-        private CacheKey(String namespace, String value) {
-            if (namespace == null)
-                throw MESSAGES.illegalArgumentNull("namespace");
-            if (value == null)
-                throw MESSAGES.illegalArgumentNull("value");
-            key = namespace + ":" + value;
+    private boolean matches(Requirement req, Capability cap) {
+        boolean result;
+        if (req instanceof XRequirement) {
+            XRequirement xreq = (XRequirement) req;
+            result = xreq.matches(cap);
+        } else {
+            result = req.getNamespace().equals(cap.getNamespace()) && matchFilter(req, cap);
         }
+        return result;
+    }
 
-        @Override
-        public int hashCode() {
-            return key.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            CacheKey other = (CacheKey) obj;
-            return key.equals(other.key);
-        }
-
-        @Override
-        public String toString() {
-            return "[" + key + "]";
-        }
+    private boolean matchFilter(Requirement req, Capability cap) {
+        Filter filter = AbstractRequirement.getFilterFromDirective(req);
+        return filter != null ? filter.match(new Hashtable<String, Object>(cap.getAttributes())) : true;
     }
 }
