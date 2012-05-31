@@ -207,10 +207,13 @@ public class RepositoryXMLReader implements RepositoryReader {
         String name = reader.getAttributeValue(null, Attribute.NAME.toString());
         String valstr = reader.getAttributeValue(null, Attribute.VALUE.toString());
         String typespec = reader.getAttributeValue(null, Attribute.TYPE.toString());
-        Type type = typespec != null ? Type.valueOf(typespec) : Type.String;
-        if (valstr.startsWith("List<") && valstr.endsWith(">")) {
-            valstr = valstr.substring(5, valstr.length() - 1);
+        if (typespec != null && typespec.startsWith("List<") && typespec.endsWith(">")) {
+            typespec = typespec.substring(5, typespec.length() - 1);
             listType = true;
+        }
+        Type type = typespec != null ? Type.valueOf(typespec) : Type.String;
+        if (type != Type.String) {
+            valstr = valstr.trim();
         }
         Object value;
         switch (type) {
@@ -231,7 +234,7 @@ public class RepositoryXMLReader implements RepositoryReader {
                     List<Version> list = new ArrayList<Version>();
                     String[] split = valstr.split(",");
                     for (String val : split) {
-                        list.add(Version.parseVersion(val));
+                        list.add(Version.parseVersion(val.trim()));
                     }
                     value = list;
                 } else {
@@ -243,7 +246,7 @@ public class RepositoryXMLReader implements RepositoryReader {
                     List<Long> list = new ArrayList<Long>();
                     String[] split = valstr.split(",");
                     for (String val : split) {
-                        list.add(Long.parseLong(val));
+                        list.add(Long.parseLong(val.trim()));
                     }
                     value = list;
                 } else {
@@ -255,7 +258,7 @@ public class RepositoryXMLReader implements RepositoryReader {
                     List<Double> list = new ArrayList<Double>();
                     String[] split = valstr.split(",");
                     for (String val : split) {
-                        list.add(Double.parseDouble(val));
+                        list.add(Double.parseDouble(val.trim()));
                     }
                     value = list;
                 } else {

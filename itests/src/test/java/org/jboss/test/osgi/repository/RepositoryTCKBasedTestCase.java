@@ -57,7 +57,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.test.osgi.repository.tb1.pkg1.TestInterface;
 import org.jboss.test.osgi.repository.tb1.pkg2.TestInterface2;
 import org.jboss.test.osgi.repository.tb2.TestClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.BundleContext;
@@ -321,15 +320,14 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
     }
 
     @Test
-    @Ignore
     public void testQueryCustomNamespace() throws Exception {
-        Requirement req = new RequirementImpl("osgi.foo.bar", "(myattr=myval)");
+        Requirement req = new RequirementImpl("osgi.foo.bar", "(myattr=myotherval)");
         Map<Requirement, Collection<Capability>> result = findProvidersAllRepos(req);
         assertEquals(1, result.size());
         Collection<Capability> matches = result.get(req);
         assertEquals(1, matches.size());
         Capability capability = matches.iterator().next();
-        assertEquals("myval", capability.getAttributes().get("myattr"));
+        assertEquals("myotherval", capability.getAttributes().get("myattr"));
     }
 
     @Test
@@ -398,7 +396,6 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
     }
 
     @Test
-    @Ignore
     public void testAttributeDataTypes() throws Exception {
         Requirement req = new RequirementImpl("osgi.test.namespace", "(osgi.test.namespace=a testing namespace)");
         Map<Requirement, Collection<Capability>> result = findProvidersAllRepos(req);
@@ -413,8 +410,8 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
         assertEquals(Version.parseVersion("1.2.3.qualifier"), cap.getAttributes().get("testVersion"));
         assertEquals(new Long(Long.MAX_VALUE), cap.getAttributes().get("testLong"));
         assertEquals(new Double(Math.PI), cap.getAttributes().get("testDouble"));
-        assertEquals(Arrays.asList("a", "b and c", "d"), cap.getAttributes().get("testStringList"));
-        assertEquals(Collections.emptyList(), cap.getAttributes().get("testVersionList"));
+        assertEquals(Arrays.asList(" a ", " b and c", "d    "), cap.getAttributes().get("testStringList"));
+        assertEquals(Arrays.asList(Version.parseVersion("1.2.3"), Version.parseVersion("4.5.6")), cap.getAttributes().get("testVersionList"));
         assertEquals(Collections.singletonList(-1L), cap.getAttributes().get("testLongList"));
         assertEquals(Arrays.asList(Math.E, Math.E), cap.getAttributes().get("testDoubleList"));
     }
@@ -529,6 +526,11 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
             } else if (!namespace.equals(other.namespace))
                 return false;
             return true;
+        }
+
+        @Override
+        public String toString() {
+            return "Requirement[" + namespace+ ",dirs=" + directives + "]";
         }
     }
 }
