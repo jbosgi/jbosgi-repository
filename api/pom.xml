@@ -28,22 +28,28 @@
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
         </dependency>
+        
+        <!-- Provided Dependencies -->
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-processor</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.osgi.resolver</groupId>
-            <artifactId>jbosgi-resolver-api</artifactId>
+            <groupId>org.jboss.modules</groupId>
+            <artifactId>jboss-modules</artifactId>
+            <scope>provided</scope>
         </dependency>
-        
-        <!-- Provided Dependencies -->
 		<dependency>
-			<groupId>org.jboss.osgi.spi</groupId>
-			<artifactId>jbosgi-spi</artifactId>
+			<groupId>org.jboss.osgi.resolver</groupId>
+			<artifactId>jbosgi-resolver-api</artifactId>
             <scope>provided</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.jboss.osgi.spi</groupId>
+            <artifactId>jbosgi-spi</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
