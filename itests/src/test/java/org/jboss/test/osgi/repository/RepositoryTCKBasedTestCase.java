@@ -387,7 +387,7 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
         byte[] contentBytes = readFully(repositoryContent.getContent());
         assertTrue(contentBytes.length > 0);
         assertEquals(new Long(contentBytes.length), contentCap.getAttributes().get("size"));
-        //assertEquals(getSHA256(contentBytes), contentCap.getAttributes().get("osgi.content"));
+        assertEquals(getSHA256(contentBytes), contentCap.getAttributes().get("osgi.content"));
         // The previous line fails sometimes (depending on the value of the SHA-256).
         // if the SHA contains bytes with a value < 16 the leading 0 is not added to the output
         // for example:
@@ -410,7 +410,7 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
         assertEquals(Version.parseVersion("1.2.3.qualifier"), cap.getAttributes().get("testVersion"));
         assertEquals(new Long(Long.MAX_VALUE), cap.getAttributes().get("testLong"));
         assertEquals(new Double(Math.PI), cap.getAttributes().get("testDouble"));
-        assertEquals(Arrays.asList(" a ", " b and c", "d    "), cap.getAttributes().get("testStringList"));
+        assertEquals(Arrays.asList("a", "b and c", "d"), cap.getAttributes().get("testStringList"));
         assertEquals(Arrays.asList(Version.parseVersion("1.2.3"), Version.parseVersion("4.5.6")), cap.getAttributes().get("testVersionList"));
         assertEquals(Collections.singletonList(-1L), cap.getAttributes().get("testLongList"));
         assertEquals(Arrays.asList(Math.E, Math.E), cap.getAttributes().get("testDoubleList"));
