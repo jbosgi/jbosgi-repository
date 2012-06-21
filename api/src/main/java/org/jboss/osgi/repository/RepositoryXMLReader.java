@@ -212,9 +212,10 @@ public class RepositoryXMLReader implements RepositoryReader {
             listType = true;
         }
         Type type = typespec != null ? Type.valueOf(typespec) : Type.String;
-        if (type != Type.String) {
-            valstr = valstr.trim();
-        }
+        
+        // Whitespace around the list and around commas must be trimmed
+        valstr = valstr.trim();
+        
         Object value;
         switch (type) {
             case String:
@@ -222,7 +223,7 @@ public class RepositoryXMLReader implements RepositoryReader {
                     List<String> list = new ArrayList<String>();
                     String[] split = valstr.split(",");
                     for (String val : split) {
-                        list.add(val);
+                        list.add(val.trim());
                     }
                     value = list;
                 } else {

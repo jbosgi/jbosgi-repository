@@ -53,13 +53,11 @@ public class RepositoryContentHelper {
         }
         byte[] mdbytes = md.digest();
 
-        // Convert the byte to hex format method 2
-        StringBuffer result = new StringBuffer();
-        for (int i = 0; i < mdbytes.length; i++) {
-            result.append(Integer.toHexString(0xFF & mdbytes[i]));
+        StringBuilder builder = new StringBuilder();
+        for (byte b : mdbytes) {
+            builder.append(String.format("%02x", b));
         }
-
-        return result.toString();
+        return builder.toString();
     }
 
 }
