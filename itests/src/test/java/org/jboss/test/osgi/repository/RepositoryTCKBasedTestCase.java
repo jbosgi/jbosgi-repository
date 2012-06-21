@@ -415,6 +415,24 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
         assertEquals(Collections.singletonList(-1L), cap.getAttributes().get("testLongList"));
         assertEquals(Arrays.asList(Math.E, Math.E), cap.getAttributes().get("testDoubleList"));
     }
+    
+    @Test
+    public void testSHA256Computation() throws Exception {
+        // This test validates the SHA256 computation in this test class with the example SHA256 serializations 
+        // as listed here: http://en.wikipedia.org/wiki/SHA-2
+        // SHA256("")
+        // e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        // SHA256("The quick brown fox jumps over the lazy dog")
+        // d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592
+        // SHA256("The quick brown fox jumps over the lazy dog.")
+        // ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c
+        
+        assertEquals("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", getSHA256("".getBytes()));
+        assertEquals("d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592", 
+                getSHA256("The quick brown fox jumps over the lazy dog".getBytes()));
+        assertEquals("ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c",
+                getSHA256("The quick brown fox jumps over the lazy dog.".getBytes()));
+    }
 
     private Map<Requirement, Collection<Capability>> findProvidersAllRepos(Requirement ... requirements) throws InterruptedException {
         return getRepository().findProviders(Arrays.asList(requirements));
