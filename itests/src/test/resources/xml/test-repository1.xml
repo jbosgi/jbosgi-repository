@@ -42,11 +42,9 @@
             <attribute name='testLongList' value=' -1  ' type='List&lt;Long&gt;'/>
             <attribute name='testDoubleList' value='2.718281828459045,2.718281828459045' type='List&lt;Double&gt;'/>
         </capability>
-        <!-- Used in testQueryCustomNamespace(), removed as it currently fails the population stage
         <capability namespace='osgi.foo.bar'>
             <attribute name='myattr' value='myval'/>
         </capability>
-        -->
     </resource>
     <resource>
         <capability namespace='osgi.identity'>
@@ -81,6 +79,25 @@
             <directive name='filter' value='(&amp;(osgi.wiring.package=org.jboss.test.cases.repository.tb1.pkg1)(version&gt;=1.1)(!(version&gt;=2)))' />
             <attribute name='custom' type='Long' value='42'/>
         </requirement>
+    </resource>
+    <resource>
+        <capability namespace='osgi.identity'>
+            <attribute name='osgi.identity' value='org.jboss.test.cases.repository.testresource' />
+            <attribute name='version' type='Version' value='0.0' />
+            <attribute name='type' value='someresource' />
+        </capability>
+        <capability namespace='osgi.content'>
+            <attribute name='osgi.content' value='@@trzipSHA256@@' />
+            <attribute name='url' value='@@trzipURL@@' />
+            <attribute name='size' type='Long' value='@@trzipSize@@' />
+            <attribute name='mime' value='application/vnd.osgi.test.zip' />
+        </capability>
+        <capability namespace='osgi.content'>
+            <attribute name='osgi.content' value='@@trtgzSHA256@@' />
+            <attribute name='url' value='@@trtgzURL@@' />
+            <attribute name='size' type='Long' value='@@trtgzSize@@' />
+            <attribute name='mime' value='application/vnd.osgi.test.tar.gz' />
+        </capability>
     </resource>
 </repository>
 
