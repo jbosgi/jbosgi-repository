@@ -59,6 +59,7 @@ import org.jboss.test.osgi.repository.tb1.pkg2.TestInterface2;
 import org.jboss.test.osgi.repository.tb2.TestClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.resource.Capability;
@@ -74,6 +75,8 @@ import org.osgi.service.repository.RepositoryContent;
  */
 @RunWith(Arquillian.class)
 public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
+    @Inject
+    public Bundle bundle;
 
     @Inject
     public BundleContext context;
@@ -84,6 +87,10 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
         archive.addClasses(RepositoryBundleTest.class);
         URL xmlURL = RepositoryTCKBasedTestCase.class.getResource("/xml/test-repository1.xml");
         archive.addAsResource(xmlURL, "/xml/test-repository1.xml");
+        URL zipURL = RepositoryBundleTestCase.class.getResource("/other/testresource.zip");
+        archive.addAsResource(zipURL, "/other/testresource.zip");
+        URL tgzURL = RepositoryBundleTestCase.class.getResource("/other/testresource.tar.gz");
+        archive.addAsResource(tgzURL, "/other/testresource.tar.gz");
         archive.addAsResource(new Asset() {
             @Override
             public InputStream openStream() {
@@ -162,6 +169,8 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
         String xml = new String(readFully(xmlURL.openStream()));
         xml = fillInTemplate(xml, "tb1");
         xml = fillInTemplate(xml, "tb2");
+        xml = fillInResourceTemplate(xml, "other/testresource.zip", "trzip");
+        xml = fillInResourceTemplate(xml, "other/testresource.tar.gz", "trtgz");
 
         ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes());
         RepositoryReader reader = RepositoryXMLReader.create(bais);
@@ -410,10 +419,40 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
         assertEquals(Collections.singletonList(-1L), cap.getAttributes().get("testLongList"));
         assertEquals(Arrays.asList(Math.E, Math.E), cap.getAttributes().get("testDoubleList"));
     }
-    
+
+    @Test
+    public void testMultiContent() throws Exception {
+        Resource res = findSingleCapSingleReq("osgi.identity", "(osgi.identity=org.jboss.test.cases.repository.testresource)").getResource();
+        List<Capability> caps = res.getCapabilities("osgi.content");
+
+        boolean foundZip = false;
+        boolean foundTgz = false;
+        for (Capability cap : caps) {
+            Map<String, Object> attrs = cap.getAttributes();
+
+            URL url = null;
+            if ("application/vnd.osgi.test.zip".equals(attrs.get("mime"))) {
+                url = bundle.getResource("/other/testresource.zip");
+                foundZip = true;
+            } else if ("application/vnd.osgi.test.tar.gz".equals(attrs.get("mime"))) {
+                url = bundle.getResource("/other/testresource.tar.gz");
+                foundTgz = true;
+            }
+
+            byte[] expectedBytes = readFully(url.openStream());
+
+            byte[] actualBytes = readFully(new URL((String) attrs.get("url")).openStream());
+            assertTrue(Arrays.equals(expectedBytes, actualBytes));
+            assertEquals(new Long(expectedBytes.length), attrs.get("size"));
+            assertEquals(getSHA256(expectedBytes), attrs.get("osgi.content"));
+        }
+        assertTrue(foundZip);
+        assertTrue(foundTgz);
+    }
+
     @Test
     public void testSHA256Computation() throws Exception {
-        // This test validates the SHA256 computation in this test class with the example SHA256 serializations 
+        // This test validates the SHA256 computation in this test class with the example SHA256 serializations
         // as listed here: http://en.wikipedia.org/wiki/SHA-2
         // SHA256("")
         // e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -421,25 +460,41 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
         // d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592
         // SHA256("The quick brown fox jumps over the lazy dog.")
         // ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c
-        
+
         assertEquals("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", getSHA256("".getBytes()));
-        assertEquals("d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592", 
+        assertEquals("d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592",
                 getSHA256("The quick brown fox jumps over the lazy dog".getBytes()));
         assertEquals("ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c",
                 getSHA256("The quick brown fox jumps over the lazy dog.".getBytes()));
     }
 
-    private Map<Requirement, Collection<Capability>> findProvidersAllRepos(Requirement ... requirements) throws InterruptedException {
+    private Capability findSingleCapSingleReq(String ns, String filter) {
+        Requirement req = new RequirementImpl(ns, filter);
+        Map<Requirement, Collection<Capability>> res = findProvidersAllRepos(req);
+        assertEquals(1, res.size());
+        Collection<Capability> caps = res.get(req);
+        if (caps.size() == 0)
+            return null;
+
+        assertEquals(1, caps.size());
+        return caps.iterator().next();
+    }
+
+    private Map<Requirement, Collection<Capability>> findProvidersAllRepos(Requirement ... requirements) {
         return getRepository().findProviders(Arrays.asList(requirements));
     }
 
     private String fillInTemplate(String xml, String bundleName) throws IOException, NoSuchAlgorithmException {
-        URL url = getClass().getResource("/" + bundleName + ".jar");
+        return fillInResourceTemplate(xml, bundleName + ".jar", bundleName);
+    }
+
+    private String fillInResourceTemplate(String xml, String resource, String name) throws IOException, NoSuchAlgorithmException {
+        URL url = getClass().getResource("/" + resource);
         byte[] bytes = readFully(url.openStream());
 
-        xml = xml.replaceAll("@@" + bundleName + "SHA256@@", getSHA256(bytes));
-        xml = xml.replaceAll("@@" + bundleName + "URL@@", url.toExternalForm());
-        xml = xml.replaceAll("@@" + bundleName + "Size@@", "" + bytes.length);
+        xml = xml.replaceAll("@@" + name + "SHA256@@", getSHA256(bytes));
+        xml = xml.replaceAll("@@" + name + "URL@@", url.toExternalForm());
+        xml = xml.replaceAll("@@" + name + "Size@@", "" + bytes.length);
         return xml;
     }
 
