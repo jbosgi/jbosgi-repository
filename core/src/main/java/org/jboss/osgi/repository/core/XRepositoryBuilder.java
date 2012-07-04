@@ -25,9 +25,9 @@ import static org.jboss.osgi.repository.XRepository.SERVICE_NAMES;
 import java.io.File;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
@@ -50,8 +50,9 @@ public class XRepositoryBuilder {
 
     public static final String ROOT_REPOSITORY = "root-repository";
 
-    private final Set<ServiceRegistration> registrations = new HashSet<ServiceRegistration>();
+    private final Set<ServiceRegistration> registrations = new CopyOnWriteArraySet<ServiceRegistration>();
     private final BundleContext context;
+    private ServiceTracker repositoryStorageFactoryTracker;
 
     public static XRepositoryBuilder create(BundleContext context) {
         return new XRepositoryBuilder(context);
@@ -75,24 +76,43 @@ public class XRepositoryBuilder {
         registrations.add(context.registerService(RepositoryStorageFactory.class.getName(), factory, null));
     }
 
-    public XRepository addDefaultRepositories() {
+    public void addDefaultRepositories() {
 
         // Register the maven artifact repository
         addRepository(new MavenArtifactRepository());
 
-        // Get the {@link RepositoryStorageFactory} service
-        ServiceReference sref = context.getServiceReference(RepositoryStorageFactory.class.getName());
-        RepositoryStorageFactory factory = (RepositoryStorageFactory) context.getService(sref);
+        repositoryStorageFactoryTracker = new ServiceTracker(context, RepositoryStorageFactory.class.getName(), null) {
+            @Override
+            public Object addingService(ServiceReference reference) {
+                Object svc = super.addingService(reference);
+                if (svc instanceof RepositoryStorageFactory) {
+                    RepositoryStorageFactory factory = (RepositoryStorageFactory) svc;
 
-        // Register the root repository
-        XRepository repository = new AbstractPersistentRepository(factory, getRepositoryServiceTracker());
-        Dictionary<String, Object> props = new Hashtable<String, Object>();
-        props.put(Constants.SERVICE_RANKING, new Integer(1000));
-        props.put(Constants.SERVICE_DESCRIPTION, repository.getName());
-        props.put(ROOT_REPOSITORY, Boolean.TRUE);
-        registrations.add(context.registerService(SERVICE_NAMES, repository, props));
+                    // Register the root repository
+                    XRepository repository = new AbstractPersistentRepository(factory, getRepositoryServiceTracker());
+                    Dictionary<String, Object> props = new Hashtable<String, Object>();
+                    props.put(Constants.SERVICE_RANKING, new Integer(1000));
+                    props.put(Constants.SERVICE_DESCRIPTION, repository.getName());
+                    props.put(ROOT_REPOSITORY, Boolean.TRUE);
+                    ServiceRegistration reg = context.registerService(SERVICE_NAMES, repository, props);
+                    registrations.add(reg);
+                    return reg;
+                }
+                return null;
+            }
 
-        return repository;
+            @Override
+            public void removedService(ServiceReference reference, Object registration) {
+                if (registration instanceof ServiceRegistration) {
+                    ServiceRegistration reg = (ServiceRegistration) registration;
+                    reg.unregister();
+                    registrations.remove(reg);
+                }
+
+                super.removedService(reference, registration);
+            }
+        };
+        repositoryStorageFactoryTracker.open();
     }
 
     public void addRepository(XRepository repository) {
@@ -110,6 +130,7 @@ public class XRepositoryBuilder {
     }
 
     public void unregisterServices() {
+        repositoryStorageFactoryTracker.close();
         for (ServiceRegistration reg : getRegistrations()) {
             reg.unregister();
         }

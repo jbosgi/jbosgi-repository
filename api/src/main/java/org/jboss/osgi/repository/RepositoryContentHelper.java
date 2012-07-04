@@ -44,20 +44,23 @@ public class RepositoryContentHelper {
      * Get the digest for a given input stream and algorithm
      */
     public static String getDigest(InputStream input, String algorithm) throws IOException, NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance(algorithm);
+        try {
+            MessageDigest md = MessageDigest.getInstance(algorithm);
 
-        int nread = 0;
-        byte[] dataBytes = new byte[1024];
-        while ((nread = input.read(dataBytes)) != -1) {
-            md.update(dataBytes, 0, nread);
-        }
-        byte[] mdbytes = md.digest();
+            int nread = 0;
+            byte[] dataBytes = new byte[1024];
+            while ((nread = input.read(dataBytes)) != -1) {
+                md.update(dataBytes, 0, nread);
+            }
+            byte[] mdbytes = md.digest();
 
-        StringBuilder builder = new StringBuilder();
-        for (byte b : mdbytes) {
-            builder.append(String.format("%02x", b));
+            StringBuilder builder = new StringBuilder();
+            for (byte b : mdbytes) {
+                builder.append(String.format("%02x", b));
+            }
+            return builder.toString();
+        } finally {
+            input.close();
         }
-        return builder.toString();
     }
-
 }
