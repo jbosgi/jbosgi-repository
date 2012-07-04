@@ -258,10 +258,13 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
     }
 
     private boolean deleteRecursive(File file) {
+        boolean result = true;
+
         if (file.isDirectory()) {
             for (File aux : file.listFiles())
-                return deleteRecursive(aux);
+                result &= deleteRecursive(aux);
         }
-        return file.delete();
+        result &= file.delete();
+        return result;
     }
 }
