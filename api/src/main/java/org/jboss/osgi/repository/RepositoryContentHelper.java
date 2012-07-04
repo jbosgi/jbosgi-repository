@@ -28,7 +28,7 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Helpers for repository content
- *
+ * 
  * @author thomas.diesler@jboss.com
  * @since 31-May-2012
  */
@@ -44,23 +44,19 @@ public class RepositoryContentHelper {
      * Get the digest for a given input stream and algorithm
      */
     public static String getDigest(InputStream input, String algorithm) throws IOException, NoSuchAlgorithmException {
-        try {
-            MessageDigest md = MessageDigest.getInstance(algorithm);
+        MessageDigest md = MessageDigest.getInstance(algorithm);
 
-            int nread = 0;
-            byte[] dataBytes = new byte[1024];
-            while ((nread = input.read(dataBytes)) != -1) {
-                md.update(dataBytes, 0, nread);
-            }
-            byte[] mdbytes = md.digest();
-
-            StringBuilder builder = new StringBuilder();
-            for (byte b : mdbytes) {
-                builder.append(String.format("%02x", b));
-            }
-            return builder.toString();
-        } finally {
-            input.close();
+        int nread = 0;
+        byte[] dataBytes = new byte[1024];
+        while ((nread = input.read(dataBytes)) != -1) {
+            md.update(dataBytes, 0, nread);
         }
+        byte[] mdbytes = md.digest();
+
+        StringBuilder builder = new StringBuilder();
+        for (byte b : mdbytes) {
+            builder.append(String.format("%02x", b));
+        }
+        return builder.toString();
     }
 }

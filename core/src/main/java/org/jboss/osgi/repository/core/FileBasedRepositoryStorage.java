@@ -196,11 +196,14 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             // Calculate the SHA-256
             String algorithm = "SHA-256";
             String sha256;
+            InputStream tempInput = new FileInputStream(tempFile);
             try {
-                sha256 = RepositoryContentHelper.getDigest(new FileInputStream(tempFile), algorithm);
+                sha256 = RepositoryContentHelper.getDigest(tempInput, algorithm);
                 atts.put(ContentNamespace.CONTENT_NAMESPACE, sha256);
             } catch (NoSuchAlgorithmException ex) {
                 throw MESSAGES.storageNoSuchAlgorithm(ex, algorithm);
+            } finally {
+                tempInput.close();
             }
             // Move the content to storage location
             String contentPath = sha256.substring(0, 2) + File.separator + sha256.substring(2) + File.separator + "content";
@@ -258,7 +261,6 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
 
     private boolean deleteRecursive(File file) {
         boolean result = true;
-
         if (file.isDirectory()) {
             for (File aux : file.listFiles())
                 result &= deleteRecursive(aux);
