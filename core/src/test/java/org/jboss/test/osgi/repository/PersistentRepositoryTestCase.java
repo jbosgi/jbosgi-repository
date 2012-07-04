@@ -110,7 +110,14 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         assertEquals("One capability", 1, caps.size());
         cap = (XCapability) caps.iterator().next();
         URL url = new URL((String) cap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE));
-        Assert.assertTrue("Local path: " + url, url.getPath().startsWith(storageDir.getAbsolutePath()));
+
+        String absolutePath = storageDir.getAbsolutePath();
+        // Convert the absolute path so that it works on Windows too
+        absolutePath = absolutePath.replace('\\', '/');
+        if (!absolutePath.startsWith("/"))
+            absolutePath = "/" + absolutePath;
+
+        Assert.assertTrue("Local path: " + url, url.getPath().startsWith(absolutePath));
 
         RepositoryContent content = (RepositoryContent) resource;
         Manifest manifest = new JarInputStream(content.getContent()).getManifest();
