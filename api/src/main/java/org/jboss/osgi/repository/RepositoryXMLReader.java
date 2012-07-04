@@ -147,9 +147,8 @@ public class RepositoryXMLReader implements RepositoryReader {
                 }
                 builder = URLResourceBuilderFactory.create(contentURL, ccap.getAttributes(), false);
                 for (Capability cap : resource.getCapabilities(null)) {
-                    String namespace = cap.getNamespace();
-                    if (!namespace.equals(ContentNamespace.CONTENT_NAMESPACE)) {
-                        builder.addCapability(namespace, cap.getAttributes(), cap.getDirectives());
+                    if (cap != ccap) {
+                        builder.addCapability(cap.getNamespace(), cap.getAttributes(), cap.getDirectives());
                     }
                 }
                 for (Requirement req : resource.getRequirements(null)) {

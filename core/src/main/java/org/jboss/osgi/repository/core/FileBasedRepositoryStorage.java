@@ -135,9 +135,8 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             String mime = (String) ccap.getAttribute(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE);
             XResourceBuilder builder = createResourceInternal(input, mime, false);
             for (Capability cap : res.getCapabilities(null)) {
-                String namespace = cap.getNamespace();
-                if (!namespace.equals(ContentNamespace.CONTENT_NAMESPACE)) {
-                    builder.addCapability(namespace, cap.getAttributes(), cap.getDirectives());
+                if (cap != ccap) {
+                    builder.addCapability(cap.getNamespace(), cap.getAttributes(), cap.getDirectives());
                 }
             }
             for (Requirement req : res.getRequirements(null)) {
