@@ -28,25 +28,20 @@ import static org.osgi.service.repository.ContentNamespace.CAPABILITY_SIZE_ATTRI
 import static org.osgi.service.repository.ContentNamespace.CAPABILITY_URL_ATTRIBUTE;
 import static org.osgi.service.repository.ContentNamespace.CONTENT_NAMESPACE;
 
-import java.io.BufferedWriter;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import junit.framework.Assert;
 
-import org.jboss.osgi.metadata.OSGiMetaData;
-import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.RepositoryContentHelper;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
@@ -63,7 +58,6 @@ import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.XResourceBuilderFactory;
 import org.jboss.osgi.spi.BundleInfo;
 import org.jboss.osgi.spi.OSGiManifestBuilder;
-import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
@@ -72,7 +66,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
 import org.osgi.service.repository.RepositoryContent;
 
@@ -105,7 +98,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         bundleAtxt = new File("./target/bundleA.txt");
         PrintWriter bw = new PrintWriter(new FileWriter(bundleAtxt));
         BundleInfo infoA = BundleInfo.createBundleInfo(bundleAjar.toURI().toURL());
-        bw.println(infoA.toString());
+        bw.print(infoA.getOSGiMetadata().toString());
         bw.close();
     }
 
@@ -163,9 +156,32 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         XResource resource = (XResource) cap.getResource();
         verifyDefaultContent(resource);
         
+        InputStream input = ((RepositoryContent)resource).getContent();
+        String digest = RepositoryContentHelper.getDigest(input);
+        Assert.assertNotNull("RepositoryContent not null", input);
+        input.close();
+        
         List<Capability> ccaps = resource.getCapabilities(CONTENT_NAMESPACE);
         Assert.assertEquals(2, ccaps.size());
         XContentCapability ccap = ((XCapability) ccaps.get(0)).adapt(XContentCapability.class); 
+        Assert.assertEquals(digest, ccap.getDigest());
+        Assert.assertEquals("application/vnd.osgi.bundle", ccap.getMimeType());
+        Assert.assertEquals(new Long(400), ccap.getSize());
+        File contentFile = new File(new URL(ccap.getContentURL()).getPath()).getCanonicalFile();
+        Assert.assertTrue("File exists: " + contentFile, contentFile.exists());
+        Assert.assertTrue("Path starts with: " + storageDir.getPath(), contentFile.getPath().startsWith(storageDir.getPath()));
+
+        ccap = ((XCapability) ccaps.get(1)).adapt(XContentCapability.class); 
+        Assert.assertFalse(digest.equals(ccap.getDigest()));
+        Assert.assertEquals("text/plain", ccap.getMimeType());
+        Assert.assertEquals(new Long("[bundleA:0.0.0]".length()), ccap.getSize());
+        contentFile = new File(new URL(ccap.getContentURL()).getPath()).getCanonicalFile();
+        Assert.assertTrue("File exists: " + contentFile, contentFile.exists());
+        Assert.assertTrue("Path starts with: " + storageDir.getPath(), contentFile.getPath().startsWith(storageDir.getPath()));
+        
+        BufferedReader br = new BufferedReader(new FileReader(contentFile));
+        Assert.assertEquals("[bundleA:0.0.0]", br.readLine());
+        br.close();
     }
 
     @Test
@@ -255,10 +271,10 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         Assert.assertEquals("application/vnd.osgi.bundle", cap.getAttribute(CAPABILITY_MIME_ATTRIBUTE));
         Assert.assertEquals(new Long(400), ccap.getSize());
         Assert.assertEquals(new Long(400), (Long)cap.getAttribute(CAPABILITY_SIZE_ATTRIBUTE));
-        URL fileURL = new URL((String) ccap.getAttribute(CAPABILITY_URL_ATTRIBUTE));
-        File contentFile = new File(fileURL.getPath());
-        Assert.assertTrue("File exists: " + fileURL, contentFile.exists());
-        Assert.assertTrue("Path starts with: " + storageDir.getPath(), fileURL.getPath().startsWith(storageDir.getCanonicalPath()));
+        String contentURL = (String) ccap.getAttribute(CAPABILITY_URL_ATTRIBUTE);
+        File contentFile = new File(new URL(contentURL).getPath()).getCanonicalFile();
+        Assert.assertTrue("File exists: " + contentFile, contentFile.exists());
+        Assert.assertTrue("Path starts with: " + storageDir.getPath(), contentFile.getPath().startsWith(storageDir.getPath()));
     }
 
     private void verifyProviders(RepositoryStorage storage) throws Exception {
