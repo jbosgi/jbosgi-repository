@@ -32,29 +32,37 @@ import java.security.NoSuchAlgorithmException;
  * @author thomas.diesler@jboss.com
  * @since 31-May-2012
  */
-public class RepositoryContentHelper {
+public final class RepositoryContentHelper {
 
-    public static final String UNKNOWN_DIGEST = "unknown-digest";
-
+    public static final String DEFAULT_DIGEST_ALGORITHM = "SHA-256";
+    
     // Hide ctor
     private RepositoryContentHelper() {
     }
 
     /**
+     * Get the digest for a given input stream using the default algorithm
+     */
+    public static String getDigest(InputStream input) throws IOException, NoSuchAlgorithmException {
+        return getDigest(input, DEFAULT_DIGEST_ALGORITHM);
+    }
+    
+    /**
      * Get the digest for a given input stream and algorithm
      */
     public static String getDigest(InputStream input, String algorithm) throws IOException, NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance(algorithm);
-
-        int nread = 0;
-        byte[] dataBytes = new byte[1024];
-        while ((nread = input.read(dataBytes)) != -1) {
-            md.update(dataBytes, 0, nread);
+        try {
+            int nread = 0;
+            byte[] dataBytes = new byte[1024];
+            while ((nread = input.read(dataBytes)) != -1) {
+                md.update(dataBytes, 0, nread);
+            }
+        } finally {
+            input.close();
         }
-        byte[] mdbytes = md.digest();
-
         StringBuilder builder = new StringBuilder();
-        for (byte b : mdbytes) {
+        for (byte b : md.digest()) {
             builder.append(String.format("%02x", b));
         }
         return builder.toString();

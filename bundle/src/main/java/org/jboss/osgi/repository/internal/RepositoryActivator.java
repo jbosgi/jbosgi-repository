@@ -21,7 +21,7 @@
  */
 package org.jboss.osgi.repository.internal;
 
-import org.jboss.osgi.repository.core.XRepositoryBuilder;
+import org.jboss.osgi.repository.XRepositoryBuilder;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.repository.Repository;

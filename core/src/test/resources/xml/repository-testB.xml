@@ -7,6 +7,12 @@
 			<attribute name='url' value='file:./target/bundleA.jar'/>
             <attribute name='size' value='0'/>
 		</capability>
+        <capability namespace='osgi.content'>
+            <attribute name='osgi.content' value='unknown-digest' />
+            <attribute name='mime' value='text/plain'/>
+            <attribute name='url' value='file:./target/bundleA.txt'/>
+            <attribute name='size' value='0'/>
+        </capability>
 		<capability namespace='osgi.identity'>
 			<attribute name='osgi.identity' value='bundleA'/>
 			<attribute name='type' value='osgi.bundle'/>

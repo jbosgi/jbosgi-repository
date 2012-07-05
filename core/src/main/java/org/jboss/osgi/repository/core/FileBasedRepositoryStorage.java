@@ -194,16 +194,13 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             Long size = copyResourceContent(input, tempFile);
             atts.put(ContentNamespace.CAPABILITY_SIZE_ATTRIBUTE, size);
             // Calculate the SHA-256
-            String algorithm = "SHA-256";
             String sha256;
-            InputStream tempInput = new FileInputStream(tempFile);
+            String algorithm = RepositoryContentHelper.DEFAULT_DIGEST_ALGORITHM;
             try {
-                sha256 = RepositoryContentHelper.getDigest(tempInput, algorithm);
+                sha256 = RepositoryContentHelper.getDigest(new FileInputStream(tempFile), algorithm);
                 atts.put(ContentNamespace.CONTENT_NAMESPACE, sha256);
             } catch (NoSuchAlgorithmException ex) {
                 throw MESSAGES.storageNoSuchAlgorithm(ex, algorithm);
-            } finally {
-                tempInput.close();
             }
             // Move the content to storage location
             String contentPath = sha256.substring(0, 2) + File.separator + sha256.substring(2) + File.separator + "content";

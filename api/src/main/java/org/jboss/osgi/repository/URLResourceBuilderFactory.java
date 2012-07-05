@@ -35,6 +35,7 @@ import java.util.jar.Manifest;
 
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
+import org.jboss.osgi.repository.spi.AbstractRepositoryCapability;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
@@ -45,7 +46,7 @@ import org.osgi.service.repository.RepositoryContent;
 
 /**
  * Create an URL based resource
- *
+ * 
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
@@ -63,8 +64,16 @@ public final class URLResourceBuilderFactory extends XResourceBuilderFactory {
 
         XResourceBuilder builder = XResourceBuilderFactory.create(factory);
         XCapability ccap = builder.addCapability(ContentNamespace.CONTENT_NAMESPACE, contentAtts, null);
-        ccap.getAttributes().put(ContentNamespace.CAPABILITY_URL_ATTRIBUTE, contentURL.toExternalForm());
-
+        
+        Map<String, Object> atts = ccap.getAttributes();
+        atts.put(ContentNamespace.CAPABILITY_URL_ATTRIBUTE, contentURL.toExternalForm());
+        if (atts.get(ContentNamespace.CONTENT_NAMESPACE) == null)
+            atts.put(ContentNamespace.CONTENT_NAMESPACE, XContentCapability.DEFAULT_DIGEST);
+        if (atts.get(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE) == null)
+            atts.put(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE, XContentCapability.DEFAULT_MIME_TYPE);
+        if (atts.get(ContentNamespace.CAPABILITY_SIZE_ATTRIBUTE) == null)
+            atts.put(ContentNamespace.CAPABILITY_SIZE_ATTRIBUTE, XContentCapability.DEFAULT_SIZE);
+        
         if (loadMetadata) {
             InputStream content = urlres.getContent();
             try {
@@ -84,6 +93,11 @@ public final class URLResourceBuilderFactory extends XResourceBuilderFactory {
             }
         }
         return builder;
+    }
+
+    @Override
+    public XCapability createCapability(XResource resource, String namespace, Map<String, Object> atts, Map<String, String> dirs) {
+        return new AbstractRepositoryCapability(resource, namespace, atts, dirs);
     }
 
     @Override

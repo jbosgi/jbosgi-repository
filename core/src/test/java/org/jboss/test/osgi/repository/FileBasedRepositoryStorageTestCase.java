@@ -21,9 +21,20 @@
  */
 package org.jboss.test.osgi.repository;
 
+import static org.osgi.framework.namespace.IdentityNamespace.IDENTITY_NAMESPACE;
+import static org.osgi.framework.namespace.PackageNamespace.PACKAGE_NAMESPACE;
+import static org.osgi.service.repository.ContentNamespace.CAPABILITY_MIME_ATTRIBUTE;
+import static org.osgi.service.repository.ContentNamespace.CAPABILITY_SIZE_ATTRIBUTE;
+import static org.osgi.service.repository.ContentNamespace.CAPABILITY_URL_ATTRIBUTE;
+import static org.osgi.service.repository.ContentNamespace.CONTENT_NAMESPACE;
+
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,10 +50,12 @@ import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.RepositoryContentHelper;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
+import org.jboss.osgi.repository.XContentCapability;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.XRequirementBuilder;
 import org.jboss.osgi.repository.core.FileBasedRepositoryStorage;
 import org.jboss.osgi.resolver.XCapability;
+import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XPackageCapability;
 import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResource;
@@ -59,9 +72,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.osgi.framework.namespace.PackageNamespace;
+import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
-import org.osgi.service.repository.ContentNamespace;
 import org.osgi.service.repository.RepositoryContent;
 
 /**
@@ -75,19 +87,33 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
     private File storageDir;
     private XRepository repository;
     private RepositoryStorage storage;
+    private File bundleAjar;
+    private File bundleAtxt;
 
     @Before
-    public void setUp() throws IOException {
-        storageDir = new File("./target/repository/" + System.currentTimeMillis());
+    public void setUp() throws Exception {
+        storageDir = new File("./target/repository/" + System.currentTimeMillis()).getCanonicalFile();
         repository = Mockito.mock(XRepository.class);
         Mockito.when(repository.getName()).thenReturn("MockedRepo");
         storage = new FileBasedRepositoryStorage(repository, storageDir);
+        
+        // Write the bundle to the location referenced by repository-testA.xml
+        bundleAjar = new File("./target/bundleA.jar");
+        getBundleA().as(ZipExporter.class).exportTo(bundleAjar, true);
+        
+        // Write some text to the location referenced by repository-testB.xml
+        bundleAtxt = new File("./target/bundleA.txt");
+        PrintWriter bw = new PrintWriter(new FileWriter(bundleAtxt));
+        BundleInfo infoA = BundleInfo.createBundleInfo(bundleAjar.toURI().toURL());
+        bw.println(infoA.toString());
+        bw.close();
     }
 
     @After
-    public void teardown() {
-        new File("./target/bundleA.jar").delete();
+    public void tearDown() {
         deleteRecursive(storageDir);
+        bundleAjar.delete();
+        bundleAtxt.delete();
     }
 
     @Test
@@ -104,17 +130,13 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
 
         Assert.assertTrue(storage.removeResource(resource));
 
-        XCapability ccap = (XCapability) resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE).get(0);
-        URL fileURL = new URL((String) ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE));
+        XCapability ccap = (XCapability) resource.getCapabilities(CONTENT_NAMESPACE).get(0);
+        URL fileURL = new URL((String) ccap.getAttribute(CAPABILITY_URL_ATTRIBUTE));
         Assert.assertFalse("File removed: " + fileURL, new File(fileURL.getPath()).exists());
     }
 
     @Test
     public void testAddResourceFromXML() throws Exception {
-
-        // Write the bundle to the location referenced by repository-testA.xml
-        getBundleA().as(ZipExporter.class).exportTo(new File("./target/bundleA.jar"), true);
-
         // Add a resource from XML
         RepositoryReader reader = getRepositoryReader("xml/repository-testA.xml");
         XResource resource = storage.addResource(reader.nextResource());
@@ -124,19 +146,40 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
     }
 
     @Test
-    public void testAddResourceFromOSGiMetadata() throws Exception {
-        getBundleA().as(ZipExporter.class).exportTo(new File("./target/bundleA.jar"), true);
+    public void testAddResourceWithMultipleContent() throws Exception {
+        // Add a resource from XML
+        RepositoryReader reader = getRepositoryReader("xml/repository-testB.xml");
+        storage.addResource(reader.nextResource());
 
+        XRequirement req = XRequirementBuilder.create(IDENTITY_NAMESPACE, "bundleA").getRequirement();
+        Collection<Capability> providers = storage.findProviders(req);
+        Assert.assertNotNull(providers);
+        Assert.assertEquals(1, providers.size());
+
+        XCapability cap = (XCapability) providers.iterator().next();
+        XIdentityCapability icap = cap.adapt(XIdentityCapability.class);
+        Assert.assertEquals("bundleA", icap.getSymbolicName());
+        
+        XResource resource = (XResource) cap.getResource();
+        verifyDefaultContent(resource);
+        
+        List<Capability> ccaps = resource.getCapabilities(CONTENT_NAMESPACE);
+        Assert.assertEquals(2, ccaps.size());
+        XContentCapability ccap = ((XCapability) ccaps.get(0)).adapt(XContentCapability.class); 
+    }
+
+    @Test
+    public void testAddResourceFromOSGiMetadata() throws Exception {
+        
         XResourceBuilder builder = XResourceBuilderFactory.create();
-        Manifest manifest = new Manifest(getBundleA().get(JarFile.MANIFEST_NAME).getAsset().openStream());
-        OSGiMetaData metadata = OSGiMetaDataBuilder.load(manifest);
-        builder.loadFrom(metadata);
+        BundleInfo info = BundleInfo.createBundleInfo(bundleAjar.toURI().toURL());
+        builder.loadFrom(info.getOSGiMetadata());
 
         Map<String, Object> atts = new HashMap<String, Object>();
-        atts.put(ContentNamespace.CONTENT_NAMESPACE, RepositoryContentHelper.UNKNOWN_DIGEST);
-        atts.put(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE, "application/vnd.osgi.bundle");
-        atts.put(ContentNamespace.CAPABILITY_URL_ATTRIBUTE, "file:./target/bundleA.jar");
-        builder.addCapability(ContentNamespace.CONTENT_NAMESPACE, atts, null);
+        atts.put(CONTENT_NAMESPACE, XContentCapability.DEFAULT_DIGEST);
+        atts.put(CAPABILITY_MIME_ATTRIBUTE, "application/vnd.osgi.bundle");
+        atts.put(CAPABILITY_URL_ATTRIBUTE, "file:./target/bundleA.jar");
+        builder.addCapability(CONTENT_NAMESPACE, atts, null);
 
         XResource resource = storage.addResource(builder.getResource());
         verifyResource(resource);
@@ -145,8 +188,6 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
 
     @Test
     public void testFileStorageRestart() throws Exception {
-        // Write the bundle to the location referenced by repository-testA.xml
-        getBundleA().as(ZipExporter.class).exportTo(new File("./target/bundleA.jar"), true);
 
         // Add a resource from XML
         RepositoryReader reader = getRepositoryReader("xml/repository-testA.xml");
@@ -161,25 +202,20 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
 
     @Test
     public void testBundleInfo() throws Exception {
-        // Write the bundle to the location referenced by repository-testA.xml
-        getBundleA().as(ZipExporter.class).exportTo(new File("./target/bundleA.jar"), true);
 
         // Add a resource from XML
         RepositoryReader reader = getRepositoryReader("xml/repository-testA.xml");
         XResource resource = storage.addResource(reader.nextResource());
 
-        XCapability ccap = (XCapability) resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE).get(0);
-        URL fileURL = new URL((String) ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE));
+        XCapability ccap = (XCapability) resource.getCapabilities(CONTENT_NAMESPACE).get(0);
+        URL fileURL = new URL((String) ccap.getAttribute(CAPABILITY_URL_ATTRIBUTE));
 
-        BundleInfo binfo = BundleInfo.createBundleInfo(AbstractVFS.toVirtualFile(fileURL), "location");
-        OSGiMetaData metadata = binfo.getOSGiMetadata();
-        Assert.assertEquals("bundleA", metadata.getBundleSymbolicName());
+        BundleInfo info = BundleInfo.createBundleInfo(fileURL);
+        Assert.assertEquals("bundleA", info.getOSGiMetadata().getBundleSymbolicName());
     }
 
     @Test
     public void testCustomNamespace() throws Exception {
-        // Write the bundle to the location referenced by repository-testA.xml
-        getBundleA().as(ZipExporter.class).exportTo(new File("./target/bundleA.jar"), true);
 
         // Add a resource from XML
         RepositoryReader reader = getRepositoryReader("xml/repository-testA.xml");
@@ -201,20 +237,32 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
     }
 
     private void verifyResource(XResource resource) throws Exception {
+        verifyDefaultContent(resource);
+        Assert.assertEquals(6, resource.getCapabilities(null).size());
+    }
+
+    private void verifyDefaultContent(XResource resource) throws Exception {
         InputStream input = ((RepositoryContent)resource).getContent();
+        String digest = RepositoryContentHelper.getDigest(input);
         Assert.assertNotNull("RepositoryContent not null", input);
         input.close();
 
-        XCapability ccap = (XCapability) resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE).get(0);
-        Assert.assertEquals("application/vnd.osgi.bundle", ccap.getAttribute(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE));
-        Assert.assertNotNull(ccap.getAttribute(ContentNamespace.CAPABILITY_SIZE_ATTRIBUTE));
-        Assert.assertNotNull(ccap.getAttribute(ContentNamespace.CONTENT_NAMESPACE));
-        URL fileURL = new URL((String) ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE));
-        Assert.assertTrue("File exists: " + fileURL, new File(fileURL.getPath()).exists());
+        XCapability cap = (XCapability) resource.getCapabilities(CONTENT_NAMESPACE).get(0);
+        XContentCapability ccap = cap.adapt(XContentCapability.class);
+        Assert.assertEquals(digest, ccap.getDigest());
+        Assert.assertEquals(digest, cap.getAttribute(CONTENT_NAMESPACE));
+        Assert.assertEquals("application/vnd.osgi.bundle", ccap.getMimeType());
+        Assert.assertEquals("application/vnd.osgi.bundle", cap.getAttribute(CAPABILITY_MIME_ATTRIBUTE));
+        Assert.assertEquals(new Long(400), ccap.getSize());
+        Assert.assertEquals(new Long(400), (Long)cap.getAttribute(CAPABILITY_SIZE_ATTRIBUTE));
+        URL fileURL = new URL((String) ccap.getAttribute(CAPABILITY_URL_ATTRIBUTE));
+        File contentFile = new File(fileURL.getPath());
+        Assert.assertTrue("File exists: " + fileURL, contentFile.exists());
+        Assert.assertTrue("Path starts with: " + storageDir.getPath(), fileURL.getPath().startsWith(storageDir.getCanonicalPath()));
     }
 
     private void verifyProviders(RepositoryStorage storage) throws Exception {
-        XRequirement req = XRequirementBuilder.create(PackageNamespace.PACKAGE_NAMESPACE, "org.acme.foo").getRequirement();
+        XRequirement req = XRequirementBuilder.create(PACKAGE_NAMESPACE, "org.acme.foo").getRequirement();
         Collection<Capability> providers = storage.findProviders(req);
         Assert.assertNotNull(providers);
         Assert.assertEquals(1, providers.size());
@@ -235,6 +283,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
                 builder.addBundleManifestVersion(2);
                 builder.addBundleSymbolicName(archive.getName());
                 builder.addExportPackages("org.acme.foo");
+                builder.addProvidedCapabilities("custom.namespace;custom.namespace=custom.value");
                 return builder.openStream();
             }
         });

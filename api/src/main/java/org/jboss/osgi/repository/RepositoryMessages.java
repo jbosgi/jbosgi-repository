@@ -85,4 +85,7 @@ public interface RepositoryMessages {
 
     @Message(id = 20514, value = "Invalid filter directive: %s")
     IllegalArgumentException illegalArgumentInvalidFilterDirective(String filter);
+
+    @Message(id = 20515, value = "Cannot obtain RepositoryStorageFactory service")
+    IllegalStateException illegalStateCannotObtainRepositoryStorageFactory();
 }

@@ -18,8 +18,9 @@
  * #L%
  */
 
-package org.jboss.osgi.repository.core;
+package org.jboss.osgi.repository;
 
+import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 import static org.jboss.osgi.repository.XRepository.SERVICE_NAMES;
 
 import java.io.File;
@@ -32,6 +33,8 @@ import java.util.Set;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XRepository;
+import org.jboss.osgi.repository.core.FileBasedRepositoryStorage;
+import org.jboss.osgi.repository.core.MavenArtifactRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.repository.spi.AggregatingRepository;
 import org.osgi.framework.BundleContext;
@@ -88,9 +91,11 @@ public class XRepositoryBuilder {
 
         // Get the {@link RepositoryStorageFactory} service
         ServiceReference sref = context.getServiceReference(RepositoryStorageFactory.class.getName());
-        RepositoryStorageFactory factory = (RepositoryStorageFactory) context.getService(sref);
-
+        if (sref == null)
+            throw MESSAGES.illegalStateCannotObtainRepositoryStorageFactory();
+        
         // Register the root repository
+        RepositoryStorageFactory factory = (RepositoryStorageFactory) context.getService(sref);
         XRepository repository = new AbstractPersistentRepository(factory, getRepositoryServiceTracker());
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put(Constants.SERVICE_RANKING, new Integer(1000));
