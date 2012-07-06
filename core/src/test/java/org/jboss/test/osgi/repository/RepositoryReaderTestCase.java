@@ -51,14 +51,12 @@ public class RepositoryReaderTestCase extends AbstractRepositoryTest {
 
     @Test
     public void testSampleRepositoryXML() throws Exception {
-
         RepositoryReader reader = getRepositoryReader("xml/sample-repository.xml");
-
         Map<String, String> attributes = reader.getRepositoryAttributes();
         List<XResource> resources = getResources(reader);
         verifyContent(attributes, resources);
     }
-
+    
     static void verifyContent(Map<String, String> attributes, List<XResource> resources) {
         Assert.assertEquals("Two attributes", 2, attributes.size());
         Assert.assertEquals("OSGi Repository", attributes.get(Namespace100.Attribute.NAME.getLocalName()));

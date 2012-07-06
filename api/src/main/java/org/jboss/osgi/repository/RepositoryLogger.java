@@ -22,6 +22,7 @@
 package org.jboss.osgi.repository;
 
 import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.WARN;
 import static org.jboss.logging.Logger.Level.INFO;
 
 import org.jboss.logging.BasicLogger;
@@ -63,5 +64,9 @@ public interface RepositoryLogger extends BasicLogger {
 
     @LogMessage(level = ERROR)
     @Message(id = 20404, value = "Cannot create resource for: %s")
-    void resolutionCannotCreateResource(@Cause Throwable th, MavenCoordinates coordinates);
+    void errorCannotCreateResource(@Cause Throwable th, MavenCoordinates coordinates);
+
+    @LogMessage(level = WARN)
+    @Message(id = 20405, value = "Cannot infer value type from %s")
+    void warnCannotInferValueType(Object value);
 }

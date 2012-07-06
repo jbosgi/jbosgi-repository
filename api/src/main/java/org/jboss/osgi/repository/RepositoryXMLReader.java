@@ -31,7 +31,6 @@ import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,14 +39,13 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jboss.osgi.repository.AttributeValueHandler.AttributeValue;
 import org.jboss.osgi.repository.Namespace100.Attribute;
 import org.jboss.osgi.repository.Namespace100.Element;
-import org.jboss.osgi.repository.Namespace100.Type;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.XResourceBuilderFactory;
-import org.osgi.framework.Version;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.service.repository.ContentNamespace;
@@ -202,76 +200,12 @@ public class RepositoryXMLReader implements RepositoryReader {
     }
 
     private void readAttributeElement(XMLStreamReader reader, Map<String, Object> attributes) throws XMLStreamException {
-        boolean listType = false;
         String name = reader.getAttributeValue(null, Attribute.NAME.toString());
         String valstr = reader.getAttributeValue(null, Attribute.VALUE.toString());
         String typespec = reader.getAttributeValue(null, Attribute.TYPE.toString());
-        if (typespec != null && typespec.startsWith("List<") && typespec.endsWith(">")) {
-            typespec = typespec.substring(5, typespec.length() - 1);
-            listType = true;
-        }
-        Type type = typespec != null ? Type.valueOf(typespec) : Type.String;
-        
-        // Whitespace around the list and around commas must be trimmed
-        valstr = valstr.trim();
-        
-        Object value;
-        switch (type) {
-            case String:
-                if (listType) {
-                    List<String> list = new ArrayList<String>();
-                    String[] split = valstr.split(",");
-                    for (String val : split) {
-                        list.add(val.trim());
-                    }
-                    value = list;
-                } else {
-                    value = valstr;
-                }
-                break;
-            case Version:
-                if (listType) {
-                    List<Version> list = new ArrayList<Version>();
-                    String[] split = valstr.split(",");
-                    for (String val : split) {
-                        list.add(Version.parseVersion(val.trim()));
-                    }
-                    value = list;
-                } else {
-                    value = Version.parseVersion(valstr);
-                }
-                break;
-            case Long:
-                if (listType) {
-                    List<Long> list = new ArrayList<Long>();
-                    String[] split = valstr.split(",");
-                    for (String val : split) {
-                        list.add(Long.parseLong(val.trim()));
-                    }
-                    value = list;
-                } else {
-                    value = Long.parseLong(valstr);
-                }
-                break;
-            case Double:
-                if (listType) {
-                    List<Double> list = new ArrayList<Double>();
-                    String[] split = valstr.split(",");
-                    for (String val : split) {
-                        list.add(Double.parseDouble(val.trim()));
-                    }
-                    value = list;
-                } else {
-                    value = Double.parseDouble(valstr);
-                }
-                break;
-            default:
-                value = valstr;
-                break;
-        }
-        attributes.put(name, value);
-        while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
-        }
+        AttributeValue value = AttributeValueHandler.readAttributeValue(typespec, valstr);
+        attributes.put(name, value.getValue());
+        while (reader.hasNext() && reader.nextTag() != END_ELEMENT);
     }
 
     private void readDirectiveElement(XMLStreamReader reader, Map<String, String> directives) throws XMLStreamException {

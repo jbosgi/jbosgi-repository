@@ -87,7 +87,7 @@ public class MavenArtifactRepository extends AbstractRepository implements XRepo
                     LOGGER.infoFoundMavenResource(builder.getResource());
                     break;
                 } catch (Exception ex) {
-                    LOGGER.resolutionCannotCreateResource(ex, coordinates);
+                    LOGGER.errorCannotCreateResource(ex, coordinates);
                 }
             }
         }

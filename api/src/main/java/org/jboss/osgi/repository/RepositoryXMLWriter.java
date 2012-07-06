@@ -19,7 +19,6 @@
  */
 package org.jboss.osgi.repository;
 
-import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 import static org.jboss.osgi.repository.Namespace100.REPOSITORY_NAMESPACE;
 import static org.jboss.osgi.repository.Namespace100.Attribute.NAME;
 import static org.jboss.osgi.repository.Namespace100.Attribute.NAMESPACE;
@@ -31,9 +30,9 @@ import static org.jboss.osgi.repository.Namespace100.Element.DIRECTIVE;
 import static org.jboss.osgi.repository.Namespace100.Element.REPOSITORY;
 import static org.jboss.osgi.repository.Namespace100.Element.REQUIREMENT;
 import static org.jboss.osgi.repository.Namespace100.Element.RESOURCE;
+import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -41,6 +40,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.jboss.osgi.repository.AttributeValueHandler.AttributeValue;
 import org.jboss.osgi.repository.Namespace100.Type;
 import org.jboss.osgi.resolver.XResource;
 import org.osgi.resource.Capability;
@@ -119,24 +119,16 @@ public class RepositoryXMLWriter implements RepositoryWriter {
 
     private void writeAttributes(Map<String, Object> attributes) throws XMLStreamException {
         for (Entry<String, Object> entry : attributes.entrySet()) {
-            Object value = entry.getValue();
-            Class<?> clazz = value.getClass();
-            boolean listType = List.class.isAssignableFrom(clazz);
+            AttributeValue attval = AttributeValue.create(entry.getValue());
             writer.writeStartElement(ATTRIBUTE.getLocalName());
             writer.writeAttribute(NAME.getLocalName(), entry.getKey());
-            if (listType) {
-                String valstr = value.toString();
-                valstr = valstr.substring(1, valstr.length() -1);
-                writer.writeAttribute(VALUE.getLocalName(), valstr);
-                Class<?> type = ((List<?>)value).toArray().getClass().getComponentType();
-                if (type != String.class) {
-                    writer.writeAttribute(TYPE.getLocalName(), "List<" + type.getSimpleName() + ">");
-                }
+            if (attval.isListType()) {
+                writer.writeAttribute(VALUE.getLocalName(), attval.getValueString());
+                writer.writeAttribute(TYPE.getLocalName(), "List<" + attval.getType() + ">");
             } else {
-                writer.writeAttribute(VALUE.getLocalName(), value.toString());
-                if (clazz != String.class) {
-                    Type type = Type.valueOf(clazz.getSimpleName());
-                    writer.writeAttribute(TYPE.getLocalName(), type.toString());
+                writer.writeAttribute(VALUE.getLocalName(), attval.getValueString());
+                if (attval.getType() != Type.String) {
+                    writer.writeAttribute(TYPE.getLocalName(), attval.getType().toString());
                 }
             }
             writer.writeEndElement();
