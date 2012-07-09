@@ -192,6 +192,7 @@
         <module>core</module>
         <module>bundle</module>
         <module>itests</module>
+        <module>tck</module>
     </modules>
 
 </project>
