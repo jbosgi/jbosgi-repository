@@ -61,7 +61,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Bundle-Version>${bundle.version}</Bundle-Version>
+            <Bundle-Version>${project.version}</Bundle-Version>
             <Bundle-Activator>org.jboss.test.osgi.repository.tck.Activator</Bundle-Activator>
             <Export-Package/>
           </instructions>

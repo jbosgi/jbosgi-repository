@@ -77,12 +77,12 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Version>${bundle.version}</Bundle-Version>
+                        <Bundle-Version>${project.version}</Bundle-Version>
                         <Bundle-Activator>org.jboss.osgi.repository.internal.RepositoryActivator</Bundle-Activator>
                         <Export-Package>
                             org.jboss.osgi.metadata;version="${version.jboss.osgi.metadata}",
-                            org.jboss.osgi.repository;version="${bundle.version}",
-                            org.jboss.osgi.repository.spi;version="${bundle.version}",
+                            org.jboss.osgi.repository;version="${project.version}",
+                            org.jboss.osgi.repository.spi;version="${project.version}",
                             org.jboss.osgi.resolver;version="${version.jboss.osgi.resolver}",
                             org.jboss.osgi.resolver.spi;version="${version.jboss.osgi.resolver}",
                             org.osgi.framework.wiring;version="1.1",

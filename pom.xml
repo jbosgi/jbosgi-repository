@@ -45,7 +45,6 @@
 
     <!-- Properties -->
     <properties>
-    	<bundle.version>2.0.0.CR1</bundle.version>
         <version.jboss.arquillian.core>1.0.0.CR7</version.jboss.arquillian.core>
         <version.jboss.arquillian.osgi>1.0.2.Final</version.jboss.arquillian.osgi>
         <version.jboss.logging>3.1.2.GA</version.jboss.logging>
