@@ -45,26 +45,18 @@ public interface RepositoryLogger extends BasicLogger {
     RepositoryLogger LOGGER = Logger.getMessageLogger(RepositoryLogger.class, "org.jboss.osgi.repository");
 
     @LogMessage(level = INFO)
-    @Message(id = 20400, value = "Resource added: %s")
-    void infoResourceAdded(XResource res);
-
-    @LogMessage(level = INFO)
-    @Message(id = 20401, value = "Resource removed: %s")
-    void infoResourceRemoved(XResource res);
-
-    @LogMessage(level = INFO)
-    @Message(id = 20402, value = "Find maven providers for: %s")
+    @Message(id = 20400, value = "Find maven providers for: %s")
     void infoFindMavenProviders(MavenCoordinates coordinates);
 
     @LogMessage(level = INFO)
-    @Message(id = 20403, value = "Found maven resource: %s")
+    @Message(id = 20401, value = "Found maven resource: %s")
     void infoFoundMavenResource(XResource resource);
 
     @LogMessage(level = ERROR)
-    @Message(id = 20404, value = "Cannot create resource for: %s")
+    @Message(id = 20402, value = "Cannot create resource for: %s")
     void errorCannotCreateResource(@Cause Throwable th, MavenCoordinates coordinates);
 
     @LogMessage(level = WARN)
-    @Message(id = 20405, value = "Cannot infer value type from %s")
+    @Message(id = 20403, value = "Cannot infer value type from %s")
     void warnCannotInferValueType(Object value);
 }

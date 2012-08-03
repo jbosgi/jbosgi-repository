@@ -151,7 +151,7 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
                 addCachedCapability((XCapability) cap);
             }
             increment.incrementAndGet();
-            LOGGER.infoResourceAdded(res);
+            LOGGER.debugf("Resource added: %s", res);
         }
         return res;
     }
@@ -181,7 +181,7 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
                     }
                 }
             }
-            LOGGER.infoResourceRemoved(res);
+            LOGGER.debugf("Resource removed: %s", res);
         }
         return found;
     }
