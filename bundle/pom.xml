@@ -71,18 +71,53 @@
 
     <build>
         <plugins>
+            <!-- [JBOSGI-585] Separate maven project.version from bundle.version and package version -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals><goal>parse-version</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                  <execution>
+                    <phase>validate</phase>
+                    <goals><goal>run</goal></goals>
+                    <configuration>
+                      <exportAntProperties>true</exportAntProperties>
+                      <target>
+                       <condition property="final.version">
+                          <matches string="${project.version}" pattern="(.*)Final"/>
+                       </condition>
+                       <condition property="bundle.version" value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}">
+                          <isset property="final.version"/>
+                       </condition>
+                       <condition property="bundle.version" value="${project.version}">
+                          <not><isset property="final.version"/></not>
+                       </condition>
+                       <echo message="bundle.version=${bundle.version}"/>
+                      </target>
+                    </configuration>
+                  </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Bundle-Version>${bundle.version}</Bundle-Version>
                         <Bundle-Activator>org.jboss.osgi.repository.internal.RepositoryActivator</Bundle-Activator>
                         <Export-Package>
                             org.jboss.osgi.metadata;version="${version.jboss.osgi.metadata}",
-                            org.jboss.osgi.repository;version="${project.version}",
-                            org.jboss.osgi.repository.spi;version="${project.version}",
+                            org.jboss.osgi.repository;version="${bundle.version}",
+                            org.jboss.osgi.repository.spi;version="${bundle.version}",
                             org.jboss.osgi.resolver;version="${version.jboss.osgi.resolver}",
                             org.jboss.osgi.resolver.spi;version="${version.jboss.osgi.resolver}",
                             org.osgi.framework.wiring;version="1.1",
