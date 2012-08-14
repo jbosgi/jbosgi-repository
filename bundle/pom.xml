@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.osgi.repository</groupId>
         <artifactId>jbosgi-repository-parent</artifactId>
-        <version>2.0.1-SNAPSHOT</version>
+        <version>2.0.1.Final</version>
     </parent>
 
     <name>JBossOSGi Repository: Bundle</name>
@@ -92,15 +92,15 @@
                       <exportAntProperties>true</exportAntProperties>
                       <target>
                        <condition property="final.version">
-                          <matches string="${project.version}" pattern="(.*)Final"/>
+                          <matches string="${project.version}" pattern="(.*)Final" />
                        </condition>
                        <condition property="bundle.version" value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}">
-                          <isset property="final.version"/>
+                          <isset property="final.version" />
                        </condition>
                        <condition property="bundle.version" value="${project.version}">
-                          <not><isset property="final.version"/></not>
+                          <not><isset property="final.version" /></not>
                        </condition>
-                       <echo message="bundle.version=${bundle.version}"/>
+                       <echo message="bundle.version=${bundle.version}" />
                       </target>
                     </configuration>
                   </execution>
