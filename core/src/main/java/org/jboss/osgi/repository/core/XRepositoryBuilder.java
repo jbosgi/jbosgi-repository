@@ -18,7 +18,7 @@
  * #L%
  */
 
-package org.jboss.osgi.repository;
+package org.jboss.osgi.repository.core;
 
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 import static org.jboss.osgi.repository.XRepository.SERVICE_NAMES;
@@ -33,8 +33,6 @@ import java.util.Set;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.core.FileBasedRepositoryStorage;
-import org.jboss.osgi.repository.core.MavenArtifactRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.repository.spi.AggregatingRepository;
 import org.osgi.framework.BundleContext;

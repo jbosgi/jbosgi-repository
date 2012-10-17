@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.osgi.repository</groupId>
         <artifactId>jbosgi-repository-parent</artifactId>
-        <version>2.0.2-SNAPSHOT</version>
+        <version>3.0.0.Alpha1-SNAPSHOT</version>
     </parent>
 
     <name>JBossOSGi Repository: Bundle</name>
@@ -120,31 +120,28 @@
                             org.jboss.osgi.repository.spi;version="${bundle.version}",
                             org.jboss.osgi.resolver;version="${version.jboss.osgi.resolver}",
                             org.jboss.osgi.resolver.spi;version="${version.jboss.osgi.resolver}",
-                            org.osgi.framework.wiring;version="1.1",
-                            org.osgi.resource;version="1.0",
                             org.osgi.service.repository;version="1.0",
-                            org.osgi.service.resolver;version="1.0",
                         </Export-Package>
                         <Import-Package>
                             javax.xml.namespace, 
                             javax.xml.stream, 
                             org.jboss.logging;version="[3.0,4.0)",
-                            org.jboss.osgi.metadata;version="[2.1,3.0)",
-                            org.jboss.osgi.resolver;version="[3.0,4.0)",
-                            org.jboss.osgi.resolver.spi;version="[3.0,4.0)",
-                            org.osgi.framework;version="[1.5,2.0)",
+                            org.jboss.osgi.metadata;version="[3.0,4.0)",
+                            org.jboss.osgi.resolver;version="[4.0,5.0)",
+                            org.jboss.osgi.resolver.spi;version="[4.0,5.0)",
+                            org.osgi.framework;version="[1.7,2.0)",
                             org.osgi.framework.wiring;version="[1.1,2.0)",
                             org.osgi.resource;version="[1.0,2.0)",
                             org.osgi.service.repository;version="[1.0,2.0)",
                             org.osgi.service.resolver;version="[1.0,2.0)",
-                            org.osgi.util.tracker;version="[1.4,2.0)",
+                            org.osgi.util.tracker;version="[1.5,2.0)",
                             org.jboss.modules;resolution:=optional,
+                            !org.jboss.shrinkwrap.api.asset
                         </Import-Package>
                         <Private-Package>
                             org.jboss.osgi.metadata.internal,
                             org.jboss.osgi.repository.core, 
                             org.jboss.osgi.repository.internal,
-                            org.jboss.osgi.resolver.internal,
                         </Private-Package>
                     </instructions>
                 </configuration>
