@@ -20,7 +20,6 @@
 
 package org.jboss.osgi.repository.spi;
 
-import static org.jboss.osgi.resolver.ResolverMessages.MESSAGES;
 import static org.osgi.service.repository.ContentNamespace.CAPABILITY_MIME_ATTRIBUTE;
 import static org.osgi.service.repository.ContentNamespace.CAPABILITY_SIZE_ATTRIBUTE;
 import static org.osgi.service.repository.ContentNamespace.CAPABILITY_URL_ATTRIBUTE;
@@ -30,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jboss.osgi.repository.XContentCapability;
+import org.jboss.osgi.resolver.ResolverMessages;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.spi.AbstractCapability;
@@ -86,19 +86,19 @@ public class AbstractRepositoryCapability extends AbstractCapability implements 
         if (CONTENT_NAMESPACE.equals(getNamespace())) {
             digest = (String) getAttribute(CONTENT_NAMESPACE);
             if (digest == null)
-                throw MESSAGES.illegalStateCannotObtainAttribute(CONTENT_NAMESPACE);
+                throw ResolverMessages.MESSAGES.illegalStateCannotObtainAttribute(CONTENT_NAMESPACE);
             mimeType = (String) getAttribute(CAPABILITY_MIME_ATTRIBUTE);
             if (mimeType == null)
-                throw MESSAGES.illegalStateCannotObtainAttribute(CAPABILITY_MIME_ATTRIBUTE);
+                throw ResolverMessages.MESSAGES.illegalStateCannotObtainAttribute(CAPABILITY_MIME_ATTRIBUTE);
             mimeType = (String) getAttribute(CAPABILITY_MIME_ATTRIBUTE);
             if (mimeType == null)
-                throw MESSAGES.illegalStateCannotObtainAttribute(CAPABILITY_MIME_ATTRIBUTE);
+                throw ResolverMessages.MESSAGES.illegalStateCannotObtainAttribute(CAPABILITY_MIME_ATTRIBUTE);
             contentURL = (String) getAttribute(CAPABILITY_URL_ATTRIBUTE);
             if (contentURL == null)
-                throw MESSAGES.illegalStateCannotObtainAttribute(CAPABILITY_URL_ATTRIBUTE);
+                throw ResolverMessages.MESSAGES.illegalStateCannotObtainAttribute(CAPABILITY_URL_ATTRIBUTE);
             size = (Long) getAttribute(CAPABILITY_SIZE_ATTRIBUTE);
             if (size == null)
-                throw MESSAGES.illegalStateCannotObtainAttribute(CAPABILITY_SIZE_ATTRIBUTE);
+                throw ResolverMessages.MESSAGES.illegalStateCannotObtainAttribute(CAPABILITY_SIZE_ATTRIBUTE);
         }
     }
 
