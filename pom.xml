@@ -34,7 +34,7 @@
     <artifactId>jbosgi-repository-parent</artifactId>
     <packaging>pom</packaging>
 
-    <version>2.1.1.Final-SNAPSHOT</version>
+    <version>3.0.0.Alpha1-SNAPSHOT</version>
 
     <!-- Source -->
     <scm>
@@ -54,21 +54,21 @@
     <!-- Properties -->
     <properties>
         <version.jboss.arquillian.core>1.0.0.Final</version.jboss.arquillian.core>
-        <version.jboss.arquillian.osgi>1.0.3.Final</version.jboss.arquillian.osgi>
+        <version.jboss.arquillian.osgi>1.0.3.CR1</version.jboss.arquillian.osgi>
         <version.jboss.logging>3.1.2.GA</version.jboss.logging>
-        <version.jboss.logmanager>1.4.0.Beta1</version.jboss.logmanager>
         <version.jboss.logging.processor>1.1.0.Beta1</version.jboss.logging.processor>
+        <version.jboss.logmanager>1.4.0.Beta1</version.jboss.logmanager>
         <version.jboss.modules>1.1.2.GA</version.jboss.modules>
         <version.jboss.osgi.equinox>3.5.2.SP1</version.jboss.osgi.equinox>
-        <version.jboss.osgi.framework>2.0.0.Final</version.jboss.osgi.framework>
-        <version.jboss.osgi.metadata>2.2.0.Final</version.jboss.osgi.metadata>
-        <version.jboss.osgi.resolver>3.0.0.Final</version.jboss.osgi.resolver>
-        <version.jboss.osgi.spi>3.2.0.Final</version.jboss.osgi.spi>
-        <version.jboss.osgi.testing>1.1.0.Final</version.jboss.osgi.testing>
+        <version.jboss.osgi.framework>3.0.0.Alpha2</version.jboss.osgi.framework>
+        <version.jboss.osgi.metadata>3.0.0.Alpha1</version.jboss.osgi.metadata>
+        <version.jboss.osgi.resolver>4.0.0.Alpha2</version.jboss.osgi.resolver>
+        <version.jboss.osgi.spi>4.0.0.Alpha1</version.jboss.osgi.spi>
+        <version.jboss.osgi.testing>2.0.0.Alpha1</version.jboss.osgi.testing>
         <version.jboss.shrinkwrap>1.0.0</version.jboss.shrinkwrap>
         <version.junit>4.10</version.junit>
         <version.mockito>1.8.4</version.mockito>
-        <version.osgi>4.2.0</version.osgi>
+        <version.osgi>5.0.0</version.osgi>
     </properties>
 
     <!-- Dependency Management -->
