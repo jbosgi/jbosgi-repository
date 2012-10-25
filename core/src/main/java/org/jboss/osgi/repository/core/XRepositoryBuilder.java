@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +17,7 @@
  * limitations under the License.
  * #L%
  */
-
-package org.jboss.osgi.repository;
+package org.jboss.osgi.repository.core;
 
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 import static org.jboss.osgi.repository.XRepository.SERVICE_NAMES;
@@ -33,8 +32,6 @@ import java.util.Set;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.core.FileBasedRepositoryStorage;
-import org.jboss.osgi.repository.core.MavenArtifactRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.repository.spi.AggregatingRepository;
 import org.osgi.framework.BundleContext;
@@ -45,9 +42,9 @@ import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * A builder for {@link XRepository} services.
- * 
+ *
  * The intended usage of this builder is something like
- *      
+ *
  *      builder = XRepositoryBuilder.create(context);
  *      builder.addDefaultRepositoryStorage(context.getDataFile("repository"));
  *      builder.addDefaultRepositories();
@@ -93,7 +90,7 @@ public class XRepositoryBuilder {
         ServiceReference sref = context.getServiceReference(RepositoryStorageFactory.class.getName());
         if (sref == null)
             throw MESSAGES.illegalStateCannotObtainRepositoryStorageFactory();
-        
+
         // Register the root repository
         RepositoryStorageFactory factory = (RepositoryStorageFactory) context.getService(sref);
         XRepository repository = new AbstractPersistentRepository(factory, getRepositoryServiceTracker());

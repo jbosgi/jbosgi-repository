@@ -8,9 +8,9 @@ package org.jboss.test.osgi.repository;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,7 +55,7 @@ import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.XResourceBuilderFactory;
 import org.jboss.osgi.spi.BundleInfo;
-import org.jboss.osgi.spi.OSGiManifestBuilder;
+import org.jboss.osgi.metadata.OSGiManifestBuilder;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
@@ -87,11 +87,11 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         repository = Mockito.mock(XRepository.class);
         Mockito.when(repository.getName()).thenReturn("MockedRepo");
         storage = new FileBasedRepositoryStorage(repository, storageDir);
-        
+
         // Write the bundle to the location referenced by repository-testA.xml
         bundleAjar = new File("./target/bundleA.jar");
         getBundleA().as(ZipExporter.class).exportTo(bundleAjar, true);
-        
+
         // Write some text to the location referenced by repository-testB.xml
         bundleAtxt = new File("./target/bundleA.txt");
         PrintWriter bw = new PrintWriter(new FileWriter(bundleAtxt));
@@ -150,18 +150,18 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         XCapability cap = (XCapability) providers.iterator().next();
         XIdentityCapability icap = cap.adapt(XIdentityCapability.class);
         Assert.assertEquals("bundleA", icap.getSymbolicName());
-        
+
         XResource resource = (XResource) cap.getResource();
         verifyDefaultContent(resource);
-        
+
         InputStream input = ((RepositoryContent)resource).getContent();
         String digest = RepositoryContentHelper.getDigest(input);
         Assert.assertNotNull("RepositoryContent not null", input);
         input.close();
-        
+
         List<Capability> ccaps = resource.getCapabilities(CONTENT_NAMESPACE);
         Assert.assertEquals(2, ccaps.size());
-        XContentCapability ccap = ((XCapability) ccaps.get(0)).adapt(XContentCapability.class); 
+        XContentCapability ccap = ((XCapability) ccaps.get(0)).adapt(XContentCapability.class);
         Assert.assertEquals(digest, ccap.getDigest());
         Assert.assertEquals("application/vnd.osgi.bundle", ccap.getMimeType());
         Assert.assertEquals(new Long(400), ccap.getSize());
@@ -169,14 +169,14 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         Assert.assertTrue("File exists: " + contentFile, contentFile.exists());
         Assert.assertTrue("Path starts with: " + storageDir.getPath(), contentFile.getPath().startsWith(storageDir.getPath()));
 
-        ccap = ((XCapability) ccaps.get(1)).adapt(XContentCapability.class); 
+        ccap = ((XCapability) ccaps.get(1)).adapt(XContentCapability.class);
         Assert.assertFalse(digest.equals(ccap.getDigest()));
         Assert.assertEquals("text/plain", ccap.getMimeType());
         Assert.assertEquals(new Long("[bundleA:0.0.0]".length()), ccap.getSize());
         contentFile = new File(new URL(ccap.getContentURL()).getPath()).getCanonicalFile();
         Assert.assertTrue("File exists: " + contentFile, contentFile.exists());
         Assert.assertTrue("Path starts with: " + storageDir.getPath(), contentFile.getPath().startsWith(storageDir.getPath()));
-        
+
         BufferedReader br = new BufferedReader(new FileReader(contentFile));
         Assert.assertEquals("[bundleA:0.0.0]", br.readLine());
         br.close();
@@ -184,7 +184,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
 
     @Test
     public void testAddResourceFromOSGiMetadata() throws Exception {
-        
+
         XResourceBuilder builder = XResourceBuilderFactory.create();
         BundleInfo info = BundleInfo.createBundleInfo(bundleAjar.toURI().toURL());
         builder.loadFrom(info.getOSGiMetadata());
@@ -268,7 +268,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         Assert.assertEquals("application/vnd.osgi.bundle", ccap.getMimeType());
         Assert.assertEquals("application/vnd.osgi.bundle", cap.getAttribute(CAPABILITY_MIME_ATTRIBUTE));
         Assert.assertEquals(new Long(400), ccap.getSize());
-        Assert.assertEquals(new Long(400), (Long)cap.getAttribute(CAPABILITY_SIZE_ATTRIBUTE));
+        Assert.assertEquals(new Long(400), cap.getAttribute(CAPABILITY_SIZE_ATTRIBUTE));
         String contentURL = (String) ccap.getAttribute(CAPABILITY_URL_ATTRIBUTE);
         File contentFile = new File(new URL(contentURL).getPath()).getCanonicalFile();
         Assert.assertTrue("File exists: " + contentFile, contentFile.exists());
@@ -292,6 +292,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
     private JavaArchive getBundleA() {
         final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "bundleA");
         archive.setManifest(new Asset() {
+            @Override
             public InputStream openStream() {
                 OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
                 builder.addBundleManifestVersion(2);

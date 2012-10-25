@@ -138,13 +138,14 @@
                             org.osgi.service.repository;version="[1.0,2.0)",
                             org.osgi.service.resolver;version="[1.0,2.0)",
                             org.osgi.util.tracker;version="[1.4,2.0)",
-                            org.jboss.modules;resolution:=optional,
+                            org.jboss.modules;version="[1.1,2.0)";resolution:=optional,
+                            org.jboss.shrinkwrap.api.asset;version="[1.0,2.0)";resolution:=optional
                         </Import-Package>
                         <Private-Package>
                             org.jboss.osgi.metadata.internal,
+                            org.jboss.osgi.metadata.spi, 
                             org.jboss.osgi.repository.core, 
                             org.jboss.osgi.repository.internal,
-                            org.jboss.osgi.resolver.internal,
                         </Private-Package>
                     </instructions>
                 </configuration>
