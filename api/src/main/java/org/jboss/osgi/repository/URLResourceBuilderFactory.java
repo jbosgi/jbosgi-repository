@@ -9,9 +9,9 @@ package org.jboss.osgi.repository;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,11 +44,11 @@ import org.osgi.service.repository.RepositoryContent;
 
 /**
  * Create an URL based resource
- * 
+ *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public final class URLResourceBuilderFactory extends XResourceBuilderFactory {
+public final class URLResourceBuilderFactory extends XResourceBuilderFactory<XResource> {
 
     private final URLResource urlres;
 
@@ -56,13 +56,13 @@ public final class URLResourceBuilderFactory extends XResourceBuilderFactory {
         this.urlres = urlres;
     }
 
-    public static XResourceBuilder create(URL contentURL, Map<String, Object> contentAtts, boolean loadMetadata) {
+    public static XResourceBuilder<XResource> create(URL contentURL, Map<String, Object> contentAtts, boolean loadMetadata) {
         URLResource urlres = new URLResource(contentURL);
         URLResourceBuilderFactory factory = new URLResourceBuilderFactory(urlres);
 
-        XResourceBuilder builder = XResourceBuilderFactory.create(factory);
+        XResourceBuilder<XResource> builder = XResourceBuilderFactory.create(factory);
         XCapability ccap = builder.addCapability(ContentNamespace.CONTENT_NAMESPACE, contentAtts, null);
-        
+
         Map<String, Object> atts = ccap.getAttributes();
         atts.put(ContentNamespace.CAPABILITY_URL_ATTRIBUTE, contentURL.toExternalForm());
         if (atts.get(ContentNamespace.CONTENT_NAMESPACE) == null)
@@ -71,7 +71,7 @@ public final class URLResourceBuilderFactory extends XResourceBuilderFactory {
             atts.put(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE, XContentCapability.DEFAULT_MIME_TYPE);
         if (atts.get(ContentNamespace.CAPABILITY_SIZE_ATTRIBUTE) == null)
             atts.put(ContentNamespace.CAPABILITY_SIZE_ATTRIBUTE, XContentCapability.DEFAULT_SIZE);
-        
+
         if (loadMetadata) {
             InputStream content = urlres.getContent();
             try {
