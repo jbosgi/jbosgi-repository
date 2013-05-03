@@ -144,7 +144,7 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
             for (XCapability aux : icaps) {
                 XIdentityCapability iaux = aux.adapt(XIdentityCapability.class);
                 if (icap.getVersion().equals(iaux.getVersion())) {
-                    throw MESSAGES.illegalStateResourceAlreadyExists(res);
+                    throw MESSAGES.resourceAlreadyExists(res);
                 }
             }
             for (Capability cap : res.getCapabilities(null)) {

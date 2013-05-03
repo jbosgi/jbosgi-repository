@@ -33,7 +33,7 @@ import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.XRequirementBuilder;
-import org.jboss.osgi.repository.core.MavenArtifactRepository;
+import org.jboss.osgi.repository.core.MavenRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
@@ -48,18 +48,18 @@ import org.osgi.service.repository.ContentNamespace;
 import org.osgi.service.repository.RepositoryContent;
 
 /**
- * Test the {@link MavenArtifactRepository}
+ * Test the {@link MavenRepository}
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class MavenArtifactRepositoryTestCase {
+public class MavenRepositoryTestCase {
 
     private XRepository repository;
 
     @Before
     public void setUp() throws IOException {
-        repository = new MavenArtifactRepository();
+        repository = new MavenRepository();
     }
 
     @Test

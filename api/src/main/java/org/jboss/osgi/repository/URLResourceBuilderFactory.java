@@ -126,7 +126,7 @@ public final class URLResourceBuilderFactory extends XResourceBuilderFactory<XRe
                     return contentURL.openStream();
                 }
             } catch (IOException ex) {
-                throw MESSAGES.storageCannotObtainInputStream(ex, this);
+                throw MESSAGES.cannotObtainInputStream(ex, this);
             }
         }
     }

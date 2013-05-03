@@ -64,7 +64,7 @@ public class RepositoryXMLWriter implements RepositoryWriter {
         try {
             writer = XMLOutputFactory.newInstance().createXMLStreamWriter(output);
         } catch (Exception ex) {
-            throw MESSAGES.illegalStateCannotInitializeRepositoryWriter(ex);
+            throw MESSAGES.cannotInitializeRepositoryWriter(ex);
         }
     }
 
@@ -79,7 +79,7 @@ public class RepositoryXMLWriter implements RepositoryWriter {
                 writer.writeAttribute(entry.getKey(), entry.getValue());
             }
         } catch (XMLStreamException ex) {
-            throw MESSAGES.illegalStateCannotWriteRepositoryElement(ex);
+            throw MESSAGES.cannotWriteRepositoryElement(ex);
         }
     }
 
@@ -103,7 +103,7 @@ public class RepositoryXMLWriter implements RepositoryWriter {
             }
             writer.writeEndElement();
         } catch (XMLStreamException ex) {
-            throw MESSAGES.illegalStateCannotWriteRepositoryElement(ex);
+            throw MESSAGES.cannotWriteRepositoryElement(ex);
         }
     }
 
@@ -113,7 +113,7 @@ public class RepositoryXMLWriter implements RepositoryWriter {
             writer.writeEndDocument();
             writer.close();
         } catch (XMLStreamException ex) {
-            throw MESSAGES.illegalStateCannotWriteRepositoryElement(ex);
+            throw MESSAGES.cannotWriteRepositoryElement(ex);
         }
     }
 

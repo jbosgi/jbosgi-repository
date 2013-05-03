@@ -1,4 +1,3 @@
-package org.jboss.osgi.repository;
 /*
  * #%L
  * JBossOSGi Repository
@@ -8,9 +7,9 @@ package org.jboss.osgi.repository;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,6 +17,7 @@ package org.jboss.osgi.repository;
  * limitations under the License.
  * #L%
  */
+package org.jboss.osgi.repository;
 
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.START_DOCUMENT;
@@ -67,7 +67,7 @@ public class RepositoryXMLReader implements RepositoryReader {
         try {
             reader = XMLInputFactory.newInstance().createXMLStreamReader(input);
         } catch (Exception ex) {
-            throw MESSAGES.illegalStateCannotInitializeRepositoryReader(ex);
+            throw MESSAGES.cannotInitializeRepositoryReader(ex);
         }
         try {
             reader.require(START_DOCUMENT, null, null);
@@ -77,7 +77,7 @@ public class RepositoryXMLReader implements RepositoryReader {
                 attributes.put(reader.getAttributeLocalName(i), reader.getAttributeValue(i));
             }
         } catch (Exception ex) {
-            throw MESSAGES.storageCannotReadResourceElement(ex, reader.getLocation());
+            throw MESSAGES.cannotReadResourceElement(ex, reader.getLocation());
         }
     }
 
@@ -98,7 +98,7 @@ public class RepositoryXMLReader implements RepositoryReader {
                 }
             }
         } catch (XMLStreamException ex) {
-            throw MESSAGES.storageCannotReadResourceElement(ex, reader.getLocation());
+            throw MESSAGES.cannotReadResourceElement(ex, reader.getLocation());
         }
         return null;
     }
@@ -113,7 +113,7 @@ public class RepositoryXMLReader implements RepositoryReader {
     }
 
     private XResource readResourceElement(XMLStreamReader reader) throws XMLStreamException {
-        XResourceBuilder builder = XResourceBuilderFactory.create();
+        XResourceBuilder<XResource> builder = XResourceBuilderFactory.create();
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             Element element = Element.forName(reader.getLocalName());
             switch (element) {
@@ -139,7 +139,7 @@ public class RepositoryXMLReader implements RepositoryReader {
                 try {
                     contentURL = new URL(urlspec);
                 } catch (MalformedURLException ex) {
-                    throw MESSAGES.storageInvalidContentURL(urlspec);
+                    throw MESSAGES.invalidContentURL(urlspec);
                 }
                 builder = URLResourceBuilderFactory.create(contentURL, ccap.getAttributes(), false);
                 for (Capability cap : resource.getCapabilities(null)) {
@@ -157,7 +157,7 @@ public class RepositoryXMLReader implements RepositoryReader {
         return resource;
     }
 
-    private void readCapabilityElement(XMLStreamReader reader, XResourceBuilder builder) throws XMLStreamException {
+    private void readCapabilityElement(XMLStreamReader reader, XResourceBuilder<XResource> builder) throws XMLStreamException {
         String namespace = reader.getAttributeValue(null, Attribute.NAMESPACE.toString());
         Map<String, Object> atts = new HashMap<String, Object>();
         Map<String, String> dirs = new HashMap<String, String>();
@@ -165,11 +165,11 @@ public class RepositoryXMLReader implements RepositoryReader {
         try {
             builder.addCapability(namespace, atts, dirs);
         } catch (RuntimeException ex) {
-            throw MESSAGES.storageCannotReadResourceElement(ex, reader.getLocation());
+            throw MESSAGES.cannotReadResourceElement(ex, reader.getLocation());
         }
     }
 
-    private void readRequirementElement(XMLStreamReader reader, XResourceBuilder builder) throws XMLStreamException {
+    private void readRequirementElement(XMLStreamReader reader, XResourceBuilder<XResource> builder) throws XMLStreamException {
         String namespace = reader.getAttributeValue(null, Attribute.NAMESPACE.toString());
         Map<String, Object> atts = new HashMap<String, Object>();
         Map<String, String> dirs = new HashMap<String, String>();
@@ -177,7 +177,7 @@ public class RepositoryXMLReader implements RepositoryReader {
         try {
             builder.addRequirement(namespace, atts, dirs);
         } catch (RuntimeException ex) {
-            throw MESSAGES.storageCannotReadResourceElement(ex, reader.getLocation());
+            throw MESSAGES.cannotReadResourceElement(ex, reader.getLocation());
         }
     }
 

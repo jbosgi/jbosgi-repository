@@ -185,7 +185,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
     @Test
     public void testAddResourceFromOSGiMetadata() throws Exception {
 
-        XResourceBuilder builder = XResourceBuilderFactory.create();
+        XResourceBuilder<XResource> builder = XResourceBuilderFactory.create();
         BundleInfo info = BundleInfo.createBundleInfo(bundleAjar.toURI().toURL());
         builder.loadFrom(info.getOSGiMetadata());
 

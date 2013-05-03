@@ -43,47 +43,50 @@ public interface RepositoryMessages {
     IllegalArgumentException illegalArgumentNull(String name);
 
     @Message(id = 20501, value = "Resource already exists: %s")
-    IllegalStateException illegalStateResourceAlreadyExists(XResource res);
+    IllegalStateException resourceAlreadyExists(XResource res);
 
     @Message(id = 20502, value = "Cannot initialize repository reader")
-    IllegalStateException illegalStateCannotInitializeRepositoryReader(@Cause Throwable th);
+    IllegalStateException cannotInitializeRepositoryReader(@Cause Throwable th);
 
     @Message(id = 20503, value = "Cannot read repository element: %s")
-    IllegalStateException illegalStateCannotReadRepositoryElement(@Cause Throwable th, Location location);
+    IllegalStateException cannotReadRepositoryElement(@Cause Throwable th, Location location);
 
     @Message(id = 20504, value = "Cannot read resource element: %s")
-    IllegalStateException storageCannotReadResourceElement(@Cause Throwable th, Location location);
+    IllegalStateException cannotReadResourceElement(@Cause Throwable th, Location location);
 
     @Message(id = 20505, value = "Cannot obtain content capability: %s")
-    RepositoryStorageException storageCannotObtainContentCapablility(XResource res);
+    RepositoryStorageException cannotObtainContentCapablility(XResource res);
 
     @Message(id = 20506, value = "Cannot obtain content URL: %s")
-    RepositoryStorageException storageCannotObtainContentURL(XResource res);
+    RepositoryStorageException cannotObtainContentURL(XResource res);
 
     @Message(id = 20507, value = "Cannot access content URL: %s")
-    RepositoryStorageException storageCannotAccessContentURL(@Cause Throwable th, String contentURL);
+    RepositoryStorageException cannotAccessContentURL(@Cause Throwable th, String contentURL);
 
     @Message(id = 20508, value = "Invalid content URL: %s")
-    RepositoryStorageException storageInvalidContentURL(String contentURL);
+    RepositoryStorageException invalidContentURL(String contentURL);
 
     @Message(id = 20509, value = "No such digest algorithm: %s")
-    RepositoryStorageException storageNoSuchAlgorithm(@Cause Throwable th, String algorithm);
+    RepositoryStorageException noSuchAlgorithm(@Cause Throwable th, String algorithm);
 
     @Message(id = 20510, value = "Cannot add resource to storage: %s")
-    RepositoryStorageException storageCannotAddResourceToStorage(@Cause Throwable th, String mime);
+    RepositoryStorageException cannotAddResourceToStorage(@Cause Throwable th, String mime);
 
     @Message(id = 20511, value = "Cannot obtain input stream for: %s")
-    RepositoryStorageException storageCannotObtainInputStream(@Cause Throwable th, XResource res);
+    RepositoryStorageException cannotObtainInputStream(@Cause Throwable th, XResource res);
 
     @Message(id = 20512, value = "Cannot initialize repository writer")
-    IllegalStateException illegalStateCannotInitializeRepositoryWriter(@Cause Throwable th);
+    IllegalStateException cannotInitializeRepositoryWriter(@Cause Throwable th);
 
     @Message(id = 20513, value = "Cannot write repository element")
-    IllegalStateException illegalStateCannotWriteRepositoryElement(@Cause Throwable th);
+    IllegalStateException cannotWriteRepositoryElement(@Cause Throwable th);
 
     @Message(id = 20514, value = "Invalid filter directive: %s")
-    IllegalArgumentException illegalArgumentInvalidFilterDirective(String filter);
+    IllegalArgumentException invalidFilterDirective(String filter);
 
     @Message(id = 20515, value = "Cannot obtain RepositoryStorageFactory service")
-    IllegalStateException illegalStateCannotObtainRepositoryStorageFactory();
+    IllegalStateException cannotObtainRepositoryStorageFactory();
+
+    @Message(id = 20516, value = "Invalid repository base: %s")
+    IllegalArgumentException invalidRepositoryBase(String urlspec);
 }

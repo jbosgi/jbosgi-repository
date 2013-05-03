@@ -8,9 +8,9 @@ package org.jboss.osgi.repository.core;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -82,7 +82,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             try {
                 reader = RepositoryXMLReader.create(new FileInputStream(repoFile));
             } catch (IOException ex) {
-                throw MESSAGES.illegalStateCannotInitializeRepositoryReader(ex);
+                throw MESSAGES.cannotInitializeRepositoryReader(ex);
             }
             Long increment = new Long(reader.getRepositoryAttributes().get(Attribute.INCREMENT.getLocalName()));
             XResource res = reader.nextResource();
@@ -98,7 +98,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
 
     @Override
     public XResource addResource(String mime, InputStream input) throws RepositoryStorageException {
-        XResourceBuilder builder = createResourceInternal(input, mime, true);
+        XResourceBuilder<XResource> builder = createResourceInternal(input, mime, true);
         return addResourceInternal(builder.getResource(), true);
     }
 
@@ -110,18 +110,18 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
     private synchronized XResource addResourceInternal(XResource res, boolean writeXML) throws RepositoryStorageException {
         List<Capability> ccaps = res.getCapabilities(ContentNamespace.CONTENT_NAMESPACE);
         if (ccaps.isEmpty())
-            throw MESSAGES.storageCannotObtainContentCapablility(res);
+            throw MESSAGES.cannotObtainContentCapablility(res);
 
         XCapability ccap = (XCapability) ccaps.get(0);
         String contentURL = (String) ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE);
         if (contentURL == null)
-            throw MESSAGES.storageCannotObtainContentURL(res);
+            throw MESSAGES.cannotObtainContentURL(res);
 
         XResource result;
 
         // Copy the resource to this storage, if the content URL does not match
         if (contentURL.startsWith(getBaseURL().toExternalForm()) == false) {
-            XResourceBuilder builder = createResourceInternal(res, false);
+            XResourceBuilder<XResource> builder = createResourceInternal(res, false);
             for (Capability cap : res.getCapabilities(null)) {
                 if (!ContentNamespace.CONTENT_NAMESPACE.equals(cap.getNamespace())) {
                     builder.addCapability(cap.getNamespace(), cap.getAttributes(), cap.getDirectives());
@@ -162,8 +162,8 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
         return result;
     }
 
-    private XResourceBuilder createResourceInternal(XResource resource, boolean loadMetadata) {
-        XResourceBuilder factory = null;
+    private XResourceBuilder<XResource> createResourceInternal(XResource resource, boolean loadMetadata) {
+        XResourceBuilder<XResource> factory = null;
         for (Capability cap : resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE)) {
             XCapability ccap = (XCapability)cap;
             Map<String, Object> contentAtts = new HashMap<String, Object>();
@@ -180,8 +180,8 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
                     factory.addCapability(ContentNamespace.CONTENT_NAMESPACE, contentAtts, null);
                 }
             } catch (IOException ex) {
-                throw MESSAGES.storageCannotAddResourceToStorage(ex, mimeType);
-            } 
+                throw MESSAGES.cannotAddResourceToStorage(ex, mimeType);
+            }
         }
         return factory;
     }
@@ -197,13 +197,13 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             try {
                 input = new URL(contentURL).openStream();
             } catch (IOException ex) {
-                throw MESSAGES.storageCannotAccessContentURL(ex, contentURL);
+                throw MESSAGES.cannotAccessContentURL(ex, contentURL);
             }
         }
         return input;
     }
-    
-    private XResourceBuilder createResourceInternal(InputStream input, String mimeType, boolean loadMetadata) {
+
+    private XResourceBuilder<XResource> createResourceInternal(InputStream input, String mimeType, boolean loadMetadata) {
         Map<String, Object> contentAtts = new HashMap<String, Object>();
         if (mimeType != null) {
             contentAtts.put(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE, mimeType);
@@ -212,10 +212,10 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             URL contentURL = addResourceContent(input, contentAtts);
             return URLResourceBuilderFactory.create(contentURL, contentAtts, loadMetadata);
         } catch (IOException ex) {
-            throw MESSAGES.storageCannotAddResourceToStorage(ex, mimeType);
+            throw MESSAGES.cannotAddResourceToStorage(ex, mimeType);
         }
     }
-    
+
     private URL addResourceContent(InputStream input, Map<String, Object> atts) throws IOException {
         synchronized (storageDir) {
             // Copy the input stream to temporary storage
@@ -229,7 +229,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
                 sha256 = RepositoryContentHelper.getDigest(new FileInputStream(tempFile), algorithm);
                 atts.put(ContentNamespace.CONTENT_NAMESPACE, sha256);
             } catch (NoSuchAlgorithmException ex) {
-                throw MESSAGES.storageNoSuchAlgorithm(ex, algorithm);
+                throw MESSAGES.noSuchAlgorithm(ex, algorithm);
             }
             // Move the content to storage location
             String contentPath = sha256.substring(0, 2) + File.separator + sha256.substring(2) + File.separator + "content";
@@ -271,7 +271,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
         try {
             writer = RepositoryXMLWriter.create(new FileOutputStream(repoFile));
         } catch (IOException ex) {
-            throw MESSAGES.illegalStateCannotInitializeRepositoryWriter(ex);
+            throw MESSAGES.cannotInitializeRepositoryWriter(ex);
         }
         Map<String, String> attributes = new HashMap<String, String>();
         attributes.put(Attribute.NAME.getLocalName(), getRepository().getName());

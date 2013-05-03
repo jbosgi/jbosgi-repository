@@ -38,7 +38,7 @@ import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.XRequirementBuilder;
 import org.jboss.osgi.repository.core.FileBasedRepositoryStorage;
-import org.jboss.osgi.repository.core.MavenArtifactRepository;
+import org.jboss.osgi.repository.core.MavenRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XCapability;
@@ -72,7 +72,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
             public RepositoryStorage create(XRepository repository) {
                 return new FileBasedRepositoryStorage(repository, storageDir);
             }
-        }, new MavenArtifactRepository());
+        }, new MavenRepository());
     }
 
     @Test
