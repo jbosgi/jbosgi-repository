@@ -1,4 +1,3 @@
-package org.jboss.osgi.repository.spi;
 /*
  * #%L
  * JBossOSGi Repository
@@ -18,6 +17,7 @@ package org.jboss.osgi.repository.spi;
  * limitations under the License.
  * #L%
  */
+package org.jboss.osgi.repository.spi;
 
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 
@@ -43,13 +43,15 @@ import org.osgi.resource.Requirement;
 public class AbstractPersistentRepository extends AbstractRepository implements XPersistentRepository {
 
     private final RepositoryStorage storage;
-    private final XRepository delegate;
+    private XRepository delegate;
+
+    public AbstractPersistentRepository(RepositoryStorageFactory factory) {
+        this(factory, null);
+    }
 
     public AbstractPersistentRepository(RepositoryStorageFactory factory, XRepository delegate) {
         if (factory == null)
             throw MESSAGES.illegalArgumentNull("factory");
-        if (delegate == null)
-            throw MESSAGES.illegalArgumentNull("delegate");
 
         this.storage = factory.create(this);
         this.delegate = delegate;
@@ -61,7 +63,7 @@ public class AbstractPersistentRepository extends AbstractRepository implements 
             throw MESSAGES.illegalArgumentNull("req");
 
         Collection<Capability> providers = storage.findProviders(req);
-        if (providers.isEmpty()) {
+        if (providers.isEmpty() && delegate != null) {
             providers = delegate.findProviders(req);
             List<Capability> caplist = new ArrayList<Capability>(providers);
             for (int i = 0; i < caplist.size(); i++) {

@@ -1,4 +1,4 @@
-package org.jboss.osgi.repository.core;
+package org.jboss.osgi.repository.spi;
 /*
  * #%L
  * JBossOSGi Repository
@@ -39,12 +39,12 @@ import org.jboss.osgi.repository.RepositoryContentHelper;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageException;
+import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.RepositoryWriter;
 import org.jboss.osgi.repository.RepositoryXMLReader;
 import org.jboss.osgi.repository.RepositoryXMLWriter;
 import org.jboss.osgi.repository.URLResourceBuilderFactory;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.spi.MemoryRepositoryStorage;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;

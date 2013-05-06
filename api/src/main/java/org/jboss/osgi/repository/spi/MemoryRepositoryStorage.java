@@ -38,6 +38,7 @@ import org.jboss.osgi.repository.RepositoryMessages;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageException;
+import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
@@ -62,6 +63,13 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
     private final AtomicLong increment = new AtomicLong();
     private final Map<String, Map<String, Set<XCapability>>> capabilityCache = new HashMap<String, Map<String, Set<XCapability>>>();
 
+    public static final class Factory implements RepositoryStorageFactory {
+        @Override
+        public RepositoryStorage create(XRepository repository) {
+            return new MemoryRepositoryStorage(repository);
+        }
+    } 
+    
     public MemoryRepositoryStorage(XRepository repository) {
         if (repository == null)
             throw MESSAGES.illegalArgumentNull("repository");
