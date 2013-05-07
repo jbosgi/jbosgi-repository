@@ -31,6 +31,7 @@ import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.XResourceBuilderFactory;
+import org.osgi.framework.namespace.IdentityNamespace;
 
 /**
  * A builder for resource requirements
@@ -75,6 +76,7 @@ public final class XRequirementBuilder {
     }
 
     public XRequirement getRequirement() {
+        builder.addCapability(IdentityNamespace.IDENTITY_NAMESPACE, "anonymous");
         XResource resource = builder.getResource();
         String namespace = requirement.getNamespace();
         return (XRequirement) resource.getRequirements(namespace).get(0);
