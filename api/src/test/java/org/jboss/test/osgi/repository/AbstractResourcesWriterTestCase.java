@@ -32,22 +32,22 @@ import org.jboss.osgi.repository.RepositoryXMLWriter;
 import org.jboss.osgi.resolver.XResource;
 import org.junit.Test;
 
-/**
- * Test the the {@link RepositoryXMLWriter}.
+/** 
+ * Test the repository reader/writer
  *
  * @author thomas.diesler@jboss.com
  * @since 21-May-2012
  */
-public class RepositoryWriterTestCase extends AbstractRepositoryTest {
+public class AbstractResourcesWriterTestCase extends AbstractRepositoryTest {
 
     @Test
-    public void testSampleRepositoryXML() throws Exception {
+    public void testXMLWriter() throws Exception {
 
-        RepositoryReader reader = getRepositoryReader("xml/sample-repository.xml");
+        RepositoryReader reader = getRepositoryReader("xml/abstract-resources.xml");
         Map<String, String> attributes = reader.getRepositoryAttributes();
         List<XResource> resources = getResources(reader);
 
-        File file = new File("target/repository.xml");
+        File file = new File("target/abstract-resources.xml");
         RepositoryWriter writer = RepositoryXMLWriter.create(new FileOutputStream(file));
         writer.writeRepositoryAttributes(attributes);
         for (XResource res : resources) {
@@ -56,7 +56,6 @@ public class RepositoryWriterTestCase extends AbstractRepositoryTest {
         writer.close();
 
         reader = RepositoryXMLReader.create(new FileInputStream(file));
-        RepositoryReaderTestCase.verifyContent(reader.getRepositoryAttributes(), getResources(reader));
+        AbstractResourcesReaderTestCase.verifyContent(reader.getRepositoryAttributes(), getResources(reader));
     }
-
 }

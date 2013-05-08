@@ -114,6 +114,12 @@ public class RepositoryXMLReader implements RepositoryReader {
 
     private XResource readResourceElement(XMLStreamReader reader) throws XMLStreamException {
         XResourceBuilder<XResource> builder = XResourceBuilderFactory.create();
+        for (int i = 0; i < reader.getAttributeCount(); i++) {
+            // [TODO] add support for namespaced attributes
+            String key = reader.getAttributeLocalName(i);
+            String value = reader.getAttributeValue(i);
+            builder.addAttribute(key, value);
+        }
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             Element element = Element.forName(reader.getLocalName());
             switch (element) {

@@ -35,7 +35,6 @@ import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -87,6 +86,11 @@ public class RepositoryXMLWriter implements RepositoryWriter {
     public void writeResource(XResource resource) {
         try {
             writer.writeStartElement(RESOURCE.getLocalName());
+            for (Entry<String, Object> entry : resource.getAttributes().entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                writer.writeAttribute(key, "" + value);
+            }
             for (Capability cap : resource.getCapabilities(null)) {
                 writer.writeStartElement(CAPABILITY.getLocalName());
                 writer.writeAttribute(NAMESPACE.getLocalName(), cap.getNamespace());

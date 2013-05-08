@@ -45,7 +45,7 @@ import org.osgi.service.repository.RepositoryContent;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class RepositoryReaderTestCase extends AbstractRepositoryTest {
+public class SampleRepositoryReaderTestCase extends AbstractRepositoryTest {
 
     @Test
     public void testSampleRepositoryXML() throws Exception {
