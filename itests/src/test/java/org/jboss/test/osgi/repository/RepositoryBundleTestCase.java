@@ -23,8 +23,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.osgi.metadata.OSGiManifestBuilder;
@@ -46,7 +44,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleReference;
 import org.osgi.framework.Version;
 import org.osgi.framework.namespace.PackageNamespace;
@@ -62,15 +59,12 @@ import org.osgi.service.repository.RepositoryContent;
  * @since 18-Jan-2012
  */
 @RunWith(Arquillian.class)
-public class RepositoryBundleTestCase extends RepositoryBundleTest {
-
-    @Inject
-    public BundleContext context;
+public class RepositoryBundleTestCase extends AbstractRepositoryTest {
 
     @Deployment
     public static JavaArchive createdeployment() {
         final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "example-bundle");
-        archive.addClasses(RepositoryBundleTest.class);
+        archive.addClasses(AbstractRepositoryTest.class);
         archive.setManifest(new Asset() {
             @Override
             public InputStream openStream() {
@@ -83,11 +77,6 @@ public class RepositoryBundleTestCase extends RepositoryBundleTest {
             }
         });
         return archive;
-    }
-
-    @Override
-    BundleContext getBundleContext() {
-        return context;
     }
 
     @Test
@@ -115,7 +104,7 @@ public class RepositoryBundleTestCase extends RepositoryBundleTest {
         Assert.assertEquals("org.apache.felix.cm", pcap.getPackageName());
         Assert.assertEquals(Version.parseVersion("1.0.0"), pcap.getVersion());
 
-        XResource resource = (XResource) cap.getResource();
+        XResource resource = cap.getResource();
         XIdentityCapability icap = resource.getIdentityCapability();
         Assert.assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
         RepositoryContent content = (RepositoryContent) icap.getResource();

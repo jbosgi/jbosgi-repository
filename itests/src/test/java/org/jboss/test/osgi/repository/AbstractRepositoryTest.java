@@ -1,4 +1,3 @@
-package org.jboss.test.osgi.repository;
 /*
  * #%L
  * JBossOSGi Repository
@@ -18,9 +17,11 @@ package org.jboss.test.osgi.repository;
  * limitations under the License.
  * #L%
  */
+package org.jboss.test.osgi.repository;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.XPersistentRepository;
@@ -36,10 +37,13 @@ import org.osgi.framework.ServiceReference;
  * @author thomas.diesler@jboss.com
  * @since 31-May-2012
  */
-public abstract class RepositoryBundleTest {
+public abstract class AbstractRepositoryTest {
 
     private static final AtomicBoolean initialized = new AtomicBoolean();
 
+    @ArquillianResource
+    BundleContext context;
+    
     @Before
     public void setUp () throws Exception {
         if (initialized.compareAndSet(false, true)) {
@@ -58,10 +62,7 @@ public abstract class RepositoryBundleTest {
         }
     }
 
-    abstract BundleContext getBundleContext();
-
     protected XRepository getRepository() {
-        BundleContext context = getBundleContext();
         ServiceReference<XRepository> sref = context.getServiceReference(XRepository.class);
         return sref != null ? context.getService(sref) : null;
     }

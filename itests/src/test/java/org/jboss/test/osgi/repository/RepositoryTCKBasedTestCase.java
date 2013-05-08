@@ -38,10 +38,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.osgi.metadata.OSGiManifestBuilder;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
@@ -59,7 +58,6 @@ import org.jboss.test.osgi.repository.tb2.TestClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
@@ -73,17 +71,12 @@ import org.osgi.service.repository.RepositoryContent;
  * @author David Bosschaert
  */
 @RunWith(Arquillian.class)
-public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
-    @Inject
-    public Bundle bundle;
-
-    @Inject
-    public BundleContext context;
-
+public class RepositoryTCKBasedTestCase extends AbstractRepositoryTest {
+    
     @Deployment
     public static JavaArchive createTestDeployment() {
         final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "testcase-deployment");
-        archive.addClasses(RepositoryBundleTest.class);
+        archive.addClasses(AbstractRepositoryTest.class);
         URL xmlURL = RepositoryTCKBasedTestCase.class.getResource("/xml/test-repository1.xml");
         archive.addAsResource(xmlURL, "/xml/test-repository1.xml");
         URL zipURL = RepositoryBundleTestCase.class.getResource("/other/testresource.zip");
@@ -151,11 +144,6 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
             }
         });
         return archive;
-    }
-
-    @Override
-    BundleContext getBundleContext() {
-        return context;
     }
 
     @Override
@@ -424,7 +412,7 @@ public class RepositoryTCKBasedTestCase extends RepositoryBundleTest {
     }
 
     @Test
-    public void testMultiContent() throws Exception {
+    public void testMultiContent(@ArquillianResource Bundle bundle) throws Exception {
         Resource res = findSingleCapSingleReq("osgi.identity", "(osgi.identity=org.jboss.test.cases.repository.testresource)").getResource();
         List<Capability> caps = res.getCapabilities("osgi.content");
 

@@ -39,7 +39,6 @@ import org.jboss.osgi.repository.RepositoryContentHelper;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageException;
-import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.RepositoryWriter;
 import org.jboss.osgi.repository.RepositoryXMLReader;
 import org.jboss.osgi.repository.RepositoryXMLWriter;
@@ -100,7 +99,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
     public XResource addResource(String mime, InputStream input) throws RepositoryStorageException {
         XResourceBuilder<XResource> builder = createResourceInternal(input, mime, true);
         return addResourceInternal(builder.getResource(), true);
-    }
+    } 
 
     @Override
     public XResource addResource(XResource res) throws RepositoryStorageException {
