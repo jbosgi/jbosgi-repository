@@ -86,7 +86,7 @@
         
         <dependency>
             <groupId>org.jboss.osgi.repository</groupId>
-            <artifactId>jbosgi-repository</artifactId>
+            <artifactId>jbosgi-repository-bundle</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

@@ -30,7 +30,7 @@
 
     <name>JBossOSGi Repository: Bundle</name>
 
-    <artifactId>jbosgi-repository</artifactId>
+    <artifactId>jbosgi-repository-bundle</artifactId>
     <packaging>bundle</packaging>
 
 	<!-- Dependencies -->
@@ -106,7 +106,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>jbosgi-repository</Bundle-SymbolicName>
                         <Bundle-Version>${bundle.version}</Bundle-Version>
                         <Bundle-Activator>org.jboss.osgi.repository.internal.RepositoryActivator</Bundle-Activator>
                         <Export-Package>
