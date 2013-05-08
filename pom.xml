@@ -61,7 +61,7 @@
         <version.jboss.modules>1.2.0.Final</version.jboss.modules>
         <version.jboss.osgi.framework>3.0.0.CR23</version.jboss.osgi.framework>
         <version.jboss.osgi.metadata>3.0.0.CR1</version.jboss.osgi.metadata>
-        <version.jboss.osgi.resolver>4.0.0.CR13</version.jboss.osgi.resolver>
+        <version.jboss.osgi.resolver>4.0.0.CR14-SNAPSHOT</version.jboss.osgi.resolver>
         <version.jboss.osgi.spi>4.0.0.CR2</version.jboss.osgi.spi>
         <version.jboss.osgi.testing>2.0.0.CR2</version.jboss.osgi.testing>
         <version.jboss.shrinkwrap>1.0.0</version.jboss.shrinkwrap>
@@ -200,7 +200,6 @@
     <!-- Modules -->
     <modules>
         <module>api</module>
-        <module>core</module>
         <module>bundle</module>
         <module>itests</module>
         <module>tck</module>

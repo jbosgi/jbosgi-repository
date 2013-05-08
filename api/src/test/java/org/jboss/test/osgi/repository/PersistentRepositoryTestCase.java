@@ -36,14 +36,14 @@ import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.XRequirementBuilder;
-import org.jboss.osgi.repository.core.MavenRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
+import org.jboss.osgi.repository.spi.MavenDelegateRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XRequirement;
+import org.jboss.osgi.resolver.XRequirementBuilder;
 import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,7 +72,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
             public RepositoryStorage create(XRepository repository) {
                 return new FileBasedRepositoryStorage(repository, storageDir);
             }
-        }, new MavenRepository());
+        }, new MavenDelegateRepository());
     }
 
     @Test

@@ -28,11 +28,11 @@ import java.util.Hashtable;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.core.MavenRepository;
-import org.jboss.osgi.repository.core.MavenRepository.ConfigurationPropertyProvider;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.repository.spi.AggregatingRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
+import org.jboss.osgi.repository.spi.MavenDelegateRepository;
+import org.jboss.osgi.repository.spi.MavenDelegateRepository.ConfigurationPropertyProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -72,7 +72,7 @@ public class RepositoryActivator implements BundleActivator {
 
         // Setup the repositories
         AggregatingRepository aggregator = new AggregatingRepository();
-        aggregator.addRepository(new MavenRepository(propProvider));
+        aggregator.addRepository(new MavenDelegateRepository(propProvider));
         XRepository repository = new AbstractPersistentRepository(factory, aggregator);
 
         // Register the top level repository

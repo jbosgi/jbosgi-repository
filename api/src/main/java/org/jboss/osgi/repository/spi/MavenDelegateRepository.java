@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package org.jboss.osgi.repository.core;
+package org.jboss.osgi.repository.spi;
 
 import static org.jboss.osgi.repository.RepositoryLogger.LOGGER;
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
@@ -46,11 +46,11 @@ import org.osgi.resource.Requirement;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class MavenRepository extends AbstractRepository implements XRepository {
+public class MavenDelegateRepository extends AbstractRepository implements XRepository {
 
     private final URL[] baserepos;
 
-    /** The configuration for the {@link MavenRepository} */
+    /** The configuration for the {@link MavenDelegateRepository} */
     public interface Configuration {
 
         /** The default JBoss Nexus repository: http://repository.jboss.org/nexus/content/groups/public */
@@ -70,7 +70,7 @@ public class MavenRepository extends AbstractRepository implements XRepository {
         String getProperty(String key, String defaultValue);
     }
 
-    public MavenRepository() {
+    public MavenDelegateRepository() {
         this(new ConfigurationPropertyProvider() {
             @Override
             public String getProperty(String key, String defaultValue) {
@@ -79,11 +79,11 @@ public class MavenRepository extends AbstractRepository implements XRepository {
         });
     }
 
-    public MavenRepository(ConfigurationPropertyProvider provider) {
+    public MavenDelegateRepository(ConfigurationPropertyProvider provider) {
         this(getDefaultConfiguration(provider));
     }
 
-    public MavenRepository(Configuration configuration) {
+    public MavenDelegateRepository(Configuration configuration) {
         List<URL> repos = new ArrayList<URL>();
         for (URL baseURL : configuration.getBaseURLs()) {
             repos.add(baseURL);
@@ -126,8 +126,8 @@ public class MavenRepository extends AbstractRepository implements XRepository {
     public Collection<Capability> findProviders(Requirement req) {
         String namespace = req.getNamespace();
         List<Capability> result = new ArrayList<Capability>();
-        if (MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
-            String mavenId = (String) req.getAttributes().get(MAVEN_IDENTITY_NAMESPACE);
+        if (XResource.MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
+            String mavenId = (String) req.getAttributes().get(XResource.MAVEN_IDENTITY_NAMESPACE);
             MavenCoordinates coordinates = MavenCoordinates.parse(mavenId);
             LOGGER.infoFindMavenProviders(coordinates);
             for (URL baseURL : baserepos) {
@@ -140,8 +140,9 @@ public class MavenRepository extends AbstractRepository implements XRepository {
                 }
                 try {
                     XResourceBuilder<XResource> builder = URLResourceBuilderFactory.create(url, null, true);
-                    result.add(builder.addCapability(MAVEN_IDENTITY_NAMESPACE, mavenId));
-                    LOGGER.infoFoundMavenResource(builder.getResource());
+                    result.add(builder.addCapability(XResource.MAVEN_IDENTITY_NAMESPACE, mavenId));
+                    XResource resource = builder.getResource();
+                    LOGGER.infoFoundMavenResource(resource);
                     break;
                 } catch (Exception ex) {
                     LOGGER.errorCannotCreateResource(ex, coordinates);

@@ -1,4 +1,3 @@
-package org.jboss.test.osgi.repository;
 /*
  * #%L
  * JBossOSGi Repository
@@ -18,6 +17,7 @@ package org.jboss.test.osgi.repository;
  * limitations under the License.
  * #L%
  */
+package org.jboss.test.osgi.repository;
 
 import java.io.File;
 import java.io.InputStream;

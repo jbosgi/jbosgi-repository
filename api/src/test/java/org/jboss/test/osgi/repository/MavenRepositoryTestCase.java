@@ -1,4 +1,3 @@
-package org.jboss.test.osgi.repository;
 /*
  * #%L
  * JBossOSGi Repository
@@ -18,6 +17,7 @@ package org.jboss.test.osgi.repository;
  * limitations under the License.
  * #L%
  */
+package org.jboss.test.osgi.repository;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,12 +32,12 @@ import junit.framework.Assert;
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.XRequirementBuilder;
-import org.jboss.osgi.repository.core.MavenRepository;
+import org.jboss.osgi.repository.spi.MavenDelegateRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XRequirement;
+import org.jboss.osgi.resolver.XRequirementBuilder;
 import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +48,7 @@ import org.osgi.service.repository.ContentNamespace;
 import org.osgi.service.repository.RepositoryContent;
 
 /**
- * Test the {@link MavenRepository}
+ * Test the {@link MavenDelegateRepository}
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
@@ -59,7 +59,7 @@ public class MavenRepositoryTestCase {
 
     @Before
     public void setUp() throws IOException {
-        repository = new MavenRepository();
+        repository = new MavenDelegateRepository();
     }
 
     @Test
@@ -85,7 +85,7 @@ public class MavenRepositoryTestCase {
 
         Assert.assertTrue("Capability matches", req.matches(cap));
 
-        XResource resource = (XResource) cap.getResource();
+        XResource resource = cap.getResource();
         XIdentityCapability icap = resource.getIdentityCapability();
         assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
         assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());

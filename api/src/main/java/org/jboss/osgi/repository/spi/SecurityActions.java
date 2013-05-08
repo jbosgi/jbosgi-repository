@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package org.jboss.osgi.repository.core;
+package org.jboss.osgi.repository.spi;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
