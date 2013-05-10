@@ -76,7 +76,7 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
         this.repository = repository;
     }
 
-    protected AtomicLong getAtomicIncrement() {
+    protected AtomicLong getResourceIndex() {
         return increment;
     }
 

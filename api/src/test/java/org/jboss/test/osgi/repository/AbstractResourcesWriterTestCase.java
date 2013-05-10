@@ -49,7 +49,7 @@ public class AbstractResourcesWriterTestCase extends AbstractRepositoryTest {
 
         File file = new File("target/abstract-resources.xml");
         RepositoryWriter writer = RepositoryXMLWriter.create(new FileOutputStream(file));
-        writer.writeRepositoryAttributes(attributes);
+        writer.writeRepositoryElement(attributes);
         for (XResource res : resources) {
             writer.writeResource(res);
         }

@@ -68,7 +68,7 @@ public class RepositoryXMLWriter implements RepositoryWriter {
     }
 
     @Override
-    public void writeRepositoryAttributes(Map<String, String> attributes) {
+    public void writeRepositoryElement(Map<String, String> attributes) {
         try {
             writer.writeStartDocument();
             writer.setDefaultNamespace(REPOSITORY_NAMESPACE);
@@ -114,6 +114,7 @@ public class RepositoryXMLWriter implements RepositoryWriter {
     @Override
     public void close() {
         try {
+            writer.writeEndElement();
             writer.writeEndDocument();
             writer.close();
         } catch (XMLStreamException ex) {

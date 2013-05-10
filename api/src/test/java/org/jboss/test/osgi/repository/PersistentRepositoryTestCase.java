@@ -39,6 +39,7 @@ import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
 import org.jboss.osgi.repository.spi.MavenDelegateRepository;
+import org.jboss.osgi.repository.spi.MavenDelegateRepository.ConfigurationPropertyProvider;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
@@ -47,6 +48,7 @@ import org.jboss.osgi.resolver.XRequirementBuilder;
 import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.osgi.framework.Version;
 import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
@@ -70,7 +72,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         deleteRecursive(storageDir);
         repository = new AbstractPersistentRepository(new RepositoryStorageFactory() {
             public RepositoryStorage create(XRepository repository) {
-                return new FileBasedRepositoryStorage(repository, storageDir);
+                return new FileBasedRepositoryStorage(repository, storageDir, Mockito.mock(ConfigurationPropertyProvider.class));
             }
         }, new MavenDelegateRepository());
     }
@@ -98,7 +100,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
 
         Assert.assertTrue("Capability matches", req.matches(cap));
 
-        XResource resource = (XResource) cap.getResource();
+        XResource resource = cap.getResource();
         XIdentityCapability icap = resource.getIdentityCapability();
         assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
         assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());

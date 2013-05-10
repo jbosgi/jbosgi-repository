@@ -89,4 +89,8 @@ public interface RepositoryMessages {
 
     @Message(id = 20516, value = "Invalid repository base: %s")
     IllegalArgumentException invalidRepositoryBase(String urlspec);
+
+    @Message(id = 20517, value = "Cannot create repository storage area")
+    IllegalStateException cannotCreateRepositoryStorageArea(@Cause Throwable th);
+
 }

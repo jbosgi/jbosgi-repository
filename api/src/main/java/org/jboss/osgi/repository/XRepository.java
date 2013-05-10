@@ -34,9 +34,17 @@ import org.osgi.service.repository.Repository;
 public interface XRepository extends Repository {
 
     /**
-     * The system property that can be defined to list the Maven Repository base URLs.
+     * The property that defines the Maven Repository base URLs.
      */
     String PROPERTY_MAVEN_REPOSITORY_BASE_URLS = "org.jboss.osgi.repository.maven.base.urls";
+    /**
+     * The property that defines the repository storage directory.
+     */
+    String PROPERTY_REPOSITORY_STORAGE_DIR = "org.jboss.osgi.repository.storage.dir";
+    /**
+     * The property that defines the repository storage file.
+     */
+    String PROPERTY_REPOSITORY_STORAGE_FILE = "org.jboss.osgi.repository.storage.file";
 
     /**
      * The service names that repositories are registered under

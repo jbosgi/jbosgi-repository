@@ -19,9 +19,11 @@
  */
 package org.jboss.osgi.repository.internal;
 
+import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 import static org.jboss.osgi.repository.XRepository.SERVICE_NAMES;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -52,21 +54,21 @@ public class RepositoryActivator implements BundleActivator {
     @Override
     public void start(final BundleContext context) throws Exception {
 
-        // Create the {@link RepositoryStorageFactory}
-        RepositoryStorageFactory factory = new RepositoryStorageFactory() {
-            @Override
-            public RepositoryStorage create(XRepository repository) {
-                File storageDir = context.getDataFile("repository");
-                return new FileBasedRepositoryStorage(repository, storageDir);
-            }
-        };
-
         // Create the {@link ConfigurationPropertyProvider}
-        ConfigurationPropertyProvider propProvider = new ConfigurationPropertyProvider() {
+        final ConfigurationPropertyProvider propProvider = new ConfigurationPropertyProvider() {
             @Override
             public String getProperty(String key, String defaultValue) {
                 String value = context.getProperty(key);
                 return value != null ? value : defaultValue;
+            }
+        };
+
+        // Create the {@link RepositoryStorageFactory}
+        final RepositoryStorageFactory factory = new RepositoryStorageFactory() {
+            @Override
+            public RepositoryStorage create(XRepository repository) {
+                File storageDir = getRepositoryStorageDir(context);
+                return new FileBasedRepositoryStorage(repository, storageDir, propProvider);
             }
         };
 
@@ -85,5 +87,22 @@ public class RepositoryActivator implements BundleActivator {
     public void stop(BundleContext context) throws Exception {
         if (registration != null)
             registration.unregister();
+    }
+
+    private File getRepositoryStorageDir(BundleContext context) {
+        String dirName = context.getProperty(XRepository.PROPERTY_REPOSITORY_STORAGE_DIR);
+        if (dirName == null) {
+            dirName = context.getProperty(Constants.FRAMEWORK_STORAGE);
+            if (dirName == null) {
+                try {
+                    File storageDir = context.getDataFile("osgi-store");
+                    dirName = storageDir.getCanonicalPath();
+                } catch (IOException ex) {
+                    throw MESSAGES.cannotCreateRepositoryStorageArea(ex);
+                }
+            }
+            dirName += "/repository";
+        }
+        return new File(dirName).getAbsoluteFile();
     }
 }

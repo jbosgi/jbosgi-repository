@@ -47,6 +47,7 @@ import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.XContentCapability;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
+import org.jboss.osgi.repository.spi.MavenDelegateRepository.ConfigurationPropertyProvider;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XPackageCapability;
@@ -86,7 +87,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         storageDir = new File("./target/repository/" + System.currentTimeMillis()).getCanonicalFile();
         repository = Mockito.mock(XRepository.class);
         Mockito.when(repository.getName()).thenReturn("MockedRepo");
-        storage = new FileBasedRepositoryStorage(repository, storageDir);
+        storage = new FileBasedRepositoryStorage(repository, storageDir, Mockito.mock(ConfigurationPropertyProvider.class));
 
         // Write the bundle to the location referenced by repository-testA.xml
         bundleAjar = new File("./target/bundleA.jar");
@@ -151,7 +152,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         XIdentityCapability icap = cap.adapt(XIdentityCapability.class);
         Assert.assertEquals("bundleA", icap.getSymbolicName());
 
-        XResource resource = (XResource) cap.getResource();
+        XResource resource = cap.getResource();
         verifyDefaultContent(resource);
 
         InputStream input = ((RepositoryContent)resource).getContent();
@@ -210,7 +211,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         verifyResource(resource);
         verifyProviders(storage);
 
-        RepositoryStorage other = new FileBasedRepositoryStorage(repository, storageDir);
+        RepositoryStorage other = new FileBasedRepositoryStorage(repository, storageDir, Mockito.mock(ConfigurationPropertyProvider.class));
         verifyProviders(other);
     }
 
@@ -286,7 +287,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         Assert.assertNotNull(pcap);
         Assert.assertEquals("org.acme.foo", pcap.getPackageName());
 
-        verifyResource((XResource) pcap.getResource());
+        verifyResource(pcap.getResource());
     }
 
     private JavaArchive getBundleA() {

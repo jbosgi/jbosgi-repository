@@ -31,7 +31,7 @@ import org.jboss.osgi.resolver.XResource;
  */
 public interface RepositoryWriter {
 
-    void writeRepositoryAttributes(Map<String, String> attributes);
+    void writeRepositoryElement(Map<String, String> attributes);
 
     void writeResource(XResource resource);
 

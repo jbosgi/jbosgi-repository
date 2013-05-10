@@ -59,7 +59,7 @@
         <version.jboss.logging.processor>1.1.0.Final</version.jboss.logging.processor>
         <version.jboss.logmanager>1.4.1.Final</version.jboss.logmanager>
         <version.jboss.modules>1.2.0.Final</version.jboss.modules>
-        <version.jboss.osgi.framework>3.0.0.CR23</version.jboss.osgi.framework>
+        <version.jboss.osgi.framework>3.0.0.CR24-SNAPSHOT</version.jboss.osgi.framework>
         <version.jboss.osgi.metadata>3.0.0.CR1</version.jboss.osgi.metadata>
         <version.jboss.osgi.resolver>4.0.0.CR14-SNAPSHOT</version.jboss.osgi.resolver>
         <version.jboss.osgi.spi>4.0.0.CR2</version.jboss.osgi.spi>
