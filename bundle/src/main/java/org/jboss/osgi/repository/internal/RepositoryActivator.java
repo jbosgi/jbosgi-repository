@@ -67,7 +67,7 @@ public class RepositoryActivator implements BundleActivator {
         final RepositoryStorageFactory factory = new RepositoryStorageFactory() {
             @Override
             public RepositoryStorage create(XRepository repository) {
-                File storageDir = getRepositoryStorageDir(context);
+                File storageDir = getRepositoryStorageDir(propProvider, context);
                 return new FileBasedRepositoryStorage(repository, storageDir, propProvider);
             }
         };
@@ -89,10 +89,10 @@ public class RepositoryActivator implements BundleActivator {
             registration.unregister();
     }
 
-    private File getRepositoryStorageDir(BundleContext context) {
-        String dirName = context.getProperty(XRepository.PROPERTY_REPOSITORY_STORAGE_DIR);
+    private File getRepositoryStorageDir(ConfigurationPropertyProvider propProvider, BundleContext context) {
+        String dirName = propProvider.getProperty(XRepository.PROPERTY_REPOSITORY_STORAGE_DIR, null);
         if (dirName == null) {
-            dirName = context.getProperty(Constants.FRAMEWORK_STORAGE);
+            dirName = propProvider.getProperty(Constants.FRAMEWORK_STORAGE, null);
             if (dirName == null) {
                 try {
                     File storageDir = context.getDataFile("osgi-store");
