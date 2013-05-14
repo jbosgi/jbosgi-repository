@@ -78,8 +78,8 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
         this.storageDir = storageDir;
         
         String filename = propProvider.getProperty(XRepository.PROPERTY_REPOSITORY_STORAGE_FILE, REPOSITORY_XML_NAME);
-        repoFile = new File(storageDir.getAbsolutePath() + File.separator + filename);
-
+        repoFile = new File(storageDir.getAbsolutePath() + File.separator + filename).getAbsoluteFile();
+        
         // Initialize repository content
         if (repoFile.exists()) {
             RepositoryReader reader;
@@ -293,6 +293,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
     private void writeRepositoryXML() {
         RepositoryWriter writer;
         try {
+            repoFile.getParentFile().mkdirs();
             writer = RepositoryXMLWriter.create(new FileOutputStream(repoFile));
         } catch (IOException ex) {
             throw MESSAGES.cannotInitializeRepositoryWriter(ex);
