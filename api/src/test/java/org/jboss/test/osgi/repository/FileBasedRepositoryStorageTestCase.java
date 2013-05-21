@@ -109,25 +109,6 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
     }
 
     @Test
-    public void testAddResourceFromStream() throws Exception {
-
-        Assert.assertNull("Empty repository", storage.getRepositoryReader().nextResource());
-
-        // Add a resource from input stream
-        InputStream input = getBundleA().as(ZipExporter.class).exportAsInputStream();
-        XResource resource = storage.addResource("application/vnd.osgi.bundle", input);
-
-        verifyResource(resource);
-        verifyProviders(storage);
-
-        Assert.assertTrue(storage.removeResource(resource));
-
-        XCapability ccap = (XCapability) resource.getCapabilities(CONTENT_NAMESPACE).get(0);
-        URL fileURL = new URL((String) ccap.getAttribute(CAPABILITY_URL_ATTRIBUTE));
-        Assert.assertFalse("File removed: " + fileURL, new File(fileURL.getPath()).exists());
-    }
-
-    @Test
     public void testAddResourceFromXML() throws Exception {
         // Add a resource from XML
         RepositoryReader reader = getRepositoryReader("xml/repository-testA.xml");

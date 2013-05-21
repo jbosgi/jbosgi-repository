@@ -76,10 +76,10 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             throw MESSAGES.illegalArgumentNull("propProvider");
 
         this.storageDir = storageDir;
-        
+
         String filename = propProvider.getProperty(XRepository.PROPERTY_REPOSITORY_STORAGE_FILE, REPOSITORY_XML_NAME);
         repoFile = new File(storageDir.getAbsolutePath() + File.separator + filename).getAbsoluteFile();
-        
+
         // Initialize repository content
         if (repoFile.exists()) {
             RepositoryReader reader;
@@ -100,12 +100,6 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             reader.close();
         }
     }
-
-    @Override
-    public XResource addResource(String mime, InputStream input) throws RepositoryStorageException {
-        XResourceBuilder<XResource> builder = createResourceInternal(input, mime, true);
-        return addResourceInternal(builder.getResource(), true);
-    } 
 
     @Override
     public XResource addResource(XResource res) throws RepositoryStorageException {
@@ -154,7 +148,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
         }
         return result;
     }
-    
+
     private XResource addAbstractResource(XResource res, boolean writeXML) throws RepositoryStorageException {
         XResource result = super.addResource(res);
         if (writeXML == true) {
@@ -162,7 +156,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
         }
         return result;
     }
-    
+
     @Override
     public boolean removeResource(XResource res) throws RepositoryStorageException {
         return removeResourceInternal(res, true);
@@ -225,19 +219,6 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             }
         }
         return input;
-    }
-
-    private XResourceBuilder<XResource> createResourceInternal(InputStream input, String mimeType, boolean loadMetadata) {
-        Map<String, Object> contentAtts = new HashMap<String, Object>();
-        if (mimeType != null) {
-            contentAtts.put(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE, mimeType);
-        }
-        try {
-            URL contentURL = addResourceContent(input, contentAtts);
-            return URLResourceBuilderFactory.create(contentURL, contentAtts, loadMetadata);
-        } catch (IOException ex) {
-            throw MESSAGES.cannotAddResourceToStorage(ex, mimeType);
-        }
     }
 
     private URL addResourceContent(InputStream input, Map<String, Object> atts) throws IOException {

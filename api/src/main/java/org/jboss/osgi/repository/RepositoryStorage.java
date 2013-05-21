@@ -8,9 +8,9 @@ package org.jboss.osgi.repository;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,6 @@ package org.jboss.osgi.repository;
  * #L%
  */
 
-import java.io.InputStream;
 import java.util.Collection;
 
 import org.jboss.osgi.resolver.XResource;
@@ -62,16 +61,6 @@ public interface RepositoryStorage {
      * @throws RepositoryStorageException If there is a problem storing the resource
      */
     XResource addResource(XResource resource) throws RepositoryStorageException;
-
-    /**
-     * Add a resource from the given input stream
-     *
-     * @param mime An IANA defined MIME type for the format
-     * @param input The bytes for the resource
-     * @return The resource being added, which may be a modified copy of the give resource
-     * @throws RepositoryStorageException If there is a problem storing the resource
-     */
-    XResource addResource(String mime, InputStream input) throws RepositoryStorageException;
 
     /**
      * Remove a the given resource from the cache.

@@ -8,9 +8,9 @@ package org.jboss.osgi.repository.spi;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,6 @@ import static org.jboss.osgi.repository.RepositoryLogger.LOGGER;
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 import static org.osgi.framework.namespace.IdentityNamespace.IDENTITY_NAMESPACE;
 
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,8 +67,8 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
         public RepositoryStorage create(XRepository repository) {
             return new MemoryRepositoryStorage(repository);
         }
-    } 
-    
+    }
+
     public MemoryRepositoryStorage(XRepository repository) {
         if (repository == null)
             throw MESSAGES.illegalArgumentNull("repository");
@@ -102,7 +101,7 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
 
                             @Override
                             public XResource next() {
-                                return (XResource) capit.next().getResource();
+                                return capit.next().getResource();
                             }
 
                             @Override
@@ -162,11 +161,6 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
             LOGGER.debugf("Resource added: %s", res);
         }
         return res;
-    }
-
-    @Override
-    public XResource addResource(String mime, InputStream input) throws RepositoryStorageException {
-        throw new UnsupportedOperationException();
     }
 
     @Override

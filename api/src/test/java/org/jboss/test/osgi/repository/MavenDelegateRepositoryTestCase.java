@@ -53,7 +53,7 @@ import org.osgi.service.repository.RepositoryContent;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class MavenRepositoryTestCase {
+public class MavenDelegateRepositoryTestCase {
 
     private XRepository repository;
 
