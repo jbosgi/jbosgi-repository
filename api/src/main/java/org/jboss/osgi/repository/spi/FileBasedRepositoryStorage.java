@@ -46,6 +46,7 @@ import org.jboss.osgi.repository.URLResourceBuilderFactory;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.MavenDelegateRepository.ConfigurationPropertyProvider;
 import org.jboss.osgi.resolver.XCapability;
+import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.osgi.resource.Capability;
@@ -107,6 +108,13 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
     }
 
     private synchronized XResource addResourceInternal(XResource res, boolean writeXML) throws RepositoryStorageException {
+        if (res == null)
+            throw MESSAGES.illegalArgumentNull("resource");
+
+        XIdentityCapability icap = res.getIdentityCapability();
+        if (XResource.MAVEN_IDENTITY_NAMESPACE.equals(icap.getNamespace()))
+            throw MESSAGES.cannotAddMavenResourceToStorage(null, res);
+
         if (res.isAbstract()) {
             return addAbstractResource(res, writeXML);
         } else {
@@ -128,7 +136,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
 
         // Copy the resource to this storage, if the content URL does not match
         if (contentURL.startsWith(getBaseURL().toExternalForm()) == false) {
-            XResourceBuilder<XResource> builder = createResourceInternal(res, false);
+            XResourceBuilder<XResource> builder = createResourceInternal(res);
             for (Capability cap : res.getCapabilities(null)) {
                 if (!ContentNamespace.CONTENT_NAMESPACE.equals(cap.getNamespace())) {
                     builder.addCapability(cap.getNamespace(), cap.getAttributes(), cap.getDirectives());
@@ -180,7 +188,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
         return result;
     }
 
-    private XResourceBuilder<XResource> createResourceInternal(XResource resource, boolean loadMetadata) {
+    private XResourceBuilder<XResource> createResourceInternal(XResource resource) {
         XResourceBuilder<XResource> factory = null;
         for (Capability cap : resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE)) {
             XCapability ccap = (XCapability)cap;
@@ -193,7 +201,7 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
             try {
                 URL contentURL = addResourceContent(input, contentAtts);
                 if (factory == null) {
-                    factory = URLResourceBuilderFactory.create(contentURL, contentAtts, loadMetadata);
+                    factory = URLResourceBuilderFactory.create(contentURL, contentAtts);
                 } else {
                     factory.addCapability(ContentNamespace.CONTENT_NAMESPACE, contentAtts, null);
                 }

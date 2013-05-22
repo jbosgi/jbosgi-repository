@@ -28,11 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
-import java.util.jar.JarInputStream;
-import java.util.jar.Manifest;
-
-import org.jboss.osgi.metadata.OSGiMetaData;
-import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.spi.AbstractRepositoryCapability;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XResource;
@@ -56,7 +51,7 @@ public final class URLResourceBuilderFactory extends XResourceBuilderFactory<XRe
         this.urlres = urlres;
     }
 
-    public static XResourceBuilder<XResource> create(URL contentURL, Map<String, Object> contentAtts, boolean loadMetadata) {
+    public static XResourceBuilder<XResource> create(URL contentURL, Map<String, Object> contentAtts) {
         URLResource urlres = new URLResource(contentURL);
         URLResourceBuilderFactory factory = new URLResourceBuilderFactory(urlres);
 
@@ -71,25 +66,6 @@ public final class URLResourceBuilderFactory extends XResourceBuilderFactory<XRe
             atts.put(ContentNamespace.CAPABILITY_MIME_ATTRIBUTE, XContentCapability.DEFAULT_MIME_TYPE);
         if (atts.get(ContentNamespace.CAPABILITY_SIZE_ATTRIBUTE) == null)
             atts.put(ContentNamespace.CAPABILITY_SIZE_ATTRIBUTE, XContentCapability.DEFAULT_SIZE);
-
-        if (loadMetadata) {
-            InputStream content = urlres.getContent();
-            try {
-                Manifest manifest = new JarInputStream(content).getManifest();
-                OSGiMetaData metaData = OSGiMetaDataBuilder.load(manifest);
-                builder.loadFrom(metaData);
-            } catch (Exception ex) {
-                throw new IllegalStateException("Cannot create capability from: " + contentURL, ex);
-            } finally {
-                if (content != null) {
-                    try {
-                        content.close();
-                    } catch (IOException e) {
-                        // ignore
-                    }
-                }
-            }
-        }
         return builder;
     }
 

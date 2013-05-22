@@ -43,11 +43,11 @@ public abstract class AbstractRepositoryTest {
 
     @ArquillianResource
     BundleContext context;
-    
+
     @Before
     public void setUp () throws Exception {
         if (initialized.compareAndSet(false, true)) {
-            initializeRepository((XPersistentRepository) getRepository());
+            initializeRepository(getRepository());
         }
     }
 
@@ -62,9 +62,9 @@ public abstract class AbstractRepositoryTest {
         }
     }
 
-    protected XRepository getRepository() {
+    protected XPersistentRepository getRepository() {
         ServiceReference<XRepository> sref = context.getServiceReference(XRepository.class);
-        return sref != null ? context.getService(sref) : null;
+        return (XPersistentRepository) (sref != null ? context.getService(sref) : null);
     }
 
 }

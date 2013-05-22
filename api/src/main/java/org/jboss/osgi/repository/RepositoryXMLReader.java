@@ -147,7 +147,7 @@ public class RepositoryXMLReader implements RepositoryReader {
                 } catch (MalformedURLException ex) {
                     throw MESSAGES.invalidContentURL(urlspec);
                 }
-                builder = URLResourceBuilderFactory.create(contentURL, ccap.getAttributes(), false);
+                builder = URLResourceBuilderFactory.create(contentURL, ccap.getAttributes());
                 for (Capability cap : resource.getCapabilities(null)) {
                     if (cap != ccap) {
                         builder.addCapability(cap.getNamespace(), cap.getAttributes(), cap.getDirectives());

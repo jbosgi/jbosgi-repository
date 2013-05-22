@@ -35,8 +35,12 @@ import org.jboss.osgi.repository.URLResourceBuilderFactory;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.AbstractRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
+import org.jboss.osgi.resolver.XCapability;
+import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
+import org.jboss.osgi.resolver.spi.AbstractRequirement;
+import org.osgi.framework.Filter;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 
@@ -127,11 +131,22 @@ public class MavenDelegateRepository extends AbstractRepository implements XRepo
         String namespace = req.getNamespace();
         List<Capability> result = new ArrayList<Capability>();
         if (XResource.MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
-            String mavenId = (String) req.getAttributes().get(XResource.MAVEN_IDENTITY_NAMESPACE);
-            MavenCoordinates coordinates = MavenCoordinates.parse(mavenId);
-            LOGGER.infoFindMavenProviders(coordinates);
+            MavenCoordinates mavenId;
+            if (req.getDirectives().get("filter") != null) {
+                Filter filter = ((XRequirement)req).getFilter();
+                String gpart = AbstractRequirement.getValueFromFilter(filter, "groupId", null);
+                String apart = AbstractRequirement.getValueFromFilter(filter, "artifactId", null);
+                String tpart = AbstractRequirement.getValueFromFilter(filter, "type", null);
+                String vpart = AbstractRequirement.getValueFromFilter(filter, "version", null);
+                String cpart = AbstractRequirement.getValueFromFilter(filter, "classifier", null);
+                mavenId = MavenCoordinates.create(gpart, apart, vpart, tpart, cpart);
+            } else {
+                String nsvalue = (String) req.getAttributes().get(XResource.MAVEN_IDENTITY_NAMESPACE);
+                mavenId = MavenCoordinates.parse(nsvalue);
+            }
+            LOGGER.infoFindMavenProviders(mavenId);
             for (URL baseURL : baserepos) {
-                URL url = coordinates.getArtifactURL(baseURL);
+                URL url = mavenId.getArtifactURL(baseURL);
                 try {
                     url.openStream().close();
                 } catch (IOException e) {
@@ -139,13 +154,14 @@ public class MavenDelegateRepository extends AbstractRepository implements XRepo
                     continue;
                 }
                 try {
-                    XResourceBuilder<XResource> builder = URLResourceBuilderFactory.create(url, null, true);
-                    result.add(builder.addCapability(XResource.MAVEN_IDENTITY_NAMESPACE, mavenId));
+                    XResourceBuilder<XResource> builder = URLResourceBuilderFactory.create(url, null);
+                    XCapability icap = builder.addIdentityCapability(mavenId);
                     XResource resource = builder.getResource();
                     LOGGER.infoFoundMavenResource(resource);
+                    result.add(icap);
                     break;
                 } catch (Exception ex) {
-                    LOGGER.errorCannotCreateResource(ex, coordinates);
+                    LOGGER.errorCannotCreateResource(ex, mavenId);
                 }
             }
         }

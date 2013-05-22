@@ -67,7 +67,7 @@ public class SampleRepositoryReaderTestCase extends AbstractRepositoryTest {
 
         // osgi.identity
         XIdentityCapability icap = resource.getIdentityCapability();
-        Assert.assertEquals("org.acme.pool", icap.getSymbolicName());
+        Assert.assertEquals("org.acme.pool", icap.getName());
         Assert.assertEquals(Version.parseVersion("1.5.6"), icap.getVersion());
         Assert.assertEquals(IdentityNamespace.TYPE_BUNDLE, icap.getType());
 

@@ -21,6 +21,7 @@ package org.jboss.osgi.repository;
 
 import java.util.Collection;
 
+import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
@@ -52,6 +53,13 @@ public interface RepositoryStorage {
      * Get the repository reader for this storage
      */
     RepositoryReader getRepositoryReader();
+
+    /**
+     * Get the resource for the given identity capability.
+     *
+     * @return The resource or null
+     */
+    XResource getResource(XIdentityCapability icap);
 
     /**
      * Add the given resource to storage

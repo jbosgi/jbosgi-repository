@@ -26,9 +26,9 @@ import java.util.Map;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.osgi.metadata.OSGiManifestBuilder;
+import org.jboss.osgi.repository.MavenResourceHandler;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
-import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XCapability;
@@ -92,6 +92,11 @@ public class RepositoryBundleTestCase extends AbstractRepositoryTest {
         XCapability cap = (XCapability) providers.iterator().next();
         Assert.assertTrue("Capability matches", req.matches(cap));
 
+        // Add the bundle resource to storage
+        RepositoryStorage storage = getRepository().getRepositoryStorage();
+        XResource res = new MavenResourceHandler().toBundleResource(cap.getResource());
+        storage.addResource(res);
+
         XRequirementBuilder builder = XRequirementBuilder.create(PackageNamespace.PACKAGE_NAMESPACE, "org.apache.felix.cm");
         builder.getAttributes().put(PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE, "[1.0,2.0)");
         req = builder.getRequirement();
@@ -106,11 +111,11 @@ public class RepositoryBundleTestCase extends AbstractRepositoryTest {
 
         XResource resource = cap.getResource();
         XIdentityCapability icap = resource.getIdentityCapability();
-        Assert.assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
+        Assert.assertEquals("org.apache.felix.configadmin", icap.getName());
         RepositoryContent content = (RepositoryContent) icap.getResource();
         InputStream input = content.getContent();
         try {
-            Bundle bundle = context.installBundle(icap.getSymbolicName(), input);
+            Bundle bundle = context.installBundle(icap.getName(), input);
             try {
                 bundle.start();
                 Assert.assertEquals(Bundle.ACTIVE, bundle.getState());
@@ -125,7 +130,7 @@ public class RepositoryBundleTestCase extends AbstractRepositoryTest {
     @Test
     public void testRepositoryReader() throws Exception {
 
-        RepositoryStorage storage = ((XPersistentRepository)getRepository()).getRepositoryStorage();
+        RepositoryStorage storage = getRepository().getRepositoryStorage();
         RepositoryReader reader = storage.getRepositoryReader();
         Map<String, String> attributes = reader.getRepositoryAttributes();
         Assert.assertNotNull("Increment not null", attributes.get("increment"));

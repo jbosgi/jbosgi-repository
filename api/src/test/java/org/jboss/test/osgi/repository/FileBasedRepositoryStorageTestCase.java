@@ -131,7 +131,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
 
         XCapability cap = (XCapability) providers.iterator().next();
         XIdentityCapability icap = cap.adapt(XIdentityCapability.class);
-        Assert.assertEquals("bundleA", icap.getSymbolicName());
+        Assert.assertEquals("bundleA", icap.getName());
 
         XResource resource = cap.getResource();
         verifyDefaultContent(resource);

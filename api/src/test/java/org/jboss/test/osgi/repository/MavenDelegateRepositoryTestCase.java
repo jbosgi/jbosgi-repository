@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,6 @@ package org.jboss.test.osgi.repository;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
@@ -42,7 +41,6 @@ import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Version;
-import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
 import org.osgi.service.repository.ContentNamespace;
 import org.osgi.service.repository.RepositoryContent;
@@ -70,7 +68,22 @@ public class MavenDelegateRepositoryTestCase {
         assertEquals("One capability", 1, caps.size());
         XCapability cap = (XCapability) caps.iterator().next();
 
-        verifyCapability(cap, req);
+        Assert.assertTrue("Capability matches", req.matches(cap));
+
+        XResource resource = cap.getResource();
+        XIdentityCapability icap = resource.getIdentityCapability();
+        assertEquals("org.apache.felix.configadmin", icap.getName());
+        assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());
+        assertEquals("jar", icap.getType());
+
+        caps = resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE);
+        assertEquals("One capability", 1, caps.size());
+
+        RepositoryContent content = (RepositoryContent) resource;
+        Manifest manifest = new JarInputStream(content.getContent()).getManifest();
+        OSGiMetaData metaData = OSGiMetaDataBuilder.load(manifest);
+        assertEquals("org.apache.felix.configadmin", metaData.getBundleSymbolicName());
+        assertEquals(Version.parseVersion("1.2.8"), metaData.getBundleVersion());
     }
 
     @Test
@@ -79,25 +92,5 @@ public class MavenDelegateRepositoryTestCase {
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
         assertEquals("No capability", 0, caps.size());
-    }
-
-    void verifyCapability(XCapability cap, XRequirement req) throws IOException, MalformedURLException {
-
-        Assert.assertTrue("Capability matches", req.matches(cap));
-
-        XResource resource = cap.getResource();
-        XIdentityCapability icap = resource.getIdentityCapability();
-        assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
-        assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());
-        assertEquals(IdentityNamespace.TYPE_BUNDLE, icap.getType());
-
-        Collection<Capability> caps = resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE);
-        assertEquals("One capability", 1, caps.size());
-
-        RepositoryContent content = (RepositoryContent) resource;
-        Manifest manifest = new JarInputStream(content.getContent()).getManifest();
-        OSGiMetaData metaData = OSGiMetaDataBuilder.load(manifest);
-        assertEquals("org.apache.felix.configadmin", metaData.getBundleSymbolicName());
-        assertEquals(Version.parseVersion("1.2.8"), metaData.getBundleVersion());
     }
 }

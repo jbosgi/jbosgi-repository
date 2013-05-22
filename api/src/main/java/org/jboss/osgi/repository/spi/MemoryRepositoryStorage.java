@@ -1,4 +1,3 @@
-package org.jboss.osgi.repository.spi;
 /*
  * #%L
  * JBossOSGi Repository
@@ -18,6 +17,7 @@ package org.jboss.osgi.repository.spi;
  * limitations under the License.
  * #L%
  */
+package org.jboss.osgi.repository.spi;
 
 import static org.jboss.osgi.repository.RepositoryLogger.LOGGER;
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.jboss.osgi.repository.RepositoryMessages;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageException;
@@ -45,7 +44,6 @@ import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.spi.AbstractRequirement;
 import org.osgi.framework.Filter;
-import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
@@ -146,8 +144,11 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
             throw MESSAGES.illegalArgumentNull("resource");
 
         XIdentityCapability icap = res.getIdentityCapability();
+        if (XResource.MAVEN_IDENTITY_NAMESPACE.equals(icap.getNamespace()))
+            throw MESSAGES.cannotAddMavenResourceToStorage(null, res);
+
         synchronized (capabilityCache) {
-            Set<XCapability> icaps = getCachedCapabilities(IdentityNamespace.IDENTITY_NAMESPACE, icap.getSymbolicName());
+            Set<XCapability> icaps = getCachedCapabilities(icap.getNamespace(), icap.getName());
             for (XCapability aux : icaps) {
                 XIdentityCapability iaux = aux.adapt(XIdentityCapability.class);
                 if (icap.getVersion().equals(iaux.getVersion())) {
@@ -164,9 +165,27 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
     }
 
     @Override
+    public XResource getResource(XIdentityCapability icap) {
+        if (icap == null)
+            throw MESSAGES.illegalArgumentNull("icap");
+
+        XResource result = null;
+        synchronized (capabilityCache) {
+            Set<XCapability> icaps = getCachedCapabilities(icap.getNamespace(), icap.getName());
+            for (XCapability aux : icaps) {
+                XIdentityCapability iaux = aux.adapt(XIdentityCapability.class);
+                if (icap.getVersion().equals(iaux.getVersion())) {
+                    result = aux.getResource();
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public boolean removeResource(XResource res) throws RepositoryStorageException {
         if (res == null)
-            throw RepositoryMessages.MESSAGES.illegalArgumentNull("resource");
+            throw MESSAGES.illegalArgumentNull("resource");
 
         boolean found = false;
         synchronized (capabilityCache) {

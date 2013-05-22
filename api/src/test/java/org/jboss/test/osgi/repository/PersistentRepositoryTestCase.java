@@ -1,4 +1,5 @@
 package org.jboss.test.osgi.repository;
+
 /*
  * #%L
  * JBossOSGi Repository
@@ -8,9 +9,9 @@ package org.jboss.test.osgi.repository;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,8 +34,10 @@ import junit.framework.Assert;
 
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
+import org.jboss.osgi.repository.MavenResourceHandler;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
+import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
@@ -49,6 +52,7 @@ import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
 import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
@@ -63,18 +67,19 @@ import org.osgi.service.repository.RepositoryContent;
  */
 public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
 
-    private XRepository repository;
+    private XPersistentRepository repository;
     private File storageDir;
 
     @Before
     public void setUp() throws IOException {
         storageDir = new File("./target/repository");
         deleteRecursive(storageDir);
-        repository = new AbstractPersistentRepository(new RepositoryStorageFactory() {
+        RepositoryStorageFactory storageFactory = new RepositoryStorageFactory() {
             public RepositoryStorage create(XRepository repository) {
                 return new FileBasedRepositoryStorage(repository, storageDir, Mockito.mock(ConfigurationPropertyProvider.class));
             }
-        }, new MavenDelegateRepository());
+        };
+        repository = new AbstractPersistentRepository(storageFactory, new MavenDelegateRepository());
     }
 
     @Test
@@ -86,23 +91,35 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         assertEquals("One capability", 1, caps.size());
         XCapability cap = (XCapability) caps.iterator().next();
 
-        verifyCapability(cap, req);
+        Assert.assertTrue("Capability matches", req.matches(cap));
+
+        // Add the maven resource to the repository
+        RepositoryStorage storage = repository.getRepositoryStorage();
+        MavenResourceHandler handler = new MavenResourceHandler();
+        XResource res = handler.toBundleResource(cap.getResource());
+        res = storage.addResource(res);
+        cap = res.getIdentityCapability();
+
+        verifyCapability(cap);
 
         // Find the same requirement again
         caps = repository.findProviders(req);
         assertEquals("One capability", 1, caps.size());
         cap = (XCapability) caps.iterator().next();
 
-        verifyCapability(cap, req);
+        // Check that we have a resource in storage
+        res = handler.toBundleResource(cap.getResource());
+        res = storage.getResource(res.getIdentityCapability());
+        cap = res.getIdentityCapability();
+
+        verifyCapability(cap);
     }
 
-    private void verifyCapability(XCapability cap, XRequirement req) throws IOException, MalformedURLException {
-
-        Assert.assertTrue("Capability matches", req.matches(cap));
+    private void verifyCapability(XCapability cap) throws IOException, MalformedURLException, BundleException {
 
         XResource resource = cap.getResource();
         XIdentityCapability icap = resource.getIdentityCapability();
-        assertEquals("org.apache.felix.configadmin", icap.getSymbolicName());
+        assertEquals("org.apache.felix.configadmin", icap.getName());
         assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());
         assertEquals(IdentityNamespace.TYPE_BUNDLE, icap.getType());
 

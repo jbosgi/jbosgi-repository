@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,16 +21,11 @@ package org.jboss.osgi.repository.spi;
 
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.resolver.XCapability;
-import org.jboss.osgi.resolver.XResource;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 
@@ -58,6 +53,11 @@ public class AbstractPersistentRepository extends AbstractRepository implements 
     }
 
     @Override
+    public RepositoryStorage getRepositoryStorage() {
+        return storage;
+    }
+
+    @Override
     public Collection<Capability> findProviders(Requirement req) {
         if (req == null)
             throw MESSAGES.illegalArgumentNull("req");
@@ -65,29 +65,8 @@ public class AbstractPersistentRepository extends AbstractRepository implements 
         Collection<Capability> providers = storage.findProviders(req);
         if (providers.isEmpty() && delegate != null) {
             providers = delegate.findProviders(req);
-            List<Capability> caplist = new ArrayList<Capability>(providers);
-            for (int i = 0; i < caplist.size(); i++) {
-                XCapability orgcap = (XCapability) caplist.get(i);
-                XResource orgres = (XResource) orgcap.getResource();
-                XResource newres = storage.addResource(orgres);
-                if (newres != orgres) {
-                    String namespace = orgcap.getNamespace();
-                    Object orgval = orgcap.getAttributes().get(namespace);
-                    for (Capability newcap : newres.getCapabilities(namespace)) {
-                        Object newval = newcap.getAttributes().get(namespace);
-                        if (orgval.equals(newval)) {
-                            caplist.set(i, newcap);
-                        }
-                    }
-                }
-            }
-            providers = caplist;
         }
         return providers;
     }
 
-    @Override
-    public RepositoryStorage getRepositoryStorage() {
-        return storage;
-    }
 }

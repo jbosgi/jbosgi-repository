@@ -79,7 +79,7 @@ public interface RepositoryMessages {
     IllegalStateException cannotInitializeRepositoryWriter(@Cause Throwable th);
 
     @Message(id = 20513, value = "Cannot write repository element")
-    IllegalStateException cannotWriteRepositoryElement(@Cause Throwable th);
+    RepositoryStorageException cannotWriteRepositoryElement(@Cause Throwable th);
 
     @Message(id = 20514, value = "Invalid filter directive: %s")
     IllegalArgumentException invalidFilterDirective(String filter);
@@ -91,6 +91,11 @@ public interface RepositoryMessages {
     IllegalArgumentException invalidRepositoryBase(String urlspec);
 
     @Message(id = 20517, value = "Cannot create repository storage area")
-    IllegalStateException cannotCreateRepositoryStorageArea(@Cause Throwable th);
+    RepositoryStorageException cannotCreateRepositoryStorageArea(@Cause Throwable th);
 
+    @Message(id = 20518, value = "Cannot add maven resource to storage: %s")
+    RepositoryStorageException cannotAddMavenResourceToStorage(@Cause Throwable cause, XResource res);
+
+    @Message(id = 20519, value = "Invalid maven resource: %s")
+    RepositoryStorageException invalidMavenResource(@Cause Throwable cause, XResource res);
 }
