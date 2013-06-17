@@ -1,6 +1,6 @@
 /*
  * Copyright (c) OSGi Alliance (2010, 2012). All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,23 +16,24 @@
 
 /**
  * Repository Service Package Version 1.0.
- * 
+ *
  * <p>
  * Bundles wishing to use this package must list the package in the
  * Import-Package header of the bundle's manifest. This package has two types of
  * users: the consumers that use the API in this package and the providers that
  * implement the API in this package.
- * 
+ *
  * <p>
  * Example import for consumers using the API in this package:
  * <p>
- * {@code  Import-Package: org.osgi.service.repository; version="[1.0,2.0)"}
+ * {@code  Import-Package: org.osgi.service.repository; version="[1.1,2.0)"}
  * <p>
  * Example import for providers implementing the API in this package:
  * <p>
- * {@code  Import-Package: org.osgi.service.repository; version="[1.0,1.1)"}
- * 
- * @version $Id: 2f90fa85cba8d54a6431ff843f2dac5eb7beb7dc $
+ * {@code  Import-Package: org.osgi.service.repository; version="[1.1,1.2)"}
+ *
+ * @version 1.0
+ * @author $Id: 62b9996651da40f4f57af069f45648135dc1dc04 $
  */
 
 package org.osgi.service.repository;
