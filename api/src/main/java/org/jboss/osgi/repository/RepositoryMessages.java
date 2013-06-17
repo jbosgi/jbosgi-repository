@@ -26,6 +26,7 @@ import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 import org.jboss.osgi.resolver.XResource;
+import org.osgi.service.repository.RequirementExpression;
 
 /**
  * Logging Id ranges: 20500-20599
@@ -33,6 +34,7 @@ import org.jboss.osgi.resolver.XResource;
  * https://docs.jboss.org/author/display/JBOSGI/JBossOSGi+Logging
  *
  * @author Thomas.Diesler@jboss.com
+ * @author David Bosschaert
  */
 @MessageBundle(projectCode = "JBOSGI")
 public interface RepositoryMessages {
@@ -98,4 +100,7 @@ public interface RepositoryMessages {
 
     @Message(id = 20519, value = "Invalid maven resource: %s")
     RepositoryStorageException invalidMavenResource(@Cause Throwable cause, XResource res);
+
+    @Message(id = 20520, value = "Malformed Requirement Expression: %s")
+    IllegalArgumentException malformedRequirementExpression(RequirementExpression re);
 }
