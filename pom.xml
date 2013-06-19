@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.osgi</groupId>
         <artifactId>jbosgi-parent</artifactId>
-        <version>1.0.23</version>
+        <version>1.0.24</version>
     </parent>
 
     <name>JBossOSGi Repository</name>
@@ -54,16 +54,16 @@
     <!-- Properties -->
     <properties>
         <version.jboss.arquillian.core>1.0.3.Final</version.jboss.arquillian.core>
-        <version.jboss.arquillian.osgi>2.0.0.CR3</version.jboss.arquillian.osgi>
+        <version.jboss.arquillian.osgi>2.0.0.CR4</version.jboss.arquillian.osgi>
         <version.jboss.logging>3.1.3.GA</version.jboss.logging>
         <version.jboss.logging.processor>1.1.0.Final</version.jboss.logging.processor>
         <version.jboss.logmanager>1.4.1.Final</version.jboss.logmanager>
-        <version.jboss.modules>1.2.1.Final</version.jboss.modules>
-        <version.jboss.osgi.framework>3.0.0.CR26</version.jboss.osgi.framework>
-        <version.jboss.osgi.metadata>3.0.0.CR1</version.jboss.osgi.metadata>
-        <version.jboss.osgi.resolver>4.0.0.CR16</version.jboss.osgi.resolver>
-        <version.jboss.osgi.spi>4.0.0.CR2</version.jboss.osgi.spi>
-        <version.jboss.osgi.testing>2.0.0.CR2</version.jboss.osgi.testing>
+        <version.jboss.modules>1.2.2.Final</version.jboss.modules>
+        <version.jboss.osgi.framework>3.0.0.Final</version.jboss.osgi.framework>
+        <version.jboss.osgi.metadata>3.0.0.Final</version.jboss.osgi.metadata>
+        <version.jboss.osgi.resolver>4.0.0.Final</version.jboss.osgi.resolver>
+        <version.jboss.osgi.spi>4.0.0.Final</version.jboss.osgi.spi>
+        <version.jboss.osgi.testing>2.0.0.Final</version.jboss.osgi.testing>
         <version.jboss.shrinkwrap>1.0.0</version.jboss.shrinkwrap>
         <version.junit>4.10</version.junit>
         <version.mockito>1.8.4</version.mockito>
@@ -80,7 +80,7 @@
             </dependency>
             <dependency>
                 <groupId>org.jboss.arquillian.container</groupId>
-                <artifactId>arquillian-container-osgi-embedded</artifactId>
+                <artifactId>arquillian-osgi-embedded</artifactId>
                 <version>${version.jboss.arquillian.osgi}</version>
             </dependency>
 	        <dependency>
