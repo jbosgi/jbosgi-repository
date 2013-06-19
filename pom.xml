@@ -34,14 +34,15 @@
     <artifactId>jbosgi-repository-parent</artifactId>
     <packaging>pom</packaging>
 
-    <version>3.0.0.CR7-SNAPSHOT</version>
+    <version>3.0.0.Final</version>
 
     <!-- Source -->
     <scm>
         <connection>scm:git:git://github.com/jbosgi/jbosgi-repository.git</connection>
         <developerConnection>scm:git:git@github.com:jbosgi/jbosgi-repository.git</developerConnection>
         <url>http://github.com/jbosgi/jbosgi-repository</url>
-    </scm>
+      <tag>3.0.0.Final</tag>
+  </scm>
 
     <!-- Licenses -->
     <licenses>
