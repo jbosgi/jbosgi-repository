@@ -26,7 +26,6 @@ import java.util.Map;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.osgi.metadata.OSGiManifestBuilder;
-import org.jboss.osgi.repository.MavenResourceHandler;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.XRepository;
@@ -90,11 +89,10 @@ public class RepositoryBundleTestCase extends AbstractRepositoryTest {
         Assert.assertEquals("One capability", 1, providers.size());
 
         XCapability cap = (XCapability) providers.iterator().next();
-        Assert.assertTrue("Capability matches", req.matches(cap));
 
         // Add the bundle resource to storage
         RepositoryStorage storage = getRepository().getRepositoryStorage();
-        XResource res = new MavenResourceHandler().toBundleResource(cap.getResource());
+        XResource res = cap.getResource();
         storage.addResource(res);
 
         XRequirementBuilder builder = XRequirementBuilder.create(PackageNamespace.PACKAGE_NAMESPACE, "org.apache.felix.cm");

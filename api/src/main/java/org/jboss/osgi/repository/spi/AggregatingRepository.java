@@ -8,9 +8,9 @@ package org.jboss.osgi.repository.spi;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,9 +20,11 @@ package org.jboss.osgi.repository.spi;
  */
 
 import static org.jboss.osgi.repository.RepositoryLogger.LOGGER;
+import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.jboss.osgi.repository.XRepository;
@@ -68,6 +70,43 @@ public class AggregatingRepository extends AbstractRepository {
                 LOGGER.debugf("Remove repository: %s", repo);
                 repositories.remove(repo);
             }
+        }
+    }
+
+    public List<XRepository> getRepositories() {
+        synchronized (repositories) {
+            return Collections.unmodifiableList(repositories);
+        }
+    }
+
+    public XRepository getRepositoryByName(String name) {
+        if (name == null)
+            MESSAGES.illegalArgumentNull("name");
+        synchronized (repositories) {
+            XRepository result = null;
+            for (XRepository repo : repositories) {
+                if (name.equals(repo.getName())) {
+                    result = repo;
+                    break;
+                }
+            }
+            return result;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends XRepository> T getRepositoryByType(Class<T> type) {
+        if (type == null)
+            MESSAGES.illegalArgumentNull("type");
+        synchronized (repositories) {
+            T result = null;
+            for (XRepository repo : repositories) {
+                if (type.isAssignableFrom(repo.getClass())) {
+                    result = (T) repo;
+                    break;
+                }
+            }
+            return result;
         }
     }
 }

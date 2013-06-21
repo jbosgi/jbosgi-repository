@@ -34,15 +34,14 @@ import junit.framework.Assert;
 
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
-import org.jboss.osgi.repository.MavenResourceHandler;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
-import org.jboss.osgi.repository.spi.MavenDelegateRepository;
-import org.jboss.osgi.repository.spi.MavenDelegateRepository.ConfigurationPropertyProvider;
+import org.jboss.osgi.repository.spi.MavenIdentityRepository;
+import org.jboss.osgi.repository.spi.MavenIdentityRepository.ConfigurationPropertyProvider;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
@@ -79,7 +78,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
                 return new FileBasedRepositoryStorage(repository, storageDir, Mockito.mock(ConfigurationPropertyProvider.class));
             }
         };
-        repository = new AbstractPersistentRepository(storageFactory, new MavenDelegateRepository());
+        repository = new AbstractPersistentRepository(storageFactory, new MavenIdentityRepository());
     }
 
     @Test
@@ -91,12 +90,9 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         assertEquals("One capability", 1, caps.size());
         XCapability cap = (XCapability) caps.iterator().next();
 
-        Assert.assertTrue("Capability matches", req.matches(cap));
-
         // Add the maven resource to the repository
         RepositoryStorage storage = repository.getRepositoryStorage();
-        MavenResourceHandler handler = new MavenResourceHandler();
-        XResource res = handler.toBundleResource(cap.getResource());
+        XResource res = cap.getResource();
         res = storage.addResource(res);
         cap = res.getIdentityCapability();
 
@@ -108,7 +104,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         cap = (XCapability) caps.iterator().next();
 
         // Check that we have a resource in storage
-        res = handler.toBundleResource(cap.getResource());
+        res = cap.getResource();
         res = storage.getResource(res.getIdentityCapability());
         cap = res.getIdentityCapability();
 

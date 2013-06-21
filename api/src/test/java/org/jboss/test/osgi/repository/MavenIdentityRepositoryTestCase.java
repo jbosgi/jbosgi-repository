@@ -1,5 +1,3 @@
-package org.jboss.test.osgi.repository;
-
 /*
  * #%L
  * JBossOSGi Repository
@@ -19,6 +17,7 @@ package org.jboss.test.osgi.repository;
  * limitations under the License.
  * #L%
  */
+package org.jboss.test.osgi.repository;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,18 +27,14 @@ import java.util.Collection;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
-import junit.framework.Assert;
-
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
-import org.jboss.osgi.repository.MavenResourceHandler;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
-import org.jboss.osgi.repository.spi.MavenDelegateRepository;
-import org.jboss.osgi.repository.spi.MavenDelegateRepository.ConfigurationPropertyProvider;
+import org.jboss.osgi.repository.spi.MavenIdentityRepository;
+import org.jboss.osgi.repository.spi.MavenIdentityRepository.ConfigurationPropertyProvider;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XRequirement;
@@ -56,12 +51,12 @@ import org.osgi.service.repository.ContentNamespace;
 import org.osgi.service.repository.RepositoryContent;
 
 /**
- * Test the {@link AbstractPersistentRepository}
+ * Test the {@link MavenIdentityRepository}
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class MavenResourceHandlerTestCase extends AbstractRepositoryTest {
+public class MavenIdentityRepositoryTestCase extends AbstractRepositoryTest {
 
     private XRepository repository;
     private RepositoryStorage storage;
@@ -70,25 +65,20 @@ public class MavenResourceHandlerTestCase extends AbstractRepositoryTest {
     public void setUp() throws IOException {
         File storageDir = new File("./target/repository");
         deleteRecursive(storageDir);
-        repository = new MavenDelegateRepository();
+        repository = new MavenIdentityRepository();
         ConfigurationPropertyProvider config = Mockito.mock(ConfigurationPropertyProvider.class);
         storage = new FileBasedRepositoryStorage(repository, storageDir, config);
     }
 
     @Test
     public void testBundleResource() throws Exception {
-
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
         assertEquals("One capability", 1, caps.size());
         XIdentityCapability cap = (XIdentityCapability) caps.iterator().next();
 
-        Assert.assertTrue("Capability matches", req.matches(cap));
-
-        MavenResourceHandler handler = new MavenResourceHandler();
-
-        XResource resource = handler.toBundleResource(cap.getResource());
+        XResource resource = cap.getResource();
         XIdentityCapability icap = resource.getIdentityCapability();
         assertEquals(IdentityNamespace.IDENTITY_NAMESPACE, icap.getNamespace());
         assertEquals("org.apache.felix.configadmin", icap.getName());
@@ -109,42 +99,25 @@ public class MavenResourceHandlerTestCase extends AbstractRepositoryTest {
 
     @Test
     public void testBundleResourceFromJar() throws Exception {
-
         MavenCoordinates mavenid = MavenCoordinates.parse("org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final");
-        XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
+        XRequirementBuilder builder = XRequirementBuilder.create(mavenid);
+        builder.getAttributes().put(XRepository.TARGET_TYPE, XResource.TYPE_BUNDLE);
+        XRequirement req = builder.getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
-        assertEquals("One capability", 1, caps.size());
-        XIdentityCapability cap = (XIdentityCapability) caps.iterator().next();
-
-        Assert.assertTrue("Capability matches", req.matches(cap));
-
-        MavenResourceHandler handler = new MavenResourceHandler();
-
-        XResource resource = handler.toBundleResource(cap.getResource(), "javax.persistence.api", Version.parseVersion("1.0.1.Final"));
-        XIdentityCapability icap = resource.getIdentityCapability();
-        assertEquals(IdentityNamespace.IDENTITY_NAMESPACE, icap.getNamespace());
-        assertEquals("javax.persistence.api", icap.getName());
-        assertEquals(Version.parseVersion("1.0.1.Final"), icap.getVersion());
-        assertEquals(IdentityNamespace.TYPE_BUNDLE, icap.getType());
-
-        caps = resource.getCapabilities(PackageNamespace.PACKAGE_NAMESPACE);
-        assertEquals("Four package capabilities", 4, caps.size());
+        assertEquals("No capability", 0, caps.size());
     }
 
     @Test
     public void testModuleResource() throws Exception {
-
         MavenCoordinates mavenid = MavenCoordinates.parse("org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final");
-        XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
+        XRequirementBuilder builder = XRequirementBuilder.create(mavenid);
+        builder.getAttributes().put(XResource.MODULE_IDENTITY_NAMESPACE, ModuleIdentifier.create("javax.persistence.api", "1.0.1.Final"));
+        XRequirement req = builder.getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
         assertEquals("One capability", 1, caps.size());
         XIdentityCapability cap = (XIdentityCapability) caps.iterator().next();
 
-        Assert.assertTrue("Capability matches", req.matches(cap));
-
-        MavenResourceHandler handler = new MavenResourceHandler();
-
-        XResource resource = handler.toModuleResource(cap.getResource(), ModuleIdentifier.create("javax.persistence.api", "1.0.1.Final"));
+        XResource resource = cap.getResource();
         XIdentityCapability icap = resource.getIdentityCapability();
         assertEquals(XResource.MODULE_IDENTITY_NAMESPACE, icap.getNamespace());
         assertEquals("javax.persistence.api", icap.getName());
@@ -158,16 +131,15 @@ public class MavenResourceHandlerTestCase extends AbstractRepositoryTest {
     @Test
     public void testModuleResourceFromBundle() throws Exception {
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
-        XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
+        XRequirementBuilder builder = XRequirementBuilder.create(mavenid);
+        builder.getAttributes().put(XResource.MODULE_IDENTITY_NAMESPACE, ModuleIdentifier.create("org.apache.felix.configadmin", "1.2.8"));
+        builder.getAttributes().put(XRepository.TARGET_TYPE, XResource.TYPE_MODULE);
+        XRequirement req = builder.getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
         assertEquals("One capability", 1, caps.size());
         XIdentityCapability cap = (XIdentityCapability) caps.iterator().next();
 
-        Assert.assertTrue("Capability matches", req.matches(cap));
-
-        MavenResourceHandler handler = new MavenResourceHandler();
-
-        XResource resource = handler.toModuleResource(cap.getResource(), ModuleIdentifier.create("org.apache.felix.configadmin", "1.2.8"));
+        XResource resource = cap.getResource();
         XIdentityCapability icap = resource.getIdentityCapability();
         assertEquals(XResource.MODULE_IDENTITY_NAMESPACE, icap.getNamespace());
         assertEquals("org.apache.felix.configadmin", icap.getName());
@@ -176,5 +148,13 @@ public class MavenResourceHandlerTestCase extends AbstractRepositoryTest {
 
         caps = resource.getCapabilities(PackageNamespace.PACKAGE_NAMESPACE);
         assertEquals("No package capabilities", 0, caps.size());
+    }
+
+    @Test
+    public void testFindProvidersFails() throws Exception {
+        MavenCoordinates mavenid = MavenCoordinates.parse("foo:bar:1.2.8");
+        XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
+        Collection<Capability> caps = repository.findProviders(req);
+        assertEquals("No capability", 0, caps.size());
     }
 }

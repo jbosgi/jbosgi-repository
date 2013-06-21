@@ -20,8 +20,6 @@
 package org.jboss.osgi.repository.internal;
 
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
-import static org.jboss.osgi.repository.XRepository.SERVICE_NAMES;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Dictionary;
@@ -29,12 +27,13 @@ import java.util.Hashtable;
 
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
+import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.repository.spi.AggregatingRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
-import org.jboss.osgi.repository.spi.MavenDelegateRepository;
-import org.jboss.osgi.repository.spi.MavenDelegateRepository.ConfigurationPropertyProvider;
+import org.jboss.osgi.repository.spi.MavenIdentityRepository;
+import org.jboss.osgi.repository.spi.MavenIdentityRepository.ConfigurationPropertyProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -74,13 +73,14 @@ public class RepositoryActivator implements BundleActivator {
 
         // Setup the repositories
         AggregatingRepository aggregator = new AggregatingRepository();
-        aggregator.addRepository(new MavenDelegateRepository(propProvider));
-        XRepository repository = new AbstractPersistentRepository(factory, aggregator);
+        aggregator.addRepository(new MavenIdentityRepository(propProvider));
+        XPersistentRepository repository = new AbstractPersistentRepository(factory, aggregator);
 
         // Register the top level repository
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put(Constants.SERVICE_DESCRIPTION, repository.getName());
-        registration = context.registerService(SERVICE_NAMES, repository, props);
+        String[] serviceNames = new String[] { XRepository.class.getName(), XPersistentRepository.class.getName(), Repository.class.getName() };
+        registration = context.registerService(serviceNames, repository, props);
     }
 
     @Override

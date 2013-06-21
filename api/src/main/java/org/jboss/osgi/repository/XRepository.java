@@ -21,6 +21,9 @@ package org.jboss.osgi.repository;
 
 import java.util.Collection;
 
+import org.jboss.osgi.metadata.OSGiMetaData;
+import org.jboss.osgi.repository.spi.MavenIdentityRepository;
+import org.jboss.osgi.spi.AttachmentKey;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.service.repository.Repository;
@@ -47,9 +50,21 @@ public interface XRepository extends Repository {
     String PROPERTY_REPOSITORY_STORAGE_FILE = "org.jboss.osgi.repository.storage.file";
 
     /**
-     * The service names that repositories are registered under
+     * The target type returned by the {@link MavenIdentityRepository}
+     *
+     * @see {@link org.jboss.osgi.resolver.XResource#TYPE_BUNDLE}
+     * @see {@link org.jboss.osgi.resolver.XResource#TYPE_MODULE}
      */
-    String[] SERVICE_NAMES = new String[] { XRepository.class.getName(), Repository.class.getName() };
+    String TARGET_TYPE = "targetType";
+
+    /**
+     * The source requirement for the target resource
+     */
+    AttachmentKey<Requirement> SOURCE_REQUIREMENT = AttachmentKey.create(Requirement.class);
+    /**
+     * The metadata for the target resource
+     */
+    AttachmentKey<OSGiMetaData> OSGI_METADATA = AttachmentKey.create(OSGiMetaData.class);
 
     /**
      * Get the name for this repository

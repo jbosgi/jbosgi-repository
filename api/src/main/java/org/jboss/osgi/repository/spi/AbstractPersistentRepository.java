@@ -58,6 +58,11 @@ public class AbstractPersistentRepository extends AbstractRepository implements 
     }
 
     @Override
+    public XRepository getRepository() {
+        return delegate;
+    }
+
+    @Override
     public Collection<Capability> findProviders(Requirement req) {
         if (req == null)
             throw MESSAGES.illegalArgumentNull("req");

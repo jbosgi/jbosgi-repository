@@ -47,7 +47,7 @@ import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.XContentCapability;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
-import org.jboss.osgi.repository.spi.MavenDelegateRepository.ConfigurationPropertyProvider;
+import org.jboss.osgi.repository.spi.MavenIdentityRepository.ConfigurationPropertyProvider;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XPackageCapability;

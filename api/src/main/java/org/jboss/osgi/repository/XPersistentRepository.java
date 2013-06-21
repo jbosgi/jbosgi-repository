@@ -12,4 +12,9 @@ public interface XPersistentRepository extends XRepository {
      * Get the associated repository storage
      */
     RepositoryStorage getRepositoryStorage();
+
+    /**
+     * Get the repository delegate
+     */
+    XRepository getRepository();
 }

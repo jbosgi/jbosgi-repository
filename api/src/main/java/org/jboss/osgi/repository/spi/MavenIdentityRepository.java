@@ -30,12 +30,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
 import org.jboss.osgi.repository.URLResourceBuilderFactory;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.spi.AbstractRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
-import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
@@ -50,11 +47,11 @@ import org.osgi.resource.Requirement;
  * @author thomas.diesler@jboss.com
  * @since 16-Jan-2012
  */
-public class MavenDelegateRepository extends AbstractRepository implements XRepository {
+public class MavenIdentityRepository extends AbstractRepository implements XRepository {
 
     private final URL[] baserepos;
 
-    /** The configuration for the {@link MavenDelegateRepository} */
+    /** The configuration for the {@link MavenIdentityRepository} */
     public interface Configuration {
 
         /** The default JBoss Nexus repository: http://repository.jboss.org/nexus/content/groups/public */
@@ -74,7 +71,7 @@ public class MavenDelegateRepository extends AbstractRepository implements XRepo
         String getProperty(String key, String defaultValue);
     }
 
-    public MavenDelegateRepository() {
+    public MavenIdentityRepository() {
         this(new ConfigurationPropertyProvider() {
             @Override
             public String getProperty(String key, String defaultValue) {
@@ -83,11 +80,11 @@ public class MavenDelegateRepository extends AbstractRepository implements XRepo
         });
     }
 
-    public MavenDelegateRepository(ConfigurationPropertyProvider provider) {
+    public MavenIdentityRepository(ConfigurationPropertyProvider provider) {
         this(getDefaultConfiguration(provider));
     }
 
-    public MavenDelegateRepository(Configuration configuration) {
+    public MavenIdentityRepository(Configuration configuration) {
         List<URL> repos = new ArrayList<URL>();
         for (URL baseURL : configuration.getBaseURLs()) {
             repos.add(baseURL);
@@ -128,44 +125,59 @@ public class MavenDelegateRepository extends AbstractRepository implements XRepo
 
     @Override
     public Collection<Capability> findProviders(Requirement req) {
+
         String namespace = req.getNamespace();
-        List<Capability> result = new ArrayList<Capability>();
-        if (XResource.MAVEN_IDENTITY_NAMESPACE.equals(namespace)) {
-            MavenCoordinates mavenId;
-            if (req.getDirectives().get("filter") != null) {
-                Filter filter = ((XRequirement)req).getFilter();
-                String gpart = AbstractRequirement.getValueFromFilter(filter, "groupId", null);
-                String apart = AbstractRequirement.getValueFromFilter(filter, "artifactId", null);
-                String tpart = AbstractRequirement.getValueFromFilter(filter, "type", null);
-                String vpart = AbstractRequirement.getValueFromFilter(filter, "version", null);
-                String cpart = AbstractRequirement.getValueFromFilter(filter, "classifier", null);
-                mavenId = MavenCoordinates.create(gpart, apart, vpart, tpart, cpart);
-            } else {
-                String nsvalue = (String) req.getAttributes().get(XResource.MAVEN_IDENTITY_NAMESPACE);
-                mavenId = MavenCoordinates.parse(nsvalue);
-            }
-            LOGGER.infoFindMavenProviders(mavenId);
-            for (URL baseURL : baserepos) {
-                URL url = mavenId.getArtifactURL(baseURL);
-                try {
-                    url.openStream().close();
-                } catch (IOException e) {
-                    LOGGER.debugf("Cannot access input stream for: %s", url);
-                    continue;
-                }
-                try {
-                    XResourceBuilder<XResource> builder = URLResourceBuilderFactory.create(url, null);
-                    XCapability icap = builder.addIdentityCapability(mavenId);
-                    XResource resource = builder.getResource();
-                    LOGGER.infoFoundMavenResource(resource);
-                    result.add(icap);
-                    break;
-                } catch (Exception ex) {
-                    LOGGER.errorCannotCreateResource(ex, mavenId);
-                }
+        if (!XResource.MAVEN_IDENTITY_NAMESPACE.equals(namespace))
+            return Collections.emptyList();
+
+        MavenCoordinates mavenId;
+        if (req.getDirectives().get("filter") != null) {
+            Filter filter = ((XRequirement)req).getFilter();
+            String gpart = AbstractRequirement.getValueFromFilter(filter, "groupId", null);
+            String apart = AbstractRequirement.getValueFromFilter(filter, "artifactId", null);
+            String tpart = AbstractRequirement.getValueFromFilter(filter, "type", null);
+            String vpart = AbstractRequirement.getValueFromFilter(filter, "version", null);
+            String cpart = AbstractRequirement.getValueFromFilter(filter, "classifier", null);
+            mavenId = MavenCoordinates.create(gpart, apart, vpart, tpart, cpart);
+        } else {
+            String nsvalue = (String) req.getAttributes().get(XResource.MAVEN_IDENTITY_NAMESPACE);
+            mavenId = MavenCoordinates.parse(nsvalue);
+        }
+
+        LOGGER.infoFindMavenProviders(mavenId);
+
+        URL contentURL = null;
+        for (URL baseURL : baserepos) {
+            URL url = mavenId.getArtifactURL(baseURL);
+            try {
+                url.openStream().close();
+                contentURL = url;
+                break;
+            } catch (IOException e) {
+                LOGGER.debugf("Cannot access input stream for: %s", url);
             }
         }
-        return result;
+
+        List<Capability> result = new ArrayList<Capability>();
+        if (contentURL != null) {
+            try {
+                XResourceBuilder<XResource> builder = URLResourceBuilderFactory.create(contentURL, null);
+                builder.addIdentityCapability(mavenId);
+                XResource resource = builder.getResource();
+                LOGGER.infoFoundMavenResource(resource);
+
+                // Convert the resource to the given target type
+                resource = getTargetResource((XRequirement) req, resource);
+                if (resource != null) {
+                    result.add(resource.getIdentityCapability());
+                }
+
+            } catch (Exception ex) {
+                LOGGER.errorCannotCreateResource(ex, mavenId);
+            }
+        }
+
+        return Collections.unmodifiableList(result);
     }
 
     private static URL getBaseURL(String urlspec) {

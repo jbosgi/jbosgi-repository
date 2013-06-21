@@ -44,7 +44,7 @@ import org.jboss.osgi.repository.RepositoryXMLReader;
 import org.jboss.osgi.repository.RepositoryXMLWriter;
 import org.jboss.osgi.repository.URLResourceBuilderFactory;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.spi.MavenDelegateRepository.ConfigurationPropertyProvider;
+import org.jboss.osgi.repository.spi.MavenIdentityRepository.ConfigurationPropertyProvider;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XResource;
