@@ -36,7 +36,7 @@
   <dependencies>
     <dependency>
       <groupId>org.jboss.osgi.repository</groupId>
-      <artifactId>jbosgi-repository-api</artifactId>
+      <artifactId>jbosgi-repository-core</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

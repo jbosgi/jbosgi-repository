@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
-import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
@@ -51,20 +50,22 @@ public abstract class AbstractRepositoryTest {
         }
     }
 
-    protected void initializeRepository(XPersistentRepository repo) throws Exception {
-        // remove all resources
-        RepositoryStorage storage = (repo).getRepositoryStorage();
-        RepositoryReader reader = storage.getRepositoryReader();
-        XResource resource = reader.nextResource();
-        while (resource != null) {
-            storage.removeResource(resource);
-            resource = reader.nextResource();
+    protected void initializeRepository(XRepository repo) throws Exception {
+        // Remove all resources from storage
+        RepositoryStorage storage = repo.adapt(RepositoryStorage.class);
+        if (storage != null) {
+            RepositoryReader reader = storage.getRepositoryReader();
+            XResource resource = reader.nextResource();
+            while (resource != null) {
+                storage.removeResource(resource);
+                resource = reader.nextResource();
+            }
         }
     }
 
-    protected XPersistentRepository getRepository() {
+    protected XRepository getRepository() {
         ServiceReference<XRepository> sref = context.getServiceReference(XRepository.class);
-        return (XPersistentRepository) (sref != null ? context.getService(sref) : null);
+        return sref != null ? context.getService(sref) : null;
     }
 
 }

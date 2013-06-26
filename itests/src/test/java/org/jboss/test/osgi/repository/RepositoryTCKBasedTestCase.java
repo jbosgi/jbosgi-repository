@@ -45,7 +45,6 @@ import org.jboss.osgi.metadata.OSGiManifestBuilder;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryXMLReader;
-import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -147,10 +146,10 @@ public class RepositoryTCKBasedTestCase extends AbstractRepositoryTest {
     }
 
     @Override
-    protected void initializeRepository(XPersistentRepository repo) throws Exception {
+    protected void initializeRepository(XRepository repo) throws Exception {
         super.initializeRepository(repo);
 
-        RepositoryStorage rs = repo.getRepositoryStorage();
+        RepositoryStorage storage = getRepository().adapt(RepositoryStorage.class);
 
         URL xmlURL = getClass().getResource("/xml/test-repository1.xml");
         String xml = new String(readFully(xmlURL.openStream()));
@@ -164,7 +163,7 @@ public class RepositoryTCKBasedTestCase extends AbstractRepositoryTest {
 
         XResource resource = reader.nextResource();
         while (resource != null) {
-            rs.addResource(resource);
+            storage.addResource(resource);
             resource = reader.nextResource();
         }
     }

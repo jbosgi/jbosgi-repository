@@ -25,7 +25,7 @@ import java.util.Hashtable;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryXMLReader;
-import org.jboss.osgi.repository.XPersistentRepository;
+import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XResource;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -91,8 +91,8 @@ public class Activator implements BundleActivator {
             Repository rep = (Repository) st.waitForService(10000);
             if (rep == null)
                 throw new IllegalStateException("Unable to find service: " + RepositoryStorage.class);
-            XPersistentRepository xpr = (XPersistentRepository) rep;
-            RepositoryStorage rs = xpr.getRepositoryStorage();
+            XRepository repository = (XRepository) rep;
+            RepositoryStorage rs = repository.adapt(RepositoryStorage.class);
 
             RepositoryReader reader = RepositoryXMLReader.create(new ByteArrayInputStream(xml.getBytes()));
             XResource resource = reader.nextResource();

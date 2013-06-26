@@ -30,7 +30,6 @@ import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
-import org.jboss.osgi.repository.spi.AggregatingRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
 import org.jboss.osgi.repository.spi.MavenIdentityRepository;
 import org.jboss.osgi.repository.spi.MavenIdentityRepository.ConfigurationPropertyProvider;
@@ -72,14 +71,13 @@ public class RepositoryActivator implements BundleActivator {
         };
 
         // Setup the repositories
-        AggregatingRepository aggregator = new AggregatingRepository();
-        aggregator.addRepository(new MavenIdentityRepository(propProvider));
-        XPersistentRepository repository = new AbstractPersistentRepository(factory, aggregator);
+        XPersistentRepository repository = new AbstractPersistentRepository(factory);
+        repository.addRepositoryDelegate(new MavenIdentityRepository(propProvider));
 
         // Register the top level repository
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put(Constants.SERVICE_DESCRIPTION, repository.getName());
-        String[] serviceNames = new String[] { XRepository.class.getName(), XPersistentRepository.class.getName(), Repository.class.getName() };
+        String[] serviceNames = new String[] { XRepository.class.getName(), Repository.class.getName() };
         registration = context.registerService(serviceNames, repository, props);
     }
 

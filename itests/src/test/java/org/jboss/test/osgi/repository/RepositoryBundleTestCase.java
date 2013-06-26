@@ -88,21 +88,15 @@ public class RepositoryBundleTestCase extends AbstractRepositoryTest {
         Collection<Capability> providers = getRepository().findProviders(req);
         Assert.assertEquals("One capability", 1, providers.size());
 
-        XCapability cap = (XCapability) providers.iterator().next();
-
-        // Add the bundle resource to storage
-        RepositoryStorage storage = getRepository().getRepositoryStorage();
-        XResource res = cap.getResource();
-        storage.addResource(res);
-
         XRequirementBuilder builder = XRequirementBuilder.create(PackageNamespace.PACKAGE_NAMESPACE, "org.apache.felix.cm");
         builder.getAttributes().put(PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE, "[1.0,2.0)");
         req = builder.getRequirement();
 
-        providers = getRepository().findProviders(req);
+        // Check that we have the resource in storage
+        providers = getRepository().adapt(RepositoryStorage.class).findProviders(req);
         Assert.assertEquals("One capability", 1, providers.size());
 
-        cap = (XCapability) providers.iterator().next();
+        XCapability cap = (XCapability) providers.iterator().next();
         XPackageCapability pcap = cap.adapt(XPackageCapability.class);
         Assert.assertEquals("org.apache.felix.cm", pcap.getPackageName());
         Assert.assertEquals(Version.parseVersion("1.0.0"), pcap.getVersion());
@@ -128,7 +122,7 @@ public class RepositoryBundleTestCase extends AbstractRepositoryTest {
     @Test
     public void testRepositoryReader() throws Exception {
 
-        RepositoryStorage storage = getRepository().getRepositoryStorage();
+        RepositoryStorage storage = getRepository().adapt(RepositoryStorage.class);
         RepositoryReader reader = storage.getRepositoryReader();
         Map<String, String> attributes = reader.getRepositoryAttributes();
         Assert.assertNotNull("Increment not null", attributes.get("increment"));
