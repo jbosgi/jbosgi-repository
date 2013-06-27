@@ -43,7 +43,7 @@ import org.osgi.service.repository.RepositoryContent;
  * @author Thomas.Diesler@jboss.com
  * @since 10-May-2013
  */
-public abstract class AbstractResourceInstaller implements ResourceInstaller {
+public class AbstractResourceInstaller implements ResourceInstaller {
 
     @Override
     public XBundle installResource(BundleContext context, XResource res) throws BundleException {
@@ -75,6 +75,11 @@ public abstract class AbstractResourceInstaller implements ResourceInstaller {
         }
     }
 
+    @Override
+    public XBundle installModuleResource(BundleContext context, XResource res) throws BundleException {
+        throw new UnsupportedOperationException();
+    }
+    
     private void safeClose(Closeable input) {
         try {
             input.close();

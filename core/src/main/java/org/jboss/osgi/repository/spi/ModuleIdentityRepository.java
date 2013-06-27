@@ -32,7 +32,9 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -117,15 +119,28 @@ public class ModuleIdentityRepository extends AbstractRepository {
     }
 
     private XResource getTargetResource(XResource resource, Module module) throws Exception {
-        // Add the module identity attribute
+        // Add the module identity attribute and remove all requirements
         ModuleIdentifier moduleId = module.getIdentifier();
-        XResource targetResource = super.getTargetResource(resource);
-        targetResource.setMutable(true);
-        XIdentityCapability icap = targetResource.getIdentityCapability();
-        icap.getAttributes().put(MODULE_IDENTITY_NAMESPACE, moduleId.toString());
-        targetResource.validate();
-        targetResource.setMutable(false);
-        return targetResource;
+        XResource auxres = super.getTargetResource(resource);
+        XIdentityCapability icap = auxres.getIdentityCapability();
+        XResourceBuilder<XResource> builder = XResourceBuilderFactory.create();
+        for (Capability cap : auxres.getCapabilities(null)) {
+            String namespace = cap.getNamespace();
+            Map<String, Object> atts = new LinkedHashMap<String, Object>(cap.getAttributes());
+            Map<String, String> dirs = new LinkedHashMap<String, String>(cap.getDirectives());
+            if (cap == icap) {
+                atts.put(MODULE_IDENTITY_NAMESPACE, moduleId.toString());
+            }
+            builder.addCapability(namespace, atts, dirs);
+        }
+        List<Requirement> reqs = auxres.getRequirements(null);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debugf("Ignoring %d requirements", reqs.size());
+            for (Requirement req : reqs) {
+                LOGGER.debugf(" %s", req);
+            }
+        }
+        return builder.getResource();
     }
 
     @Override

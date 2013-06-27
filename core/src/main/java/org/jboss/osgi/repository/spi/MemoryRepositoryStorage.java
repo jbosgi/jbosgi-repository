@@ -160,7 +160,15 @@ public class MemoryRepositoryStorage implements RepositoryStorage {
                 addCachedCapability((XCapability) cap);
             }
             increment.incrementAndGet();
-            LOGGER.debugf("Resource added: %s", res);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debugf("Resource added: %s", res);
+                for (Capability cap : res.getCapabilities(null)) {
+                    LOGGER.debugf(" %s", cap);
+                }
+                for (Requirement req : res.getRequirements(null)) {
+                    LOGGER.debugf(" %s", req);
+                }
+            }
         }
         return res;
     }

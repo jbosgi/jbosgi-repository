@@ -22,14 +22,18 @@ package org.jboss.osgi.repository.internal;
 import static org.jboss.osgi.repository.RepositoryMessages.MESSAGES;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
+import org.jboss.osgi.repository.ResourceInstaller;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
+import org.jboss.osgi.repository.spi.AbstractResourceInstaller;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
 import org.jboss.osgi.repository.spi.MavenIdentityRepository;
 import org.jboss.osgi.repository.spi.MavenIdentityRepository.ConfigurationPropertyProvider;
@@ -47,7 +51,7 @@ import org.osgi.service.repository.Repository;
  */
 public class RepositoryActivator implements BundleActivator {
 
-    private ServiceRegistration<?> registration;
+    private List<ServiceRegistration<?>> registrations = new ArrayList<ServiceRegistration<?>>();
 
     @Override
     public void start(final BundleContext context) throws Exception {
@@ -74,17 +78,22 @@ public class RepositoryActivator implements BundleActivator {
         XPersistentRepository repository = new AbstractPersistentRepository(factory);
         repository.addRepositoryDelegate(new MavenIdentityRepository(propProvider));
 
-        // Register the top level repository
+        // Register the {@link XRepository} service
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put(Constants.SERVICE_DESCRIPTION, repository.getName());
         String[] serviceNames = new String[] { XRepository.class.getName(), Repository.class.getName() };
-        registration = context.registerService(serviceNames, repository, props);
+        registrations.add(context.registerService(serviceNames, repository, props));
+        
+        // Register the {@link ResourceInstaller} service
+        ResourceInstaller installer = new AbstractResourceInstaller();
+        registrations.add(context.registerService(ResourceInstaller.class, installer, null));
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
-        if (registration != null)
-            registration.unregister();
+        for (ServiceRegistration<?> reg : registrations) {
+            reg.unregister();
+        }
     }
 
     private File getRepositoryStorageDir(ConfigurationPropertyProvider propProvider, BundleContext context) {
