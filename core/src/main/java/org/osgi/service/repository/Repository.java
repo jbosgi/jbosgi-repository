@@ -1,5 +1,5 @@
 /*
- * Copyright (c) OSGi Alliance (2006, 2012). All Rights Reserved.
+ * Copyright (c) OSGi Alliance (2006, 2013). All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-// This document is an experimental draft to enable interoperability
-// between bundle repositories. There is currently no commitment to
-// turn this draft into an official specification.
-
 package org.osgi.service.repository;
 
 import java.util.Collection;
 import java.util.Map;
+
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
@@ -39,7 +36,7 @@ import org.osgi.resource.Resource;
  *
  * @ThreadSafe
  * @noimplement
- * @version $Id: 7c1e9f0758f6dc1530645699c62843182c84dc1e $
+ * @author $Id: b039144310c2af8019c17dc596aea104fa2ea2c6 $
  */
 public interface Repository {
 	/**
@@ -64,4 +61,39 @@ public interface Repository {
 	 *         caller and can be modified by the caller.
 	 */
 	Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> requirements);
+
+	/**
+	 * Find the resources that match the specified {@code RequirementExpression}
+	 *
+	 * @param requirementExpression The {@code RequirementExpression} for which
+	 *        matching capabilities should be returned. Must not be {@code null}
+	 *        .
+	 * @return A collection of matching {@code Resource}s. If there are no
+	 *         matching resources, an empty collection is returned.
+	 */
+	Collection<Resource> findProviders(RequirementExpression requirementExpression);
+
+	/**
+	 * Obtain an {@code ExpressionCombiner} implementation. This can be used to
+	 * combine multiple requirements into a complex requirement using
+	 * {@code and}, {@code or} and {@code not} operators.
+	 *
+	 * @return An {@code ExpressionCombiner}.
+	 */
+	ExpressionCombiner getExpressionCombiner();
+
+	/**
+	 * Obtain a {@code RequirementBuilder} implementation which provides a
+	 * convenient way to create a requirement. For example:
+	 *
+	 * <pre>{@code
+     * Requirement myReq = .newRequirementBuilder("org.foo.ns1").
+     *   addDirective("filter", "(org.foo.ns1=val1)").
+     *   addDirective("cardinality", "multiple").build();
+	 * }</pre>
+	 *
+	 * @param namespace The namespace for the requirement to be constructed.
+	 * @return A requirement builder for a requirement in the given namespace.
+	 */
+	RequirementBuilder newRequirementBuilder(String namespace);
 }
