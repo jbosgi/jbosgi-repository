@@ -45,8 +45,6 @@ import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
-import org.jboss.osgi.repository.impl.ExpressionCombinerImpl;
-import org.jboss.osgi.repository.impl.RequirementBuilderImpl;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
 import org.jboss.osgi.repository.spi.MavenIdentityRepository;
@@ -72,7 +70,6 @@ import org.osgi.resource.Resource;
 import org.osgi.service.repository.ContentNamespace;
 import org.osgi.service.repository.ExpressionCombiner;
 import org.osgi.service.repository.RepositoryContent;
-import org.osgi.service.repository.RequirementBuilder;
 import org.osgi.service.repository.RequirementExpression;
 
 /**
@@ -96,7 +93,6 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
                 return new FileBasedRepositoryStorage(repository, storageDir, Mockito.mock(ConfigurationPropertyProvider.class));
             }
         };
-
         repository = new AbstractPersistentRepository(storageFactory);
         repository.addRepositoryDelegate(new MavenIdentityRepository());
     }
@@ -154,20 +150,6 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         OSGiMetaData metaData = OSGiMetaDataBuilder.load(manifest);
         assertEquals("org.apache.felix.configadmin", metaData.getBundleSymbolicName());
         assertEquals(Version.parseVersion("1.2.8"), metaData.getBundleVersion());
-    }
-
-    @Test
-    public void testGetRequirementBuilder() {
-        RequirementBuilder builder = repository.newRequirementBuilder("toastie");
-        Assert.assertTrue(builder instanceof RequirementBuilderImpl);
-        Requirement req = builder.build();
-        Assert.assertEquals("toastie", req.getNamespace());
-    }
-
-    @Test
-    public void testGetExpressionCombiner() {
-        Assert.assertTrue(repository.getExpressionCombiner() instanceof ExpressionCombiner);
-        Assert.assertTrue(repository.getExpressionCombiner() instanceof ExpressionCombinerImpl);
     }
 
     @Test

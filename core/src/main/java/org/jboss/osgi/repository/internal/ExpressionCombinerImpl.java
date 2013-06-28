@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package org.jboss.osgi.repository.impl;
+package org.jboss.osgi.repository.internal;
 
 /**
  * @author David Bosschaert

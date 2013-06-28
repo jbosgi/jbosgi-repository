@@ -32,8 +32,6 @@ import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
 import org.jboss.osgi.repository.spi.MavenIdentityRepository;
 import org.jboss.osgi.repository.spi.MavenIdentityRepository.ConfigurationPropertyProvider;
-import org.jboss.osgi.repository.impl.ExpressionCombinerImpl;
-import org.jboss.osgi.repository.impl.RequirementBuilderImpl;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XRequirement;
@@ -46,17 +44,13 @@ import org.mockito.Mockito;
 import org.osgi.framework.Version;
 import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
-import org.osgi.resource.Requirement;
 import org.osgi.service.repository.ContentNamespace;
-import org.osgi.service.repository.ExpressionCombiner;
 import org.osgi.service.repository.RepositoryContent;
-import org.osgi.service.repository.RequirementBuilder;
 
 /**
  * Test the {@link MavenIdentityRepository}
  *
  * @author thomas.diesler@jboss.com
- * @author David Bosschaert
  * @since 16-Jan-2012
  */
 public class MavenIdentityRepositoryTestCase extends AbstractRepositoryTest {
@@ -114,19 +108,5 @@ public class MavenIdentityRepositoryTestCase extends AbstractRepositoryTest {
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
         Assert.assertEquals("No capability", 0, caps.size());
-    }
-
-    @Test
-    public void testGetRequirementBuilder() {
-        RequirementBuilder builder = repository.newRequirementBuilder("toastie");
-        Assert.assertTrue(builder instanceof RequirementBuilderImpl);
-        Requirement req = builder.build();
-        Assert.assertEquals("toastie", req.getNamespace());
-    }
-
-    @Test
-    public void testGetExpressionCombiner() {
-        Assert.assertTrue(repository.getExpressionCombiner() instanceof ExpressionCombiner);
-        Assert.assertTrue(repository.getExpressionCombiner() instanceof ExpressionCombinerImpl);
     }
 }

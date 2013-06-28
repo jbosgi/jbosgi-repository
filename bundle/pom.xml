@@ -131,10 +131,8 @@
                             !org.jboss.shrinkwrap.api.asset
                         </Import-Package>
                         <Private-Package>
-                            org.jboss.osgi.metadata.internal,
                             org.jboss.osgi.metadata.spi, 
-                            org.jboss.osgi.repository.core, 
-                            org.jboss.osgi.repository.impl, 
+                            org.jboss.osgi.metadata.internal,
                             org.jboss.osgi.repository.internal,
                         </Private-Package>
                     </instructions>
