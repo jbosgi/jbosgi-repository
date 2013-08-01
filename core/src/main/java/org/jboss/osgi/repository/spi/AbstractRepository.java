@@ -54,12 +54,12 @@ import org.osgi.resource.Resource;
 import org.osgi.service.repository.AndExpression;
 import org.osgi.service.repository.ContentNamespace;
 import org.osgi.service.repository.ExpressionCombiner;
+import org.osgi.service.repository.IdentityExpression;
 import org.osgi.service.repository.NotExpression;
 import org.osgi.service.repository.OrExpression;
 import org.osgi.service.repository.RepositoryContent;
 import org.osgi.service.repository.RequirementBuilder;
 import org.osgi.service.repository.RequirementExpression;
-import org.osgi.service.repository.SimpleRequirementExpression;
 
 /**
  * An abstract  {@link XRepository} that does nothing.
@@ -105,8 +105,8 @@ public abstract class AbstractRepository implements XRepository {
         if (re == null)
             throw MESSAGES.illegalArgumentNull("re");
 
-        if (re instanceof SimpleRequirementExpression) {
-            return findSimpleRequirementExpression((SimpleRequirementExpression) re);
+        if (re instanceof IdentityExpression) {
+            return findIdentityExpression((IdentityExpression) re);
         } else if (re instanceof AndExpression) {
             return findAndExpression((AndExpression) re);
         } else if (re instanceof OrExpression) {
@@ -118,7 +118,7 @@ public abstract class AbstractRepository implements XRepository {
         throw MESSAGES.malformedRequirementExpression(re);
     }
 
-    private Collection<Resource> findSimpleRequirementExpression(SimpleRequirementExpression re) {
+    private Collection<Resource> findIdentityExpression(IdentityExpression re) {
         Requirement req = re.getRequirement();
         return findSimpleRequirement(req);
     }
@@ -137,7 +137,7 @@ public abstract class AbstractRepository implements XRepository {
     }
 
     private Collection<Resource> findAndExpression(AndExpression re) {
-        List<RequirementExpression> reqs = re.getRequirements();
+        List<RequirementExpression> reqs = re.getRequirementExpressions();
         if (reqs.size() == 0)
             return Collections.emptyList();
 
@@ -159,7 +159,7 @@ public abstract class AbstractRepository implements XRepository {
         // Handle the not expressions
         for (NotExpression req : notExpressions) {
             NotExpression ne = req;
-            l.removeAll(findProviders(ne.getRequirement()));
+            l.removeAll(findProviders(ne.getRequirementExpression()));
         }
 
         return l;
@@ -167,20 +167,20 @@ public abstract class AbstractRepository implements XRepository {
 
     private Collection<Resource> findOrExpression(OrExpression re) {
         Set<Resource> l = new HashSet<Resource>();
-        for (RequirementExpression req : re.getRequirements()) {
+        for (RequirementExpression req : re.getRequirementExpressions()) {
             l.addAll(findProviders(req));
         }
         return l;
     }
 
     private Collection<Resource> findNotExpression(NotExpression ne) {
-        RequirementExpression re = ne.getRequirement();
-        if (re instanceof SimpleRequirementExpression) {
-            Requirement req = ((SimpleRequirementExpression) re).getRequirement();
+        RequirementExpression re = ne.getRequirementExpression();
+        if (re instanceof IdentityExpression) {
+            Requirement req = ((IdentityExpression) re).getRequirement();
             Requirement nreq = negateRequirement(req);
             return findSimpleRequirement(nreq);
         } else if (re instanceof NotExpression) {
-            return findProviders(((NotExpression) re).getRequirement());
+            return findProviders(((NotExpression) re).getRequirementExpression());
         } else if (re instanceof AndExpression) {
             return findInverse(re);
         } else if (re instanceof OrExpression) {

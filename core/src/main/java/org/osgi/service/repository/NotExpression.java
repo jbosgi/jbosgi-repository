@@ -13,20 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.osgi.service.repository;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
- * A {@link RequirementExpression} representing the negative of a requirement,
- * the {@code not} operator.
- *
+ * A {@link RequirementExpression} representing the {@code not} (negation) of a
+ * requirement expression.
+ * 
  * @ThreadSafe
- * @noimplement
+ * @since 1.1
  */
+@ProviderType
 public interface NotExpression extends RequirementExpression {
 	/**
-	 * Obtain the requirement that is negated.
-	 *
-	 * @return The requirement, represented as {@link RequirementExpression}.
+	 * Return the requirement expression that is negated by this
+	 * {@code NotExpression}.
+	 * 
+	 * @return The requirement expression that is negated by this
+	 *         {@code NotExpression}.
 	 */
-	RequirementExpression getRequirement();
+	RequirementExpression getRequirementExpression();
 }

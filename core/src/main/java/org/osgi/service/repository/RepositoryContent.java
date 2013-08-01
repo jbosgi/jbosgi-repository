@@ -1,5 +1,5 @@
 /*
- * Copyright (c) OSGi Alliance (2012). All Rights Reserved.
+ * Copyright (c) OSGi Alliance (2012, 2013). All Rights Reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.osgi.service.repository;
 
 import java.io.InputStream;
+import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.resource.Resource;
 
 /**
@@ -28,9 +29,9 @@ import org.osgi.resource.Resource;
  * {@code InputStream} to the default content of the resource.
  * 
  * @ThreadSafe
- * @noimplement
- * @version $Id: 65c9ca60467654e7147a2fddc86acef58a634042 $
+ * @author $Id: 3af096bb605a4896abe99e5f546ea04b99f3b3e2 $
  */
+@ProviderType
 public interface RepositoryContent {
 
 	/**

@@ -13,23 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.osgi.service.repository;
 
 import java.util.List;
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
- * A {@link RequirementExpression} representing multiple requirements combined
- * together using the {@code and} operator.
- *
+ * A {@link RequirementExpression} representing the {@code and} of a number of
+ * requirement expressions.
+ * 
  * @ThreadSafe
- * @noimplement
+ * @since 1.1
  */
+@ProviderType
 public interface AndExpression extends RequirementExpression {
 	/**
-	 * Obtain the requirements that are combined using the {@code and} operator.
-	 *
-	 * @return The requirements, represented as {@link RequirementExpression}
-	 *         objects.
+	 * Return the requirement expressions that are combined by this
+	 * {@code AndExpression}.
+	 * 
+	 * @return An unmodifiable list of requirement expressions that are combined
+	 *         by this {@code AndExpression}. The list contains the requirement
+	 *         expressions in the order they were specified when this
+	 *         requirement expression was created.
 	 */
-	List<RequirementExpression> getRequirements();
+	List<RequirementExpression> getRequirementExpressions();
 }

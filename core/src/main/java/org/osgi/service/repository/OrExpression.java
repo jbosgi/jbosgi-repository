@@ -16,20 +16,25 @@
 package org.osgi.service.repository;
 
 import java.util.List;
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
- * A {@link RequirementExpression} representing multiple requirements combined
- * together using the {@code or} operator.
- *
+ * A {@link RequirementExpression} representing the {@code or} of a number of
+ * requirement expressions.
+ * 
  * @ThreadSafe
- * @noimplement
+ * @since 1.1
  */
+@ProviderType
 public interface OrExpression extends RequirementExpression {
 	/**
-	 * Obtain the requirements that are combined using the {@code or} operator.
-	 *
-	 * @return The requirements, represented as {@link RequirementExpression}
-	 *         objects.
+	 * Return the requirement expressions that are combined by this
+	 * {@code OrExpression}.
+	 * 
+	 * @return An unmodifiable list of requirement expressions that are combined
+	 *         by this {@code OrExpression}. The list contains the requirement
+	 *         expressions in the order they were specified when this
+	 *         requirement expression was created.
 	 */
-	List<RequirementExpression> getRequirements();
+	List<RequirementExpression> getRequirementExpressions();
 }

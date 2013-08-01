@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.osgi.service.repository;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
- * The base interface of all Requirement Expressions. Requirement Expression
- * objects will always be of one of its sub-interfaces.
- *
+ * The super interface for all requirement expressions. All requirement
+ * expressions must extend this interface.
+ * 
  * @ThreadSafe
- * @noimplement
+ * @since 1.1
  */
+@ProviderType
 public interface RequirementExpression {
-	// No methods.
+	// Marker interface.
 }

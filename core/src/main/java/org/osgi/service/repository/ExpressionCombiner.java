@@ -13,82 +13,95 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.osgi.service.repository;
 
+import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.resource.Requirement;
 
 /**
- * An {@code ExpressionCombiner} can be used to combine multiple requirements
- * into a single complex requirement using the {@code and}, {@code or} and
- * {@code not} operators.
- *
+ * An {@code ExpressionCombiner} can be used to combine requirement expressions
+ * into a single complex requirement expression using the {@code and},
+ * {@code or} and {@code not} operators.
+ * 
+ * @ThreadSafe
+ * @since 1.1
  */
+@ProviderType
 public interface ExpressionCombiner {
 	/**
-	 * Combine multiple {@link Requirement} objects into a single expression
+	 * Combine two {@link RequirementExpression}s into a requirement expression
 	 * using the {@code and} operator.
-	 *
-	 * @param reqs The requirements to combine.
-	 * @return A {@link RequirementExpression} representing the combined
-	 *         requirements.
+	 * 
+	 * @param expr1 The first requirement expression to combine into the
+	 *        returned requirement expression.
+	 * @param expr2 The second requirement expression to combine into the
+	 *        returned requirement expression
+	 * @return An {@link AndExpression} representing an {@code and} of the
+	 *         specified requirement expressions.
 	 */
-	RequirementExpression and(Requirement... reqs);
+	AndExpression and(RequirementExpression expr1, RequirementExpression expr2);
 
 	/**
-	 * Combine multiple {@link RequirementExpression} objects into a single
+	 * Combine multiple {@link RequirementExpression}s into a requirement
 	 * expression using the {@code and} operator.
-	 *
-	 * @param reqs The requirements to combine.
-	 * @return A {@link RequirementExpression} representing the combined
-	 *         requirements.
+	 * 
+	 * @param expr1 The first requirement expression to combine into the
+	 *        returned requirement expression.
+	 * @param expr2 The second requirement expression to combine into the
+	 *        returned requirement expression
+	 * @param moreExprs Optional, additional requirement expressions to combine
+	 *        into the returned requirement expression.
+	 * @return An {@link AndExpression} representing an {@code and} of the
+	 *         specified requirement expressions.
 	 */
-	RequirementExpression and(RequirementExpression... reqs);
+	AndExpression and(RequirementExpression expr1, RequirementExpression expr2, RequirementExpression... moreExprs);
 
 	/**
-	 * Convert a {@link Requirement} into a {@link RequirementExpression}. This
-	 * can be useful when working with a combination of {@code Requirement} and
-	 * {@code RequirementExpresion} objects.
-	 *
-	 * @param req The requirement to convert.
-	 * @return A {@link RequirementExpression} representing the requirement.
-	 */
-	RequirementExpression expression(Requirement req);
-
-	/**
-	 * Provide the negative of a {@link Requirement}.
-	 *
-	 * @param req The requirement to provide the negative of.
-	 * @return A {@link RequirementExpression} representing the negative of the
+	 * Wrap a {@link Requirement} in an {@link IdentityExpression}. This can be
+	 * useful when working with a combination of {@code Requirement}s and
+	 * {@code RequirementExpresion}s.
+	 * 
+	 * @param req The requirement to wrap in a requirement expression.
+	 * @return An {@link IdentityExpression} representing the specified
 	 *         requirement.
 	 */
-	RequirementExpression not(Requirement req);
+	IdentityExpression identity(Requirement req);
 
 	/**
-	 * Provide the negative of a {@link RequirementExpression}.
-	 *
-	 * @param req The requirement to provide the negative of.
-	 * @return A {@link RequirementExpression} representing the negative of the
-	 *         requirement.
+	 * Return the negation of a {@link RequirementExpression}.
+	 * 
+	 * @param expr The requirement expression to negate.
+	 * @return A {@link NotExpression} representing the {@code not} of the
+	 *         specified requirement expression.
 	 */
-	RequirementExpression not(RequirementExpression req);
+	NotExpression not(RequirementExpression expr);
 
 	/**
-	 * Combine multiple {@link Requirement} objects into a single expression
+	 * Combine two {@link RequirementExpression}s into a requirement expression
 	 * using the {@code or} operator.
-	 *
-	 * @param reqs The requirements to combine.
-	 * @return A {@link RequirementExpression} representing the combined
-	 *         requirements.
+	 * 
+	 * @param expr1 The first requirement expression to combine into the
+	 *        returned requirement expression.
+	 * @param expr2 The second requirement expression to combine into the
+	 *        returned requirement expression
+	 * @return An {@link OrExpression} representing an {@code or} of the
+	 *         specified requirement expressions.
 	 */
-	RequirementExpression or(Requirement... reqs);
+	OrExpression or(RequirementExpression expr1, RequirementExpression expr2);
 
 	/**
-	 * Combine multiple {@link RequirementExpression} objects into a single
+	 * Combine multiple {@link RequirementExpression}s into a requirement
 	 * expression using the {@code or} operator.
-	 *
-	 * @param reqs The requirements to combine.
-	 * @return A {@link RequirementExpression} representing the combined
-	 *         requirements.
+	 * 
+	 * @param expr1 The first requirement expression to combine into the
+	 *        returned requirement expression.
+	 * @param expr2 The second requirement expression to combine into the
+	 *        returned requirement expression
+	 * @param moreExprs Optional, additional requirement expressions to combine
+	 *        into the returned requirement expression.
+	 * @return An {@link OrExpression} representing an {@code or} of the
+	 *         specified requirement expressions.
 	 */
-	RequirementExpression or(RequirementExpression... reqs);
+	OrExpression or(RequirementExpression expr1, RequirementExpression expr2, RequirementExpression... moreExprs);
 }
