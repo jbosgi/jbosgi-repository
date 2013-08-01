@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
+import org.osgi.service.repository.IdentityExpression;
 import org.osgi.service.repository.RequirementBuilder;
 
 /**
@@ -73,6 +74,17 @@ public class RequirementBuilderImpl implements RequirementBuilder {
     @Override
     public synchronized Requirement build() {
         return new RequirementImpl(namespace, attributes, directives, resource);
+    }
+
+    @Override
+    public IdentityExpression buildExpression() {
+        final Requirement req = build();
+        return new IdentityExpression() {
+            @Override
+            public Requirement getRequirement() {
+                return req;
+            }
+        };
     }
 
     private static final class RequirementImpl implements Requirement {

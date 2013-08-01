@@ -18,30 +18,30 @@ package org.osgi.service.repository;
 
 import java.util.Collection;
 import java.util.Map;
-
+import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
 
 /**
  * A repository service that contains {@link Resource resources}.
- *
+ * 
  * <p>
  * Repositories may be registered as services and may be used as by a resolve
  * context during resolver operations.
- *
+ * 
  * <p>
  * Repositories registered as services may be filtered using standard service
  * properties.
- *
+ * 
  * @ThreadSafe
- * @noimplement
- * @author $Id: b039144310c2af8019c17dc596aea104fa2ea2c6 $
+ * @author $Id: a19f4e42f0fc6fbfe8c2ed5eccc6203f737474f6 $
  */
+@ProviderType
 public interface Repository {
 	/**
 	 * Service property to provide URLs related to this repository.
-	 *
+	 * 
 	 * <p>
 	 * The value of this property must be of type {@code String},
 	 * {@code String[]}, or {@code Collection<String>}.
@@ -50,7 +50,7 @@ public interface Repository {
 
 	/**
 	 * Find the capabilities that match the specified requirements.
-	 *
+	 * 
 	 * @param requirements The requirements for which matching capabilities
 	 *        should be returned. Must not be {@code null}.
 	 * @return A map of matching capabilities for the specified requirements.
@@ -63,37 +63,46 @@ public interface Repository {
 	Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> requirements);
 
 	/**
-	 * Find the resources that match the specified {@code RequirementExpression}
-	 *
-	 * @param requirementExpression The {@code RequirementExpression} for which
-	 *        matching capabilities should be returned. Must not be {@code null}
-	 *        .
+	 * Find the resources that match the specified requirement expression.
+	 * 
+	 * @param expression The {@code RequirementExpression} for which matching
+	 *        capabilities should be returned. Must not be {@code null}.
 	 * @return A collection of matching {@code Resource}s. If there are no
-	 *         matching resources, an empty collection is returned.
+	 *         matching resources, an empty collection is returned. The returned
+	 *         collection is the property of the caller and can be modified by
+	 *         the caller.
+	 * @since 1.1
 	 */
-	Collection<Resource> findProviders(RequirementExpression requirementExpression);
+	Collection<Resource> findProviders(RequirementExpression expression);
 
 	/**
-	 * Obtain an {@code ExpressionCombiner} implementation. This can be used to
-	 * combine multiple requirements into a complex requirement using
-	 * {@code and}, {@code or} and {@code not} operators.
-	 *
+	 * Return an expression combiner. An expression combiner can be used to
+	 * combine multiple requirement expressions into more complex requirement
+	 * expressions using {@link AndExpression and}, {@link OrExpression or} and
+	 * {@link NotExpression not} operators.
+	 * 
 	 * @return An {@code ExpressionCombiner}.
+	 * @since 1.1
 	 */
 	ExpressionCombiner getExpressionCombiner();
 
 	/**
-	 * Obtain a {@code RequirementBuilder} implementation which provides a
-	 * convenient way to create a requirement. For example:
-	 *
-	 * <pre>{@code
-     * Requirement myReq = .newRequirementBuilder("org.foo.ns1").
+	 * Return a new {@code RequirementBuilder} which provides a convenient way
+	 * to create a requirement.
+	 * 
+	 * <p>
+	 * For example:
+	 * 
+	 * <pre> 
+     * Requirement myReq = repository.newRequirementBuilder("org.foo.ns1").
      *   addDirective("filter", "(org.foo.ns1=val1)").
      *   addDirective("cardinality", "multiple").build();
-	 * }</pre>
-	 *
-	 * @param namespace The namespace for the requirement to be constructed.
-	 * @return A requirement builder for a requirement in the given namespace.
+	 * </pre>
+	 * 
+	 * @param namespace The namespace for the requirement to be created.
+	 * @return A new requirement builder for a requirement in the specified
+	 *         namespace.
+	 * @since 1.1
 	 */
 	RequirementBuilder newRequirementBuilder(String namespace);
 }

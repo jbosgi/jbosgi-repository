@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.osgi.service.repository;
 
+import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.resource.Requirement;
 
 /**
- * A wrapper to represent a simple {@link Requirement} object as a
- * {@link RequirementExpression}.
- *
+ * A {@link RequirementExpression} representing a requirement.
+ * 
  * @ThreadSafe
- * @noimplement
+ * @since 1.1
  */
-public interface SimpleRequirementExpression extends RequirementExpression {
+@ProviderType
+public interface IdentityExpression extends RequirementExpression {
 	/**
-	 * Obtain the wrapped {@link Requirement} object.
-	 *
-	 * @return The wrapped object.
+	 * Return the {@link Requirement} contained in this
+	 * {@code IdentityExpression}.
+	 * 
+	 * @return The requirement contained in this {@code IdentityExpression}.
 	 */
 	Requirement getRequirement();
 }

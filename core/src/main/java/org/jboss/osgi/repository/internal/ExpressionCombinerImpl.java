@@ -30,49 +30,39 @@ import java.util.List;
 import org.osgi.resource.Requirement;
 import org.osgi.service.repository.AndExpression;
 import org.osgi.service.repository.ExpressionCombiner;
+import org.osgi.service.repository.IdentityExpression;
 import org.osgi.service.repository.NotExpression;
 import org.osgi.service.repository.OrExpression;
 import org.osgi.service.repository.RequirementExpression;
-import org.osgi.service.repository.SimpleRequirementExpression;
 
 public class ExpressionCombinerImpl implements ExpressionCombiner {
     @Override
-    public RequirementExpression and(final Requirement... reqs) {
+    public AndExpression and(RequirementExpression expr1, RequirementExpression expr2) {
+        return and(expr1, expr2, new RequirementExpression[] {});
+    }
+
+    @Override
+    public AndExpression and(final RequirementExpression expr1, final RequirementExpression expr2, final RequirementExpression... moreExprs) {
         return new AndExpression() {
             @Override
-            public List<RequirementExpression> getRequirements() {
+            public List<RequirementExpression> getRequirementExpressions() {
                 List<RequirementExpression> l = new ArrayList<RequirementExpression>();
-                for (Requirement req : reqs) {
-                    l.add(expression(req));
-                }
+                l.add(expr1);
+                l.add(expr2);
+                l.addAll(Arrays.asList(moreExprs));
                 return l;
             }
 
             @Override
             public String toString() {
-                return formatRequirements("and", getRequirements());
+                return formatRequirements("and", getRequirementExpressions());
             }
         };
     }
 
     @Override
-    public RequirementExpression and(final RequirementExpression... reqs) {
-        return new AndExpression() {
-            @Override
-            public List<RequirementExpression> getRequirements() {
-                return Arrays.asList(reqs);
-            }
-
-            @Override
-            public String toString() {
-                return formatRequirements("and", getRequirements());
-            }
-        };
-    }
-
-    @Override
-    public RequirementExpression expression(final Requirement req) {
-        return new SimpleRequirementExpression() {
+    public IdentityExpression identity(final Requirement req) {
+        return new IdentityExpression() {
             @Override
             public Requirement getRequirement() {
                 return req;
@@ -86,65 +76,40 @@ public class ExpressionCombinerImpl implements ExpressionCombiner {
     }
 
     @Override
-    public RequirementExpression not(final Requirement req) {
+    public NotExpression not(final RequirementExpression req) {
         return new NotExpression() {
             @Override
-            public RequirementExpression getRequirement() {
-                return expression(req);
-            }
-
-            @Override
-            public String toString() {
-                return "not(" + getRequirement() + ")";
-            }
-        };
-    }
-
-    @Override
-    public RequirementExpression not(final RequirementExpression req) {
-        return new NotExpression() {
-            @Override
-            public RequirementExpression getRequirement() {
+            public RequirementExpression getRequirementExpression() {
                 return req;
             }
 
             @Override
             public String toString() {
-                return "not(" + getRequirement() + ")";
+                return "not(" + getRequirementExpression() + ")";
             }
         };
     }
 
     @Override
-    public RequirementExpression or(final Requirement... reqs) {
+    public OrExpression or(RequirementExpression expr1, RequirementExpression expr2) {
+        return or(expr1, expr2, new RequirementExpression[] {});
+    }
+
+    @Override
+    public OrExpression or(final RequirementExpression expr1, final RequirementExpression expr2, final RequirementExpression... moreExprs) {
         return new OrExpression() {
             @Override
-            public List<RequirementExpression> getRequirements() {
+            public List<RequirementExpression> getRequirementExpressions() {
                 List<RequirementExpression> l = new ArrayList<RequirementExpression>();
-                for (Requirement req : reqs) {
-                    l.add(expression(req));
-                }
+                l.add(expr1);
+                l.add(expr2);
+                l.addAll(Arrays.asList(moreExprs));
                 return l;
             }
 
             @Override
             public String toString() {
-                return formatRequirements("or", getRequirements());
-            }
-        };
-    }
-
-    @Override
-    public RequirementExpression or(final RequirementExpression... reqs) {
-        return new OrExpression() {
-            @Override
-            public List<RequirementExpression> getRequirements() {
-                return Arrays.asList(reqs);
-            }
-
-            @Override
-            public String toString() {
-                return formatRequirements("or", getRequirements());
+                return formatRequirements("or", getRequirementExpressions());
             }
         };
     }
