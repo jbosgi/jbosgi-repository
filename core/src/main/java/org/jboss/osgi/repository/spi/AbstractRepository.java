@@ -60,6 +60,8 @@ import org.osgi.service.repository.OrExpression;
 import org.osgi.service.repository.RepositoryContent;
 import org.osgi.service.repository.RequirementBuilder;
 import org.osgi.service.repository.RequirementExpression;
+import org.osgi.util.promise.Promise;
+import org.osgi.util.promise.Promises;
 
 /**
  * An abstract  {@link XRepository} that does nothing.
@@ -101,7 +103,13 @@ public abstract class AbstractRepository implements XRepository {
     public abstract Collection<Capability> findProviders(Requirement req);
 
     @Override
-    public Collection<Resource> findProviders(RequirementExpression re) {
+    public Promise<Collection<Resource>> findProviders(RequirementExpression re) {
+        // Using promises this can potentially be implemented
+        // asynchronously in the future.
+        return Promises.resolved(findProvidersImpl(re));
+    }
+
+    private Collection<Resource> findProvidersImpl(RequirementExpression re) {
         if (re == null)
             throw MESSAGES.illegalArgumentNull("re");
 
@@ -150,16 +158,16 @@ public abstract class AbstractRepository implements XRepository {
             }
             if (l == null) {
                 // first condition
-                l = new ArrayList<Resource>(findProviders(req));
+                l = new ArrayList<Resource>(findProvidersImpl(req));
             } else {
-                l.retainAll(findProviders(req));
+                l.retainAll(findProvidersImpl(req));
             }
         }
 
         // Handle the not expressions
         for (NotExpression req : notExpressions) {
             NotExpression ne = req;
-            l.removeAll(findProviders(ne.getRequirementExpression()));
+            l.removeAll(findProvidersImpl(ne.getRequirementExpression()));
         }
 
         return l;
@@ -168,7 +176,7 @@ public abstract class AbstractRepository implements XRepository {
     private Collection<Resource> findOrExpression(OrExpression re) {
         Set<Resource> l = new HashSet<Resource>();
         for (RequirementExpression req : re.getRequirementExpressions()) {
-            l.addAll(findProviders(req));
+            l.addAll(findProvidersImpl(req));
         }
         return l;
     }
@@ -180,7 +188,7 @@ public abstract class AbstractRepository implements XRepository {
             Requirement nreq = negateRequirement(req);
             return findSimpleRequirement(nreq);
         } else if (re instanceof NotExpression) {
-            return findProviders(((NotExpression) re).getRequirementExpression());
+            return findProvidersImpl(((NotExpression) re).getRequirementExpression());
         } else if (re instanceof AndExpression) {
             return findInverse(re);
         } else if (re instanceof OrExpression) {
@@ -190,7 +198,7 @@ public abstract class AbstractRepository implements XRepository {
     }
 
     private Collection<Resource> findInverse(RequirementExpression re) {
-        Collection<Resource> andProviders = findProviders(re);
+        Collection<Resource> andProviders = findProvidersImpl(re);
 
         Requirement matchAll = newRequirementBuilder("osgi.identity").build();
         Collection<Resource> allResources = findSimpleRequirement(matchAll);

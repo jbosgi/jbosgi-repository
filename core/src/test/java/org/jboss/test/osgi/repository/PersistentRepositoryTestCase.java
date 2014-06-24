@@ -158,7 +158,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
 
         RequirementExpression re = repository.getExpressionCombiner().identity(req);
-        Collection<Resource> resources = repository.findProviders(re);
+        Collection<Resource> resources = repository.findProviders(re).getValue();
         Assert.assertEquals(1, resources.size());
         XResource res = (XResource) resources.iterator().next();
         XIdentityCapability icap = res.getIdentityCapability();
@@ -174,7 +174,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         IdentityExpression re1 = ec.identity(req1);
         IdentityExpression re2 = ec.identity(req2);
         RequirementExpression re = ec.or(re1, re2);
-        Collection<Resource> resources = repository.findProviders(re);
+        Collection<Resource> resources = repository.findProviders(re).getValue();
         Assert.assertEquals(2, resources.size());
 
         for (Resource res : resources) {
@@ -213,7 +213,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         IdentityExpression req1 = repository.newRequirementBuilder("foo").addDirective("filter", "(A=1)").buildExpression();
         IdentityExpression req2 = repository.newRequirementBuilder("foo").addDirective("filter", "(B=3)").buildExpression();
 
-        Collection<Resource> providers = repository.findProviders(ec.and(req1, req2));
+        Collection<Resource> providers = repository.findProviders(ec.and(req1, req2)).getValue();
         assertEquals(1, providers.size());
 
         Resource res = providers.iterator().next();
@@ -249,7 +249,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         IdentityExpression req1 = repository.newRequirementBuilder("foo").addDirective("filter", "(A=1)").buildExpression();
         IdentityExpression req2 = repository.newRequirementBuilder("foo").addDirective("filter", "(B=3)").buildExpression();
 
-        Collection<Resource> providers = repository.findProviders(ec.and(req1, ec.not(req2)));
+        Collection<Resource> providers = repository.findProviders(ec.and(req1, ec.not(req2))).getValue();
         assertEquals(1, providers.size());
 
         Resource res = providers.iterator().next();
@@ -303,7 +303,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
 
         ExpressionCombiner ec = repository.getExpressionCombiner();
         RequirementExpression reqa = ec.identity(repository.newRequirementBuilder("x").addDirective("filter", "(test=yes)").build());
-        Collection<Resource> prova = repository.findProviders(reqa);
+        Collection<Resource> prova = repository.findProviders(reqa).getValue();
         assertEquals(2, prova.size());
         Set<Version> expectedVersions = new HashSet<Version>(
                 Arrays.asList(Version.parseVersion("1.2.3.beta4"), Version.parseVersion("2.3")));
@@ -313,7 +313,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         IdentityExpression reqb = repository.newRequirementBuilder("y").addDirective("filter", "(toast=lightly)").buildExpression();
         IdentityExpression reqc = repository.newRequirementBuilder("y").addDirective("filter", "(jam=no)").buildExpression();
         RequirementExpression reqd = ec.and(reqb, ec.not(reqc));
-        Collection<Resource> provb = repository.findProviders(reqd);
+        Collection<Resource> provb = repository.findProviders(reqd).getValue();
         assertEquals(2, provb.size());
         Set<Version> expectedVersions2 = new HashSet<Version>(
                 Arrays.asList(Version.parseVersion("2.0"), Version.parseVersion("2.3.0")));
@@ -321,7 +321,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         assertEquals(expectedVersions2, actualVersions2);
 
         RequirementExpression reqe = ec.or(reqa, reqd);
-        Collection<Resource> provc = repository.findProviders(reqe);
+        Collection<Resource> provc = repository.findProviders(reqe).getValue();
         assertEquals(3, provc.size());
         Set<Version> expectedVersions3 = new HashSet<Version>(
                 Arrays.asList(Version.parseVersion("1.2.3.beta4"), Version.parseVersion("2.0"), Version.parseVersion("2.3.0")));
@@ -376,12 +376,12 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         IdentityExpression req1 = repository.newRequirementBuilder("y").addDirective("filter", "(jam=*)").buildExpression();
         IdentityExpression req2 = repository.newRequirementBuilder("y").addDirective("filter", "(toast=*)").buildExpression();
         RequirementExpression rea = ec.and(req0, req1, req2);
-        Collection<Resource> prova = repository.findProviders(rea);
+        Collection<Resource> prova = repository.findProviders(rea).getValue();
         assertEquals(1, prova.size());
         assertEquals(Collections.singleton(Version.parseVersion("2.3")), getVersions(prova));
 
         RequirementExpression reb = ec.or(req0, req1, req2);
-        Collection<Resource> provb = repository.findProviders(reb);
+        Collection<Resource> provb = repository.findProviders(reb).getValue();
         assertEquals(4, provb.size());
         Set<Version> expectedVersions = new HashSet<Version>(
                 Arrays.asList(
@@ -393,13 +393,13 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
 
         IdentityExpression req3 = repository.newRequirementBuilder("y").addDirective("filter", "(jam=lots)").buildExpression();
         RequirementExpression rec = ec.not(req3);
-        Collection<Resource> provc = repository.findProviders(rec);
+        Collection<Resource> provc = repository.findProviders(rec).getValue();
         assertEquals(1, provc.size());
         assertEquals(Collections.singleton(Version.parseVersion("2.3.1")), getVersions(provc));
 
         IdentityExpression req4 = repository.newRequirementBuilder("osgi.identity").addDirective("filter", "(osgi.identity=foo)").buildExpression();
         RequirementExpression red = ec.not(req4);
-        Collection<Resource> provd = repository.findProviders(red);
+        Collection<Resource> provd = repository.findProviders(red).getValue();
         assertEquals(4, provd.size());
         Set<Version> expectedVersions2 = new HashSet<Version>(
                 Arrays.asList(
@@ -410,19 +410,19 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         assertEquals(expectedVersions2, getVersions(provd));
 
         IdentityExpression req5 = repository.newRequirementBuilder("y").addDirective("filter", "(jam=no)").buildExpression();
-        Collection<Resource> prove = repository.findProviders(req5);
+        Collection<Resource> prove = repository.findProviders(req5).getValue();
         assertEquals(1, prove.size());
         assertEquals(Collections.singleton(Version.parseVersion("2.3.1")), getVersions(prove));
 
         RequirementExpression ref = ec.not(ec.not(req5));
-        Collection<Resource> provf = repository.findProviders(ref);
+        Collection<Resource> provf = repository.findProviders(ref).getValue();
         assertEquals(1, provf.size());
         assertEquals(Collections.singleton(Version.parseVersion("2.3.1")), getVersions(prove));
 
         IdentityExpression req6 = repository.newRequirementBuilder("x").addDirective("filter", "(test=yes)").buildExpression();
         IdentityExpression req7 = repository.newRequirementBuilder("y").addDirective("filter", "(jam=lots)").buildExpression();
         RequirementExpression reg = ec.not(ec.and(req6, req7));
-        Collection<Resource> provg = repository.findProviders(reg);
+        Collection<Resource> provg = repository.findProviders(reg).getValue();
         assertEquals(3, provg.size());
         Set<Version> expectedVersions3 = new HashSet<Version>(
                 Arrays.asList(
@@ -434,7 +434,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         IdentityExpression req8 = repository.newRequirementBuilder("x").addDirective("filter", "(test=yes)").buildExpression();
         IdentityExpression req9 = repository.newRequirementBuilder("y").addDirective("filter", "(jam=lots)").buildExpression();
         RequirementExpression reh = ec.not(ec.or(req8, req9));
-        Collection<Resource> provh = repository.findProviders(reh);
+        Collection<Resource> provh = repository.findProviders(reh).getValue();
         assertEquals(1, provh.size());
         assertEquals(Collections.singleton(Version.parseVersion("2.3.1")), getVersions(provh));
     }

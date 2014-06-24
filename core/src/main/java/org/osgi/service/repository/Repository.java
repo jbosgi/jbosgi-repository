@@ -18,30 +18,32 @@ package org.osgi.service.repository;
 
 import java.util.Collection;
 import java.util.Map;
+
 import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
+import org.osgi.util.promise.Promise;
 
 /**
  * A repository service that contains {@link Resource resources}.
- * 
+ *
  * <p>
  * Repositories may be registered as services and may be used as by a resolve
  * context during resolver operations.
- * 
+ *
  * <p>
  * Repositories registered as services may be filtered using standard service
  * properties.
- * 
+ *
  * @ThreadSafe
- * @author $Id: a19f4e42f0fc6fbfe8c2ed5eccc6203f737474f6 $
+ * @author $Id: a33fa47aa8fb235eab97c1125cf3991366e833f5 $
  */
 @ProviderType
 public interface Repository {
 	/**
 	 * Service property to provide URLs related to this repository.
-	 * 
+	 *
 	 * <p>
 	 * The value of this property must be of type {@code String},
 	 * {@code String[]}, or {@code Collection<String>}.
@@ -50,7 +52,7 @@ public interface Repository {
 
 	/**
 	 * Find the capabilities that match the specified requirements.
-	 * 
+	 *
 	 * @param requirements The requirements for which matching capabilities
 	 *        should be returned. Must not be {@code null}.
 	 * @return A map of matching capabilities for the specified requirements.
@@ -58,29 +60,33 @@ public interface Repository {
 	 *         there are no matching capabilities for a specified requirement,
 	 *         then the value in the map for the specified requirement must be
 	 *         an empty collection. The returned map is the property of the
-	 *         caller and can be modified by the caller.
+	 *         caller and can be modified by the caller. The returned map may be
+	 *         lazily populated, so calling {@code size()} may result in a long
+	 *         running operation.
 	 */
 	Map<Requirement, Collection<Capability>> findProviders(Collection<? extends Requirement> requirements);
 
 	/**
 	 * Find the resources that match the specified requirement expression.
-	 * 
+	 *
 	 * @param expression The {@code RequirementExpression} for which matching
 	 *        capabilities should be returned. Must not be {@code null}.
-	 * @return A collection of matching {@code Resource}s. If there are no
-	 *         matching resources, an empty collection is returned. The returned
-	 *         collection is the property of the caller and can be modified by
-	 *         the caller.
+	 * @return A promise to a collection of matching {@code Resource}s. If there
+	 *         are no matching resources, an empty collection is returned. The
+	 *         returned collection is the property of the caller and can be
+	 *         modified by the caller. The returned collection may be lazily
+	 *         populated, so calling {@code size()} may result in a long running
+	 *         operation.
 	 * @since 1.1
 	 */
-	Collection<Resource> findProviders(RequirementExpression expression);
+	Promise<Collection<Resource>> findProviders(RequirementExpression expression);
 
 	/**
 	 * Return an expression combiner. An expression combiner can be used to
 	 * combine multiple requirement expressions into more complex requirement
 	 * expressions using {@link AndExpression and}, {@link OrExpression or} and
 	 * {@link NotExpression not} operators.
-	 * 
+	 *
 	 * @return An {@code ExpressionCombiner}.
 	 * @since 1.1
 	 */
@@ -89,16 +95,16 @@ public interface Repository {
 	/**
 	 * Return a new {@code RequirementBuilder} which provides a convenient way
 	 * to create a requirement.
-	 * 
+	 *
 	 * <p>
 	 * For example:
-	 * 
-	 * <pre> 
+	 *
+	 * <pre>
      * Requirement myReq = repository.newRequirementBuilder("org.foo.ns1").
      *   addDirective("filter", "(org.foo.ns1=val1)").
      *   addDirective("cardinality", "multiple").build();
 	 * </pre>
-	 * 
+	 *
 	 * @param namespace The namespace for the requirement to be created.
 	 * @return A new requirement builder for a requirement in the specified
 	 *         namespace.

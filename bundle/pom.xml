@@ -111,6 +111,8 @@
                             org.jboss.osgi.resolver.spi;version="${version.jboss.osgi.resolver}",
                             org.jboss.osgi.spi;version="${version.jboss.osgi.spi}",
                             org.osgi.service.repository;version="1.1",
+                            org.osgi.util.function;version="1",
+                            org.osgi.util.promise;version="1"
                         </Export-Package>
                         <Import-Package>
                             javax.xml.namespace, 
@@ -126,7 +128,9 @@
                             org.osgi.resource;version="[1.0,2.0)",
                             org.osgi.service.repository;version="[1.1,2.0)",
                             org.osgi.service.resolver;version="[1.0,2.0)",
+                            org.osgi.util.function;version="[1,2)",
                             org.osgi.util.tracker;version="[1.5,2.0)",
+                            org.osgi.util.promise;version="[1,2)",
                             org.jboss.modules;resolution:=optional,
                             org.jboss.modules.filter;resolution:=optional,
                             org.jboss.osgi.vfs;resolution:=optional,
