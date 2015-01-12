@@ -18,49 +18,50 @@
   limitations under the License.
   #L%
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <name>JBossOSGi Repository: TCK Integration</name>
-  <artifactId>jbosgi-repository-tck</artifactId>
-  <packaging>bundle</packaging>
-  <description>Integration with the OSGi TCK.</description>
+    <name>JBossOSGi Repository: TCK Integration</name>
+    <artifactId>jbosgi-repository-tck</artifactId>
+    <packaging>bundle</packaging>
+    <description>Integration with the OSGi TCK.</description>
 
-  <parent>
-    <groupId>org.jboss.osgi.repository</groupId>
-    <artifactId>jbosgi-repository-parent</artifactId>
-    <version>4.0.0.CR2-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <groupId>org.jboss.osgi.repository</groupId>
+        <artifactId>jbosgi-repository-parent</artifactId>
+        <version>4.0.0.Final</version>
+    </parent>
 
   <!-- Dependencies -->
-  <dependencies>
-    <dependency>
-      <groupId>org.jboss.osgi.repository</groupId>
-      <artifactId>jbosgi-repository-core</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.osgi.repository</groupId>
+            <artifactId>jbosgi-repository-core</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Bundle-Version>${project.version}</Bundle-Version>
-            <Bundle-Activator>org.jboss.test.osgi.repository.tck.Activator</Bundle-Activator>
-            <Export-Package />
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Bundle-Activator>org.jboss.test.osgi.repository.tck.Activator</Bundle-Activator>
+                        <Export-Package />
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

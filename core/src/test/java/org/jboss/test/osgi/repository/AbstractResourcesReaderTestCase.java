@@ -22,7 +22,7 @@ package org.jboss.test.osgi.repository;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jboss.osgi.repository.Namespace100;
 import org.jboss.osgi.repository.RepositoryReader;
