@@ -19,13 +19,14 @@
   #L%
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.jboss.osgi.repository</groupId>
         <artifactId>jbosgi-repository-parent</artifactId>
-        <version>4.0.0.CR2-SNAPSHOT</version>
+        <version>4.0.1.Final-SNAPSHOT</version>
     </parent>
 
     <name>JBossOSGi Repository: Bundle</name>
@@ -67,32 +68,39 @@
                 <executions>
                     <execution>
                         <phase>validate</phase>
-                        <goals><goal>parse-version</goal></goals>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
-                  <execution>
-                    <phase>validate</phase>
-                    <goals><goal>run</goal></goals>
-                    <configuration>
-                      <exportAntProperties>true</exportAntProperties>
-                      <target>
-                       <condition property="final.version">
-                          <matches string="${project.version}" pattern="(.*)Final" />
-                       </condition>
-                       <condition property="bundle.version" value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}">
-                          <isset property="final.version" />
-                       </condition>
-                       <condition property="bundle.version" value="${project.version}">
-                          <not><isset property="final.version" /></not>
-                       </condition>
-                       <echo message="bundle.version=${bundle.version}" />
-                      </target>
-                    </configuration>
-                  </execution>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <exportAntProperties>true</exportAntProperties>
+                            <target>
+                                <condition property="final.version">
+                                    <matches string="${project.version}" pattern="(.*)Final" />
+                                </condition>
+                                <condition property="bundle.version"
+                                    value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}">
+                                    <isset property="final.version" />
+                                </condition>
+                                <condition property="bundle.version" value="${project.version}">
+                                    <not>
+                                        <isset property="final.version" />
+                                    </not>
+                                </condition>
+                                <echo message="bundle.version=${bundle.version}" />
+                            </target>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -115,8 +123,8 @@
                             org.osgi.util.promise;version="1"
                         </Export-Package>
                         <Import-Package>
-                            javax.xml.namespace, 
-                            javax.xml.stream, 
+                            javax.xml.namespace,
+                            javax.xml.stream,
                             org.jboss.logging;version="[3.0,4.0)",
                             org.jboss.osgi.metadata;version="[3.0,4.0)",
                             org.jboss.osgi.resolver;version="[4.0,5.0)",
@@ -137,7 +145,7 @@
                             !org.jboss.shrinkwrap.api.asset
                         </Import-Package>
                         <Private-Package>
-                            org.jboss.osgi.metadata.spi, 
+                            org.jboss.osgi.metadata.spi,
                             org.jboss.osgi.metadata.internal,
                             org.jboss.osgi.repository.internal,
                         </Private-Package>
