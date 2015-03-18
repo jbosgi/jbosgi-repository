@@ -1,4 +1,5 @@
 package org.jboss.test.osgi.repository;
+
 /*
  * #%L
  * JBossOSGi Repository
@@ -133,24 +134,33 @@ public class RepositoryBundleTestCase extends AbstractRepositoryTest {
         Assert.assertNull("One resource only", reader.nextResource());
     }
 
-
     @Test
-    public void testRepositoryRestart() throws Exception {
+    public void testRepositoryRestart() throws Exception
+    {
+        MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
+        XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
+        Assert.assertNotNull("Requirement not null", req);
 
-        Bundle bundle = ((BundleReference)getRepository().getClass().getClassLoader()).getBundle();
+        Collection<Capability> providers = getRepository().findProviders(req);
+        Assert.assertEquals("One capability", 1, providers.size());
+
+        Bundle bundle = ((BundleReference) getRepository().getClass().getClassLoader()).getBundle();
         Assert.assertEquals("jbosgi-repository", bundle.getSymbolicName());
+
+        XRequirementBuilder builder = XRequirementBuilder.create(PackageNamespace.PACKAGE_NAMESPACE, "org.apache.felix.cm");
+        builder.getAttributes().put(PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE, "[1.0,2.0)");
+        req = builder.getRequirement();
+
+        providers = getRepository().findProviders(req);
+        Assert.assertEquals("One capability before stop", 1, providers.size());
 
         bundle.stop();
         Assert.assertNull(getRepository());
         bundle.start();
         Assert.assertNotNull(getRepository());
 
-        XRequirementBuilder builder = XRequirementBuilder.create(PackageNamespace.PACKAGE_NAMESPACE, "org.apache.felix.cm");
-        builder.getAttributes().put(PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE, "[1.0,2.0)");
-        XRequirement req = builder.getRequirement();
-
-        Collection<Capability> providers = getRepository().findProviders(req);
-        Assert.assertEquals("One capability", 1, providers.size());
+        providers = getRepository().findProviders(req);
+        Assert.assertEquals("One capability after restart", 1, providers.size());
 
         XCapability cap = (XCapability) providers.iterator().next();
         XPackageCapability pcap = cap.adapt(XPackageCapability.class);

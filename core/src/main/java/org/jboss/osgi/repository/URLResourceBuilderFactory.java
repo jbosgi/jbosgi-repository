@@ -26,14 +26,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
+
 import org.jboss.osgi.repository.spi.AbstractContentCapability;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.XResourceBuilderFactory;
 import org.jboss.osgi.resolver.spi.AbstractResource;
+import org.jboss.vfs.VFSUtils;
 import org.osgi.service.repository.ContentNamespace;
 import org.osgi.service.repository.RepositoryContent;
 
@@ -97,13 +101,31 @@ public final class URLResourceBuilderFactory extends XResourceBuilderFactory<XRe
         public InputStream getContent() {
             try {
                 if (contentURL.getProtocol().equals("file")) {
-                    return new FileInputStream(new File(contentURL.getPath()));
+                    return new FileInputStream(urlToFile(contentURL));
                 } else {
                     return contentURL.openStream();
                 }
             } catch (IOException ex) {
                 throw MESSAGES.cannotObtainInputStream(ex, this);
+            } catch (URISyntaxException ex) {
+                throw MESSAGES.cannotObtainInputStream(ex, this);
             }
         }
+    }
+
+    public static File urlToFile(URL url) throws URISyntaxException
+    {
+        URI uri;
+        try {
+            uri = url.toURI();
+        }
+        catch (URISyntaxException e) {
+            String urispec = url.toExternalForm();
+            // Escape percent sign and spaces
+            urispec = urispec.replaceAll("%", "%25");
+            urispec = urispec.replaceAll(" ", "%20");
+            uri = new URI(urispec);
+        }
+        return new File(uri.getSchemeSpecificPart());
     }
 }

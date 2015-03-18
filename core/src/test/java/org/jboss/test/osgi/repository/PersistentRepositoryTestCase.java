@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,11 +39,11 @@ import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
 import org.junit.Assert;
-
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryStorageFactory;
+import org.jboss.osgi.repository.URLResourceBuilderFactory;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
@@ -124,7 +125,7 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         verifyCapability(cap);
     }
 
-    private void verifyCapability(XCapability cap) throws IOException, MalformedURLException, BundleException {
+    private void verifyCapability(XCapability cap) throws IOException, MalformedURLException, BundleException, URISyntaxException {
 
         XResource resource = cap.getResource();
         XIdentityCapability icap = resource.getIdentityCapability();
@@ -143,7 +144,8 @@ public class PersistentRepositoryTestCase extends AbstractRepositoryTest {
         if (!absolutePath.startsWith("/"))
             absolutePath = "/" + absolutePath;
 
-        Assert.assertTrue("Local path: " + url, url.getPath().startsWith(absolutePath));
+        Assert.assertTrue("Local path '" + url + "' doesn't start with '" + absolutePath + "'",
+                URLResourceBuilderFactory.urlToFile(url).getPath().startsWith(absolutePath));
 
         RepositoryContent content = (RepositoryContent) resource;
         Manifest manifest = new JarInputStream(content.getContent()).getManifest();
