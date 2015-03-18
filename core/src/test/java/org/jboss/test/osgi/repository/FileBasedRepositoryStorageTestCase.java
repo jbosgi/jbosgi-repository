@@ -38,12 +38,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.jboss.osgi.metadata.OSGiManifestBuilder;
 import org.jboss.osgi.repository.RepositoryContentHelper;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
+import org.jboss.osgi.repository.URLResourceBuilderFactory;
 import org.jboss.osgi.repository.XContentCapability;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.repository.spi.FileBasedRepositoryStorage;
@@ -62,7 +61,9 @@ import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.osgi.resource.Capability;
@@ -118,7 +119,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         verifyProviders(storage);
     }
 
-    @Test
+    @Test @Ignore // JBVFS-200
     public void testAddResourceWithMultipleContent() throws Exception {
         // Add a resource from XML
         RepositoryReader reader = getRepositoryReader("xml/repository-testB.xml");
@@ -147,7 +148,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         Assert.assertEquals(digest, ccap.getDigest());
         Assert.assertEquals("application/vnd.osgi.bundle", ccap.getMimeType());
         Assert.assertEquals(new Long(400), ccap.getSize());
-        File contentFile = new File(new URL(ccap.getContentURL()).getPath()).getCanonicalFile();
+        File contentFile = URLResourceBuilderFactory.urlToFile(new URL(ccap.getContentURL())).getCanonicalFile();
         Assert.assertTrue("File exists: " + contentFile, contentFile.exists());
         Assert.assertTrue("Path starts with: " + storageDir.getPath(), contentFile.getPath().startsWith(storageDir.getPath()));
 
@@ -155,7 +156,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         Assert.assertFalse(digest.equals(ccap.getDigest()));
         Assert.assertEquals("text/plain", ccap.getMimeType());
         Assert.assertEquals(new Long("[bundleA:0.0.0]".length()), ccap.getSize());
-        contentFile = new File(new URL(ccap.getContentURL()).getPath()).getCanonicalFile();
+        contentFile = URLResourceBuilderFactory.urlToFile(new URL(ccap.getContentURL())).getCanonicalFile();
         Assert.assertTrue("File exists: " + contentFile, contentFile.exists());
         Assert.assertTrue("Path starts with: " + storageDir.getPath(), contentFile.getPath().startsWith(storageDir.getPath()));
 
@@ -164,7 +165,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         br.close();
     }
 
-    @Test
+    @Test @Ignore // JBVFS-200
     public void testAddResourceFromOSGiMetadata() throws Exception {
 
         XResourceBuilder<XResource> builder = XResourceBuilderFactory.create();
@@ -252,7 +253,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         Assert.assertEquals(new Long(400), ccap.getSize());
         Assert.assertEquals(new Long(400), cap.getAttribute(CAPABILITY_SIZE_ATTRIBUTE));
         String contentURL = (String) ccap.getAttribute(CAPABILITY_URL_ATTRIBUTE);
-        File contentFile = new File(new URL(contentURL).getPath()).getCanonicalFile();
+        File contentFile = URLResourceBuilderFactory.urlToFile(new URL(contentURL)).getCanonicalFile();
         Assert.assertTrue("File exists: " + contentFile, contentFile.exists());
         Assert.assertTrue("Path starts with: " + storageDir.getPath(), contentFile.getPath().startsWith(storageDir.getPath()));
     }

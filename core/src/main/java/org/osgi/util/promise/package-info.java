@@ -1,5 +1,5 @@
 /*
- * Copyright (c) OSGi Alliance (2010, 2013). All Rights Reserved.
+ * Copyright (c) OSGi Alliance (2014). All Rights Reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,26 @@
  */
 
 /**
- * Repository Service Package Version 1.1.
+ * Promise Package Version 1.0.
  * 
  * <p>
  * Bundles wishing to use this package must list the package in the
- * Import-Package header of the bundle's manifest. This package has two types of
- * users: the consumers that use the API in this package and the providers that
- * implement the API in this package.
+ * Import-Package header of the bundle's manifest.
  * 
  * <p>
  * Example import for consumers using the API in this package:
  * <p>
- * {@code  Import-Package: org.osgi.service.repository; version="[1.1,2.0)"}
+ * {@code  Import-Package: org.osgi.util.promise; version="[1.0,2.0)"}
  * <p>
  * Example import for providers implementing the API in this package:
  * <p>
- * {@code  Import-Package: org.osgi.service.repository; version="[1.1,1.2)"}
+ * {@code  Import-Package: org.osgi.util.promise; version="[1.0,1.1)"}
  * 
- * @author $Id: 108024a32a1e0ccd17a73d8540c7c5087dd8a430 $
+ * @author $Id: 5a3ec65d3b7e7ebdd2278d75675b8a808e6cb2bf $
  */
 
-@Version("1.1")
-package org.osgi.service.repository;
+@Version("1.0")
+package org.osgi.util.promise;
 
 import org.osgi.annotation.versioning.Version;
 

@@ -19,8 +19,6 @@
  */
 package org.jboss.test.osgi.repository;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -39,6 +37,7 @@ import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XRequirementBuilder;
 import org.jboss.osgi.resolver.XResource;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -73,26 +72,26 @@ public class MavenIdentityRepositoryTestCase extends AbstractRepositoryTest {
         MavenCoordinates mavenid = MavenCoordinates.parse("org.apache.felix:org.apache.felix.configadmin:1.2.8");
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
-        assertEquals("One capability", 1, caps.size());
+        Assert.assertEquals("One capability", 1, caps.size());
         XIdentityCapability cap = (XIdentityCapability) caps.iterator().next();
 
         XResource resource = cap.getResource();
         XIdentityCapability icap = resource.getIdentityCapability();
-        assertEquals(IdentityNamespace.IDENTITY_NAMESPACE, icap.getNamespace());
-        assertEquals("org.apache.felix.configadmin", icap.getName());
-        assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());
-        assertEquals(IdentityNamespace.TYPE_BUNDLE, icap.getType());
+        Assert.assertEquals(IdentityNamespace.IDENTITY_NAMESPACE, icap.getNamespace());
+        Assert.assertEquals("org.apache.felix.configadmin", icap.getName());
+        Assert.assertEquals(Version.parseVersion("1.2.8"), icap.getVersion());
+        Assert.assertEquals(IdentityNamespace.TYPE_BUNDLE, icap.getType());
 
         // Add the resource to storage and verify again
         resource = storage.addResource(resource);
         caps = resource.getCapabilities(ContentNamespace.CONTENT_NAMESPACE);
-        assertEquals("One capability", 1, caps.size());
+        Assert.assertEquals("One capability", 1, caps.size());
 
         RepositoryContent content = (RepositoryContent) resource;
         Manifest manifest = new JarInputStream(content.getContent()).getManifest();
         OSGiMetaData metaData = OSGiMetaDataBuilder.load(manifest);
-        assertEquals("org.apache.felix.configadmin", metaData.getBundleSymbolicName());
-        assertEquals(Version.parseVersion("1.2.8"), metaData.getBundleVersion());
+        Assert.assertEquals("org.apache.felix.configadmin", metaData.getBundleSymbolicName());
+        Assert.assertEquals(Version.parseVersion("1.2.8"), metaData.getBundleVersion());
     }
 
     @Test
@@ -100,7 +99,7 @@ public class MavenIdentityRepositoryTestCase extends AbstractRepositoryTest {
         MavenCoordinates mavenid = MavenCoordinates.parse("org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final");
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
-        assertEquals("No capability", 0, caps.size());
+        Assert.assertEquals("No capability", 0, caps.size());
     }
 
     @Test
@@ -108,6 +107,6 @@ public class MavenIdentityRepositoryTestCase extends AbstractRepositoryTest {
         MavenCoordinates mavenid = MavenCoordinates.parse("foo:bar:1.2.8");
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
         Collection<Capability> caps = repository.findProviders(req);
-        assertEquals("No capability", 0, caps.size());
+        Assert.assertEquals("No capability", 0, caps.size());
     }
 }
