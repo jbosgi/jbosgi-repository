@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.jboss.osgi.repository</groupId>
         <artifactId>jbosgi-repository-parent</artifactId>
-        <version>4.0.0.Final</version>
+        <version>4.0.1.Final-SNAPSHOT</version>
     </parent>
 
     <name>JBossOSGi Repository: API</name>
