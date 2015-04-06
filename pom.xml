@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.osgi</groupId>
         <artifactId>jbosgi-parent</artifactId>
-        <version>1.0.26</version>
+        <version>1.0.27</version>
     </parent>
 
     <name>JBossOSGi Repository</name>
@@ -34,14 +34,14 @@
     <artifactId>jbosgi-repository-parent</artifactId>
     <packaging>pom</packaging>
 
-    <version>4.0.0.Final</version>
+    <version>4.0.1.Final</version>
 
     <!-- Source -->
     <scm>
         <connection>scm:git:git://github.com/jbosgi/jbosgi-repository.git</connection>
         <developerConnection>scm:git:git@github.com:jbosgi/jbosgi-repository.git</developerConnection>
         <url>http://github.com/jbosgi/jbosgi-repository</url>
-        <tag>4.0.0.Final</tag>
+        <tag>4.0.1.Final</tag>
     </scm>
 
     <!-- Licenses -->
@@ -54,11 +54,9 @@
 
     <!-- Properties -->
     <properties>
-        <version.jboss.arquillian.osgi>2.1.0.CR18</version.jboss.arquillian.osgi>
-
-        <version.jboss.osgi.framework>3.0.5.Final</version.jboss.osgi.framework>
+        <version.jboss.osgi.framework>3.0.6.Final</version.jboss.osgi.framework>
         <version.jboss.osgi.metadata>4.0.0.Final</version.jboss.osgi.metadata>
-        <version.jboss.osgi.resolver>4.0.2.Final</version.jboss.osgi.resolver>
+        <version.jboss.osgi.resolver>4.0.3.Final</version.jboss.osgi.resolver>
         <version.jboss.osgi.spi>4.0.2.Final</version.jboss.osgi.spi>
         <version.jboss.osgi.testing>2.0.2.Final</version.jboss.osgi.testing>
     </properties>
