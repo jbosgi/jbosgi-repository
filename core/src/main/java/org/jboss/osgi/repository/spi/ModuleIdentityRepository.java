@@ -192,8 +192,10 @@ public class ModuleIdentityRepository extends AbstractRepository {
          */
         // Add a package capability for every exported path
         for(String path : module.getExportedPaths()) {
-            String packageName = path.replace('/', '.');
-            builder.addExportPackages(packageName);
+            if (path.length() > 0) {
+                String packageName = path.replace('/', '.');
+                builder.addExportPackages(packageName);
+            }
         }
 
         return builder.getOSGiMetaData();
