@@ -30,12 +30,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -44,7 +41,6 @@ import org.jboss.modules.ModuleClassLoader;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoadException;
 import org.jboss.modules.ModuleLoader;
-import org.jboss.modules.Resource;
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.repository.XRepository;
@@ -191,22 +187,12 @@ public class ModuleIdentityRepository extends AbstractRepository {
         }
         OSGiMetaDataBuilder builder = OSGiMetaDataBuilder.createBuilder(symbolicName, version);
 
+        /****
+         * Must be in sync with AbstractResourceBuilder#loadFrom
+         */
         // Add a package capability for every exported path
-        Set<String> paths = new HashSet<String>();
-        Iterator<Resource> it = module.getClassLoader().iterateResources("", true);
-        while (it.hasNext()) {
-            Resource res = it.next();
-            String path = res.getName();
-            if (!path.endsWith(".class"))
-                continue;
-
-            int index = path.lastIndexOf("/");
-            if (index <= 0)
-                continue;
-
-            path = path.substring(0, index);
-            if (!paths.contains(path)) {
-                paths.add(path);
+        for(String path : module.getExportedPaths()) {
+            if (path.length() > 0) {
                 String packageName = path.replace('/', '.');
                 builder.addExportPackages(packageName);
             }
