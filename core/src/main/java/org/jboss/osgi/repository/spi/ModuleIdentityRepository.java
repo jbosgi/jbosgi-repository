@@ -48,6 +48,7 @@ import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.XResourceBuilderFactory;
+import org.jboss.osgi.resolver.spi.OSGiMetaDataProcessor;
 import org.osgi.framework.Version;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
@@ -175,30 +176,7 @@ public class ModuleIdentityRepository extends AbstractRepository {
     }
 
     public OSGiMetaData getOSGiMetaDataFromModule(Module module) {
-
-        // Get symbolic name & version
-        ModuleIdentifier moduleId = module.getIdentifier();
-        String symbolicName = moduleId.getName();
-        Version version;
-        try {
-            version = Version.parseVersion(moduleId.getSlot());
-        } catch (IllegalArgumentException ex) {
-            version = Version.emptyVersion;
-        }
-        OSGiMetaDataBuilder builder = OSGiMetaDataBuilder.createBuilder(symbolicName, version);
-
-        /****
-         * Must be in sync with AbstractResourceBuilder#loadFrom
-         */
-        // Add a package capability for every exported path
-        for(String path : module.getExportedPaths()) {
-            if (path.length() > 0) {
-                String packageName = path.replace('/', '.');
-                builder.addExportPackages(packageName);
-            }
-        }
-
-        return builder.getOSGiMetaData();
+        return OSGiMetaDataProcessor.loadOsgiMetaData(module);
     }
 
     public ModuleIdentifier getModuleIdentifier(XResource resource) {
