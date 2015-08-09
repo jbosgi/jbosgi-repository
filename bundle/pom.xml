@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.osgi.repository</groupId>
         <artifactId>jbosgi-repository-parent</artifactId>
-        <version>4.0.3.Final-SNAPSHOT</version>
+        <version>4.0.3.Final</version>
     </parent>
 
     <name>JBossOSGi Repository: Bundle</name>
