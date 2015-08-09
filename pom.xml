@@ -54,11 +54,11 @@
 
     <!-- Properties -->
     <properties>
-        <version.jboss.osgi.framework>3.0.7.Final</version.jboss.osgi.framework>
-        <version.jboss.osgi.metadata>4.0.1.Final</version.jboss.osgi.metadata>
-        <version.jboss.osgi.resolver>4.0.4.Final</version.jboss.osgi.resolver>
-        <version.jboss.osgi.spi>4.0.2.Final</version.jboss.osgi.spi>
-        <version.jboss.osgi.testing>2.0.2.Final</version.jboss.osgi.testing>
+        <version.jboss.osgi.framework>3.0.8.Final</version.jboss.osgi.framework>
+        <version.jboss.osgi.metadata>4.0.2.Final</version.jboss.osgi.metadata>
+        <version.jboss.osgi.resolver>4.0.6.Final</version.jboss.osgi.resolver>
+        <version.jboss.osgi.spi>4.0.3.Final</version.jboss.osgi.spi>
+        <version.jboss.osgi.testing>2.0.3.Final</version.jboss.osgi.testing>
     </properties>
 
     <!-- Dependency Management -->
