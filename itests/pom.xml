@@ -35,7 +35,7 @@
     <parent>
         <groupId>org.jboss.osgi.repository</groupId>
         <artifactId>jbosgi-repository-parent</artifactId>
-        <version>4.0.2.Final</version>
+        <version>4.0.3.Final</version>
     </parent>
 
     <!-- Dependencies -->
@@ -84,6 +84,16 @@
         <dependency>
             <groupId>org.jboss.modules</groupId>
             <artifactId>jboss-modules</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jboss-vfs</artifactId>
             <scope>test</scope>
         </dependency>
 
