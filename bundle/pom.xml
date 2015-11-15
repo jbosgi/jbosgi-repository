@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.osgi.repository</groupId>
         <artifactId>jbosgi-repository-parent</artifactId>
-        <version>4.0.4.Final-SNAPSHOT</version>
+        <version>5.0.1.Final-SNAPSHOT</version>
     </parent>
 
     <name>JBossOSGi Repository: Bundle</name>
@@ -110,12 +110,8 @@
                         <Bundle-Version>${bundle.version}</Bundle-Version>
                         <Bundle-Activator>org.jboss.osgi.repository.internal.RepositoryActivator</Bundle-Activator>
                         <Export-Package>
-                            org.jboss.osgi.metadata;version="${version.jboss.osgi.metadata}",
                             org.jboss.osgi.repository;version="${bundle.version}",
                             org.jboss.osgi.repository.spi;version="${bundle.version}",
-                            org.jboss.osgi.resolver;version="${version.jboss.osgi.resolver}",
-                            org.jboss.osgi.resolver.spi;version="${version.jboss.osgi.resolver}",
-                            org.jboss.osgi.spi;version="${version.jboss.osgi.spi}",
                             org.osgi.service.repository;version="1.1",
                             org.osgi.util.function;version="1",
                             org.osgi.util.promise;version="1"
@@ -124,10 +120,10 @@
                             javax.xml.namespace,
                             javax.xml.stream,
                             org.jboss.logging;version="[3.0,4.0)",
-                            org.jboss.osgi.metadata;version="[3.0,4.0)",
-                            org.jboss.osgi.resolver;version="[4.0,5.0)",
-                            org.jboss.osgi.resolver.spi;version="[4.0,5.0)",
-                            org.jboss.osgi.spi;version="[4.0,5.0)",
+                            org.jboss.osgi.metadata;version="[5.0,6.0)",
+                            org.jboss.osgi.resolver;version="[5.0,6.0)",
+                            org.jboss.osgi.resolver.spi;version="[5.0,6.0)",
+                            org.jboss.osgi.spi;version="[5.0,6.0)",
                             org.osgi.framework;version="[1.7,2.0)",
                             org.osgi.framework.hooks.resolver;version="[1.0,2.0)",
                             org.osgi.framework.wiring;version="[1.1,2.0)",
@@ -143,9 +139,7 @@
                             !org.jboss.shrinkwrap.api.asset
                         </Import-Package>
                         <Private-Package>
-                            org.jboss.osgi.metadata.spi,
-                            org.jboss.osgi.metadata.internal,
-                            org.jboss.osgi.repository.internal,
+                            org.jboss.osgi.repository.internal
                         </Private-Package>
                     </instructions>
                 </configuration>
