@@ -64,7 +64,7 @@ import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.Promises;
 
 /**
- * An abstract  {@link XRepository} that does nothing.
+ * An abstract {@link XRepository} that does nothing.
  *
  * @author thomas.diesler@jboss.com
  * @author David Bosschaert
@@ -219,11 +219,8 @@ public abstract class AbstractRepository implements XRepository {
             throw new IllegalStateException("No filter directive: " + req);
         }
         String invFilter = "(!" + filter + ")";
-        return newRequirementBuilder(req.getNamespace()).
-            setAttributes(req.getAttributes()).
-            setDirectives(req.getDirectives()).
-            addDirective("filter", invFilter).
-            build();
+        return newRequirementBuilder(req.getNamespace()).setAttributes(req.getAttributes())
+                .setDirectives(req.getDirectives()).addDirective("filter", invFilter).build();
     }
 
     @Override
@@ -238,6 +235,7 @@ public abstract class AbstractRepository implements XRepository {
 
     /**
      * Convert the given resource into the target resource type.
+     * 
      * @return The target resource
      */
     protected XResource getTargetResource(XResource resource) throws Exception {
@@ -279,13 +277,11 @@ public abstract class AbstractRepository implements XRepository {
     protected Manifest getResourceManifest(XResource resource) throws IOException {
         Manifest manifest = null;
         if (resource instanceof RepositoryContent) {
-            InputStream content = ((RepositoryContent) resource).getContent();;
-            try {
-                manifest = new JarInputStream(content).getManifest();
+            try (InputStream content = ((RepositoryContent) resource).getContent();
+                    JarInputStream jis = new JarInputStream(content)) {
+                manifest = jis.getManifest();
             } catch (IOException ex) {
                 LOGGER.debugf("Cannot access manifest from: %s", resource);
-            } finally {
-                safeClose(content);
             }
         }
         return manifest;
@@ -296,16 +292,6 @@ public abstract class AbstractRepository implements XRepository {
             return new URL(urlspec);
         } catch (MalformedURLException e) {
             throw MESSAGES.invalidContentURL(urlspec);
-        }
-    }
-
-    private void safeClose(InputStream content) {
-        try {
-            if (content != null) {
-                content.close();
-            }
-        } catch (IOException e) {
-            // ignore
         }
     }
 }
