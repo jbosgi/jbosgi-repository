@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.osgi</groupId>
         <artifactId>jbosgi-parent</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.2</version>
     </parent>
 
     <name>JBossOSGi Repository</name>
@@ -34,14 +34,14 @@
     <artifactId>jbosgi-repository-parent</artifactId>
     <packaging>pom</packaging>
 
-    <version>6.0.1.Final-SNAPSHOT</version>
+    <version>6.0.1.Final</version>
 
     <!-- Source -->
     <scm>
         <connection>scm:git:git://github.com/jbosgi/jbosgi-repository.git</connection>
         <developerConnection>scm:git:git@github.com:jbosgi/jbosgi-repository.git</developerConnection>
         <url>http://github.com/jbosgi/jbosgi-repository</url>
-        <tag>HEAD</tag>
+        <tag>6.0.1.Final</tag>
     </scm>
 
     <!-- Licenses -->
@@ -67,27 +67,27 @@
             <dependency>
                 <groupId>org.jboss.osgi.framework</groupId>
                 <artifactId>jbosgi-framework-core</artifactId>
-                <version>${version.jboss.osgi.framework}</version>
+                <version>5.0.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.osgi.metadata</groupId>
                 <artifactId>jbosgi-metadata</artifactId>
-                <version>${version.jboss.osgi.metadata}</version>
+                <version>6.0.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.osgi.resolver</groupId>
                 <artifactId>jbosgi-resolver-api</artifactId>
-                <version>${version.jboss.osgi.resolver}</version>
+                <version>6.0.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.osgi.spi</groupId>
                 <artifactId>jbosgi-spi</artifactId>
-                <version>${version.jboss.osgi.spi}</version>
+                <version>6.0.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.osgi.testing</groupId>
                 <artifactId>jbosgi-testing</artifactId>
-                <version>${version.jboss.osgi.testing}</version>
+                <version>4.0.1.Final</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
