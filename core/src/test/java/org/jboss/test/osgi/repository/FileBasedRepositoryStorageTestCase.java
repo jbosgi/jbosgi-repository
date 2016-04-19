@@ -119,7 +119,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         verifyProviders(storage);
     }
 
-    @Test @Ignore // JBVFS-200
+    @Test
     public void testAddResourceWithMultipleContent() throws Exception {
         // Add a resource from XML
         RepositoryReader reader = getRepositoryReader("xml/repository-testB.xml");
@@ -165,7 +165,7 @@ public class FileBasedRepositoryStorageTestCase extends AbstractRepositoryTest {
         br.close();
     }
 
-    @Test @Ignore // JBVFS-200
+    @Test
     public void testAddResourceFromOSGiMetadata() throws Exception {
 
         XResourceBuilder<XResource> builder = XResourceBuilderFactory.create();
