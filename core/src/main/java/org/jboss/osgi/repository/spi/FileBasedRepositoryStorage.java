@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -222,8 +223,16 @@ public class FileBasedRepositoryStorage extends MemoryRepositoryStorage {
         } else {
             String contentURL = (String) ccap.getAttribute(ContentNamespace.CAPABILITY_URL_ATTRIBUTE);
             try {
-                input = new URL(contentURL).openStream();
+                URL url = new URL(contentURL);
+                if (url.getProtocol().equals("file")) {
+                    return new FileInputStream(URLResourceBuilderFactory.urlToFile(url));
+                } else {
+                    input = url.openStream();
+                }
             } catch (IOException ex) {
+                throw MESSAGES.cannotAccessContentURL(ex, contentURL);
+            }
+            catch (URISyntaxException ex) {
                 throw MESSAGES.cannotAccessContentURL(ex, contentURL);
             }
         }
